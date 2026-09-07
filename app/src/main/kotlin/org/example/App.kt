@@ -1,11 +1,21 @@
 package org.example
 
-import org.example.model.IngresoDatos
-import org.example.service.CalculadorFisico
-import org.example.service.CalculadorTiroOblicuo
-
 fun main() {
-    val calculador: CalculadorFisico = CalculadorTiroOblicuo() // Linea 1
-    val resultado = calculador.calcular(IngresoDatos(velocidadInicial = 20.0, anguloGrados = 45.0)) // Linea 2
-    println(resultado) // Linea 3
+    // Datos de ejemplo: velocidad inicial 50 m/s, ángulo 45°
+    val entrada = DatosEntrada(velocidadInicial = 50.0, anguloGrados = 45.0)
+    val calculadora = TiroOblicuo()
+    val resultados = calculadora.calcular(entrada)
+
+    // Mostramos los resultados formateados
+    println("=== Tiro Oblicuo ===")
+    println("Velocidad inicial: ${entrada.velocidadInicial} m/s")
+    println("Ángulo: ${entrada.anguloGrados}°")
+    println()
+    println("Vx (componente horizontal): ${resultados.vx} m/s")
+    println("Vy (componente vertical):   ${resultados.vy} m/s")
+    println()
+    println("Tiempo de subida:   ${resultados.tiempoSubida} s")
+    println("Tiempo total vuelo: ${resultados.tiempoTotal} s")
+    println("Altura máxima:     ${resultados.alturaMaxima} m")
+    println("Alcance horizontal:${resultados.alcanceHorizontal} m")
 }
