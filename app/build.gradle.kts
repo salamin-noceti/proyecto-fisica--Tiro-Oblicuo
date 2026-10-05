@@ -1,18 +1,34 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm")
+    alias(libs.plugins.kotlin.jvm)
     application
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
+    testImplementation(libs.junit.jupiter.engine)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    implementation(libs.guava)
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 application {
     mainClass.set("org.example.AppKt")
 }
 
-// Gradle no reenvía el teclado al proceso java por defecto.
-// Con esto, la tarea "run" conecta la consola del usuario con el programa.
+// Habilita la lectura por teclado (readln) desde la consola al ejecutar 'gradle run'
 tasks.named<JavaExec>("run") {
     standardInput = System.`in`
 }
 
-repositories {
-    mavenCentral()
+tasks.named<Test>("test") {
+    useJUnitPlatform()
 }
