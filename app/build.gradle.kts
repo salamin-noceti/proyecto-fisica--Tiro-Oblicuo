@@ -21,7 +21,12 @@ java {
 }
 
 application {
-    mainClass = "org.example.AppKt"
+    mainClass.set("org.example.AppKt")
+}
+
+// Habilita la lectura por teclado (readln) desde la consola al ejecutar 'gradle run'
+tasks.named<JavaExec>("run") {
+    standardInput = System.`in`
 }
 
 tasks.named<Test>("test") {

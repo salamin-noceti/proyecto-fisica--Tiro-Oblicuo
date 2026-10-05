@@ -1,46 +1,48 @@
-// Implementa los cálculos físicos del tiro oblicuo usando las fórmulas de cinemática.
-// Implementa la interfaz CalculadorFisico (DIP de SOLID).
 package org.example.service
 
 import org.example.model.IngresoDatos
 import org.example.model.ResultadoTiroOblicuo
-import kotlin.math.*
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
+/**
+ * Implementación concreta de [CalculadorFisico] que aplica
+ * las fórmulas del tiro oblicuo (movimiento parabólico).
+ *
+ * La aceleración de la gravedad está fijada en [GRAVEDAD] y no se pide por
+ * consola: es una constante física del modelo, no un dato del ejercicio.
+ */
 class CalculadorTiroOblicuo : CalculadorFisico {
 
-    // Aceleración de la gravedad en m/s² (cerca de la superficie terrestre)
-    private val gravedad: Double = 9.81
-
     override fun calcular(datos: IngresoDatos): ResultadoTiroOblicuo {
-        // Convertimos el ángulo de grados a radianes (así lo entiende Kotlin)
-        val anguloRadianes = Math.toRadians(datos.anguloGrados)
+        // Las funciones trigonométricas trabajan en radianes, convertimos el ángulo
+        val anguloRad = Math.toRadians(datos.angulo)
 
-        // Componentes de la velocidad inicial
-        // vx = v₀ · cos(θ)  →  velocidad horizontal (constante, no hay aire)
-        val vx = datos.velocidadInicial * cos(anguloRadianes)
+        // Componentes de la velocidad inicial (descomponer en x e y)
+        val velocidadX = datos.velocidadInicial * cos(anguloRad)
+        val velocidadY = datos.velocidadInicial * sin(anguloRad)
 
-        // vy = v₀ · sin(θ)  →  velocidad vertical inicial
-        val vyInicial = datos.velocidadInicial * sin(anguloRadianes)
+        // Tiempo de vuelo: se resuelve y(t) = y0 + Vy*t - g*t²/2 = 0 y se toma
+        // la raíz positiva. Con y0 = 0 se reduce a t = 2*Vy / g
+        val tiempoVuelo =
+            (velocidadY + sqrt(velocidadY * velocidadY + 2 * GRAVEDAD * datos.alturaInicial)) / GRAVEDAD
 
-        // Tiempo que tarda en subir hasta la altura máxima (donde vy = 0)
-        // t_subida = vy / g
-        val tiempoSubida = vyInicial / gravedad
+        // Altura máxima: el pico de la parábola, usando h = Vy² / (2 * g) sobre y0
+        val alturaMaxima = datos.alturaInicial + (velocidadY * velocidadY) / (2 * GRAVEDAD)
 
-        // Tiempo total de vuelo = 2 × tiempo de subida (simplificado para altura inicial = 0)
-        val tiempoVuelo = 2.0 * tiempoSubida
-
-        // Alcance horizontal = vx × tiempoTotal
-        val alcanceHorizontal = vx * tiempoVuelo
-
-        // Altura máxima = vy² / (2·g)
-        val alturaMaxima = (vyInicial * vyInicial) / (2.0 * gravedad)
+        // Alcance horizontal: velocidad en x por el tiempo total de vuelo
+        val distanciaHorizontal = velocidadX * tiempoVuelo
 
         return ResultadoTiroOblicuo(
-            alcanceHorizontal = alcanceHorizontal,
             alturaMaxima = alturaMaxima,
-            tiempoVuelo = tiempoVuelo,
-            vx = vx,
-            vy = vyInicial
+            distanciaHorizontal = distanciaHorizontal,
+            tiempoVuelo = tiempoVuelo
         )
+    }
+
+    companion object {
+        /** Aceleración de la gravedad en la superficie terrestre (m/s²). */
+        const val GRAVEDAD: Double = 9.81
     }
 }
