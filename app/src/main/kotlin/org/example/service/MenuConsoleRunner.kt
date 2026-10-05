@@ -2,24 +2,28 @@ package org.example.service
 
 import org.example.model.Dificultad
 import org.example.model.Ejercicio
+import org.example.ui.PantallaEjercicios
 import java.util.Locale
 
 /**
  * Orquestador del menú interactivo por consola.
- * Permite explorar el banco de ejercicios, filtrarlos por dificultad y
- * seleccionar ejercicios específicos por ID para visualizar su consigna y resolverlos.
+ * Permite explorar el banco de ejercicios, filtrarlos por dificultad,
+ * seleccionar ejercicios específicos por ID para visualizar su consigna y
+ * acceder a la pantalla interactiva de ejercicios para el estudiante (Issue 6).
  */
 class MenuConsoleRunner(
     private val banco: BancoEjerciciosService = BancoEjerciciosService(),
     private val entrada: EntradaUsuarioService = EntradaUsuarioService(),
-    private val calculador: CalculadorFisico = CalculadorTiroOblicuo()
+    private val calculador: CalculadorFisico = CalculadorTiroOblicuo(),
+    private val pantallaEjercicios: PantallaEjercicios = PantallaEjercicios(entrada = entrada)
 ) {
 
     private companion object {
         const val OPCION_VER_TODOS = 1
         const val OPCION_FILTRAR_DIFICULTAD = 2
         const val OPCION_SELECCIONAR_ID = 3
-        const val OPCION_SALIR = 4
+        const val OPCION_PANTALLA_EJERCICIOS = 4
+        const val OPCION_SALIR = 5
 
         const val SUBOPCION_VER_SOLUCION = 1
         const val SUBOPCION_VOLVER = 2
@@ -38,6 +42,7 @@ class MenuConsoleRunner(
                 OPCION_VER_TODOS -> verBancoCompleto()
                 OPCION_FILTRAR_DIFICULTAD -> filtrarPorDificultad()
                 OPCION_SELECCIONAR_ID -> seleccionarEjercicioPorId()
+                OPCION_PANTALLA_EJERCICIOS -> abrirPantallaEjercicios()
                 OPCION_SALIR -> println("   👋 ¡Hasta la próxima!")
                 else -> println("   ⚠️ Opción no válida. Escribí un número del 1 al $OPCION_SALIR.")
             }
@@ -58,9 +63,17 @@ class MenuConsoleRunner(
         println("   1. 📚 Ver todos los ejercicios del banco")
         println("   2. 🔍 Filtrar ejercicios por dificultad")
         println("   3. 🧮 Seleccionar ejercicio por ID")
-        println("   4. 🚪 Salir del programa")
+        println("   4. 📝 Pantalla de ejercicios (Modo Estudiante)")
+        println("   5. 🚪 Salir del programa")
         println()
         println("──────────────────────────────────────────────")
+    }
+
+    /**
+     * Accede a la pantalla de resolución de ejercicios para el estudiante (Issue 6).
+     */
+    private fun abrirPantallaEjercicios() {
+        pantallaEjercicios.mostrar()
     }
 
     /**
