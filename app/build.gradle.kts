@@ -12,6 +12,7 @@ dependencies {
     testImplementation(libs.junit.jupiter.engine)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation(libs.guava)
+    implementation(libs.flatlaf)
 }
 
 java {
