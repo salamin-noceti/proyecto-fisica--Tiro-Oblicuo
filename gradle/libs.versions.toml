@@ -1,10 +1,13 @@
 [versions]
 guava = "33.5.0-jre"
 junit-jupiter-engine = "6.0.1"
+flatlaf = "3.5.4"
 
 [libraries]
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter-engine" }
+flatlaf = { module = "com.formdev:flatlaf", version.ref = "flatlaf" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.3.0" }
+
