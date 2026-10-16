@@ -1,5 +1,6 @@
 package org.example.ui
 
+import org.example.state.AppState
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -15,20 +16,31 @@ import javax.swing.border.CompoundBorder
 import javax.swing.border.EmptyBorder
 
 /**
- * Pantalla de Simulación Gráfica y Cinemática (Placeholder preparado para las Issues 7 y 8).
+ * Pantalla de Simulación Gráfica y Cinemática (Preparada para las Issues 7 y 8).
  *
- * Esta pantalla alojará:
- * - Lienzo de animación en vivo del lanzamiento parabólico (Issue 7).
- * - Gráficos interactivos de física cinemática en tiempo real (Issue 8):
- *   trayectoria Y(x), velocidad en función del tiempo V(t) y componentes vectoriales.
- * - Controles de reproducción (Play, Pausa, Reinicio y velocidad de simulación).
+ * Muestra la información del ejercicio transferido desde [PantallaPractica] a través de [AppState]
+ * y aloja el contenedor central para el canvas de simulación física en vivo.
+ *
+ * @param appState Estado global compartido de la aplicación.
  */
-class PantallaSimulacion : JPanel(BorderLayout()) {
+class PantallaSimulacion(
+    val appState: AppState = AppState()
+) : JPanel(BorderLayout()) {
 
     /**
      * Contenedor central reservado para alojar el canvas de animación y los gráficos físicos.
      */
     val contenedorSimulacion: JPanel = JPanel(BorderLayout())
+
+    /**
+     * Etiqueta que muestra el estado de datos transferidos desde la pantalla de práctica.
+     */
+    val labelEjercicioCargado: JLabel = JLabel().apply {
+        alignmentX = Component.CENTER_ALIGNMENT
+        font = Font(Font.SANS_SERIF, Font.BOLD, 13)
+        foreground = Color(37, 99, 235)
+        isVisible = false
+    }
 
     init {
         border = EmptyBorder(24, 28, 24, 28)
@@ -77,6 +89,8 @@ class PantallaSimulacion : JPanel(BorderLayout()) {
             add(badgeIssue)
             add(Box.createRigidArea(Dimension(0, 10)))
             add(labelTitulo)
+            add(Box.createRigidArea(Dimension(0, 10)))
+            add(labelEjercicioCargado)
             add(Box.createRigidArea(Dimension(0, 14)))
             add(labelDetalle)
             add(Box.createRigidArea(Dimension(0, 20)))
@@ -85,6 +99,19 @@ class PantallaSimulacion : JPanel(BorderLayout()) {
         }
 
         add(panelPlaceholder, BorderLayout.CENTER)
+
+        appState.agregarListener { state ->
+            val ejercicio = state.ejercicioActual
+            if (ejercicio != null) {
+                labelEjercicioCargado.text = "🎯 Ejercicio cargado: #${ejercicio.id} ${ejercicio.titulo} " +
+                    "(v₀ = ${ejercicio.datos.velocidadInicial} m/s, θ = ${ejercicio.datos.angulo}°, y₀ = ${ejercicio.datos.alturaInicial} m)"
+                labelEjercicioCargado.isVisible = true
+            } else {
+                labelEjercicioCargado.isVisible = false
+            }
+            revalidate()
+            repaint()
+        }
     }
 
     private fun crearEncabezado(titulo: String, subtitulo: String): JPanel {
