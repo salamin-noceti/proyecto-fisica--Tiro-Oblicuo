@@ -1,0 +1,132 @@
+package org.example.ui.simulacion
+
+import org.example.model.Dificultad
+import org.example.model.Ejercicio
+import org.example.model.IngresoDatos
+import org.example.model.RespuestaEstudiante
+import org.example.model.ResultadoTiroOblicuo
+import org.example.state.AppState
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
+
+class PantallaSimulacionTest {
+
+    @Test
+    fun `inicializacion con valores por defecto seguros cuando AppState esta vacio`() {
+        val appState = AppState()
+        val pantalla = PantallaSimulacion(appState)
+
+        assertNotNull(pantalla.contenedorSimulacion)
+        assertNotNull(pantalla.lienzoSimulacion)
+        assertNotNull(pantalla.panelControl)
+
+        val datos = pantalla.controlador.datos
+        assertEquals(PantallaSimulacion.DATOS_POR_DEFECTO.velocidadInicial, datos.velocidadInicial)
+        assertEquals(PantallaSimulacion.DATOS_POR_DEFECTO.angulo, datos.angulo)
+        assertEquals(PantallaSimulacion.DATOS_POR_DEFECTO.alturaInicial, datos.alturaInicial)
+
+        assertTrue(pantalla.labelEjercicioCargado.text.contains("v₀ = 25.00 m/s"))
+        assertTrue(pantalla.labelEjercicioCargado.text.contains("θ = 45.00°"))
+    }
+
+    @Test
+    fun `los tres botones de control poseen exactamente los nombres requeridos`() {
+        val pantalla = PantallaSimulacion()
+
+        assertEquals("Lanzar", pantalla.botonLanzar.text)
+        assertEquals("Pausar", pantalla.botonPausar.text)
+        assertEquals("Reiniciar", pantalla.botonReiniciar.text)
+    }
+
+    @Test
+    fun `estados de habilitacion inicial de los botones corresponden a simulacion detenida`() {
+        val pantalla = PantallaSimulacion()
+
+        assertTrue(pantalla.botonLanzar.isEnabled, "Lanzar debe estar habilitado al inicio")
+        assertFalse(pantalla.botonPausar.isEnabled, "Pausar debe estar deshabilitado al inicio")
+        assertFalse(pantalla.botonReiniciar.isEnabled, "Reiniciar debe estar deshabilitado al inicio")
+    }
+
+    @Test
+    fun `clic en boton Lanzar inicia la simulacion y actualiza estados de botones`() {
+        val pantalla = PantallaSimulacion()
+
+        try {
+            pantalla.botonLanzar.doClick()
+
+            assertEquals(EstadoSimulacion.EN_EJECUCION, pantalla.controlador.estado)
+            assertFalse(pantalla.botonLanzar.isEnabled)
+            assertTrue(pantalla.botonPausar.isEnabled)
+            assertTrue(pantalla.botonReiniciar.isEnabled)
+        } finally {
+            pantalla.controlador.detenerTimer()
+        }
+    }
+
+    @Test
+    fun `clic en boton Pausar congela la simulacion y permite reanudar con Lanzar`() {
+        val pantalla = PantallaSimulacion()
+
+        try {
+            pantalla.botonLanzar.doClick()
+            pantalla.botonPausar.doClick()
+
+            assertEquals(EstadoSimulacion.PAUSADO, pantalla.controlador.estado)
+            assertTrue(pantalla.botonLanzar.isEnabled, "Lanzar debe habilitarse para permitir reanudar")
+            assertFalse(pantalla.botonPausar.isEnabled)
+            assertTrue(pantalla.botonReiniciar.isEnabled)
+        } finally {
+            pantalla.controlador.detenerTimer()
+        }
+    }
+
+    @Test
+    fun `clic en boton Reiniciar regresa al instante inicial t=0`() {
+        val pantalla = PantallaSimulacion()
+
+        try {
+            pantalla.botonLanzar.doClick()
+            pantalla.controlador.avanzarPaso(0.8)
+            assertTrue(pantalla.controlador.tiempoActual > 0.0)
+
+            pantalla.botonReiniciar.doClick()
+
+            assertEquals(EstadoSimulacion.DETENIDO, pantalla.controlador.estado)
+            assertEquals(0.0, pantalla.controlador.tiempoActual)
+            assertTrue(pantalla.botonLanzar.isEnabled)
+            assertFalse(pantalla.botonPausar.isEnabled)
+            assertFalse(pantalla.botonReiniciar.isEnabled)
+        } finally {
+            pantalla.controlador.detenerTimer()
+        }
+    }
+
+    @Test
+    fun `actualizacion en AppState sincroniza automaticamente el ejercicio y sus condiciones`() {
+        val appState = AppState()
+        val pantalla = PantallaSimulacion(appState)
+
+        val nuevoEjercicio = Ejercicio(
+            id = 42,
+            titulo = "Tiro de Mortero",
+            enunciado = "Un mortero dispara a 55 m/s con ángulo de 60 grados",
+            dificultad = Dificultad.MEDIO,
+            datos = IngresoDatos(velocidadInicial = 55.0, angulo = 60.0, alturaInicial = 10.0)
+        )
+        val respuesta = RespuestaEstudiante(alcanceHorizontal = 260.0, alturaMaxima = 125.0, tiempoVuelo = 9.9)
+        val resultado = ResultadoTiroOblicuo(alturaMaxima = 125.6, distanciaHorizontal = 265.4, tiempoVuelo = 9.88)
+
+        // Simular transferencia desde Issue 6
+        appState.actualizar(nuevoEjercicio, respuesta, resultado)
+
+        // Verificar que la pantalla se actualizó
+        assertEquals(55.0, pantalla.controlador.datos.velocidadInicial)
+        assertEquals(60.0, pantalla.controlador.datos.angulo)
+        assertEquals(10.0, pantalla.controlador.datos.alturaInicial)
+        assertTrue(pantalla.labelEjercicioCargado.text.contains("Ejercicio #42: Tiro de Mortero"))
+        assertTrue(pantalla.labelEjercicioCargado.text.contains("v₀ = 55.00 m/s"))
+    }
+}
