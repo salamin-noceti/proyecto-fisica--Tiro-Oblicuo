@@ -1,6 +1,7 @@
 package org.example.service
 
 import org.example.model.IngresoDatos
+import org.example.model.PosicionTrayectoria
 import org.example.model.ResultadoTiroOblicuo
 import kotlin.math.cos
 import kotlin.math.sin
@@ -41,6 +42,42 @@ class CalculadorTiroOblicuo : CalculadorFisico {
             velocidadX = velocidadX,
             velocidadY = velocidadY
         )
+    }
+
+    override fun calcularPosicion(datos: IngresoDatos, tiempo: Double): PosicionTrayectoria {
+        val anguloRad = Math.toRadians(datos.angulo)
+        val vx = datos.velocidadInicial * cos(anguloRad)
+        val vy0 = datos.velocidadInicial * sin(anguloRad)
+
+        val tiempoVuelo =
+            (vy0 + sqrt(vy0 * vy0 + 2 * GRAVEDAD * datos.alturaInicial)) / GRAVEDAD
+
+        val tEfectivo = tiempo.coerceIn(0.0, tiempoVuelo.coerceAtLeast(0.0))
+        val x = vx * tEfectivo
+        val y = if (tEfectivo >= tiempoVuelo) {
+            0.0
+        } else {
+            (datos.alturaInicial + vy0 * tEfectivo - 0.5 * GRAVEDAD * tEfectivo * tEfectivo).coerceAtLeast(0.0)
+        }
+        val vy = vy0 - GRAVEDAD * tEfectivo
+
+        return PosicionTrayectoria(
+            x = x,
+            y = y,
+            tiempo = tEfectivo,
+            velocidadX = vx,
+            velocidadY = vy
+        )
+    }
+
+    override fun calcularTrayectoria(datos: IngresoDatos, pasos: Int): List<PosicionTrayectoria> {
+        val resultado = calcular(datos)
+        val n = pasos.coerceAtLeast(2)
+        val dt = if (resultado.tiempoVuelo > 0.0) resultado.tiempoVuelo / (n - 1) else 0.0
+        return (0 until n).map { i ->
+            val t = (i * dt).coerceAtMost(resultado.tiempoVuelo)
+            calcularPosicion(datos, t)
+        }
     }
 
     companion object {
