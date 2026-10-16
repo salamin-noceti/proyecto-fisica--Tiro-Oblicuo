@@ -1,5 +1,7 @@
 package org.example.navigation
 
+import org.example.state.AppState
+
 /**
  * Interfaz funcional para observar cambios en la navegación entre pantallas.
  */
@@ -15,12 +17,17 @@ fun interface NavegacionListener {
 /**
  * Gestor del estado de navegación de la aplicación (Controller de Navegación).
  *
- * Mantiene la sección activa actual y notifica a los observadores registrados
- * desacoplando la lógica de navegación de los componentes gráficos de Swing.
+ * Mantiene la sección activa actual y el estado global compartido ([AppState]),
+ * notificando a los observadores registrados para desacoplar la lógica de navegación
+ * de los componentes gráficos de Swing.
  *
  * @param seccionInicial Sección activa con la que inicia la aplicación (por defecto [SeccionNavegacion.PRACTICA]).
+ * @param appState Estado global compartido de la aplicación (por defecto una nueva instancia de [AppState]).
  */
-class GestorNavegacion(seccionInicial: SeccionNavegacion = SeccionNavegacion.PRACTICA) {
+class GestorNavegacion(
+    seccionInicial: SeccionNavegacion = SeccionNavegacion.PRACTICA,
+    val appState: AppState = AppState()
+) {
 
     private val listeners = mutableListOf<NavegacionListener>()
 

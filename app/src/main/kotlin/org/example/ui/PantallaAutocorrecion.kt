@@ -1,5 +1,6 @@
 package org.example.ui
 
+import org.example.state.AppState
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -22,7 +23,9 @@ import javax.swing.border.EmptyBorder
  * - Desglose paso a paso de las ecuaciones físicas aplicadas.
  * - Retroalimentación detallada sobre márgenes de error, unidades y posibles equivocaciones.
  */
-class PantallaAutocorrecion : JPanel(BorderLayout()) {
+class PantallaAutocorrecion(
+    val appState: AppState = AppState()
+) : JPanel(BorderLayout()) {
 
     /**
      * Contenedor central reservado para que la Issue 9 inserte el reporte de corrección paso a paso.

@@ -81,11 +81,18 @@ class VentanaPrincipal(
         }
     }
 
+    // Estado global compartido accesible desde la ventana principal
+    val appState: org.example.state.AppState
+        get() = gestorNavegacion.appState
+
     // Componentes de las pantallas
     val barraNavegacion: BarraNavegacion = BarraNavegacion(gestorNavegacion)
-    val pantallaPractica: PantallaPractica = PantallaPractica()
-    val pantallaSimulacion: PantallaSimulacion = PantallaSimulacion()
-    val pantallaAutocorrecion: PantallaAutocorrecion = PantallaAutocorrecion()
+    val pantallaPractica: PantallaPractica = PantallaPractica(
+        gestorNavegacion = gestorNavegacion,
+        appState = gestorNavegacion.appState
+    )
+    val pantallaSimulacion: PantallaSimulacion = PantallaSimulacion(gestorNavegacion.appState)
+    val pantallaAutocorrecion: PantallaAutocorrecion = PantallaAutocorrecion(gestorNavegacion.appState)
 
     // Contenedor dinámico central y su administrador de diseño
     val layoutCentral: CardLayout = CardLayout()

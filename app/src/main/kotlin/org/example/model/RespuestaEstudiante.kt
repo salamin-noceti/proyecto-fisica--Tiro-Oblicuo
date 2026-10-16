@@ -7,11 +7,15 @@ package org.example.model
  * @property alcanceHorizontal Alcance o distancia horizontal calculada en metros.
  * @property alturaMaxima Altura máxima calculada en metros.
  * @property tiempoVuelo Tiempo total de vuelo calculado en segundos.
+ * @property velocidadX Componente horizontal de la velocidad calculada en m/s (por defecto 0.0).
+ * @property velocidadY Componente vertical inicial de la velocidad calculada en m/s (por defecto 0.0).
  */
 data class RespuestaEstudiante(
     val alcanceHorizontal: Double,
     val alturaMaxima: Double,
-    val tiempoVuelo: Double
+    val tiempoVuelo: Double,
+    val velocidadX: Double = 0.0,
+    val velocidadY: Double = 0.0
 ) {
     init {
         require(alcanceHorizontal >= 0.0) {
@@ -23,6 +27,12 @@ data class RespuestaEstudiante(
         require(tiempoVuelo >= 0.0) {
             "El tiempo de vuelo no puede ser negativo: $tiempoVuelo s"
         }
+        require(velocidadX >= 0.0) {
+            "La velocidad en X no puede ser negativa: $velocidadX m/s"
+        }
+        require(velocidadY >= 0.0) {
+            "La velocidad en Y no puede ser negativa: $velocidadY m/s"
+        }
     }
 
     /**
@@ -33,6 +43,8 @@ data class RespuestaEstudiante(
         ResultadoTiroOblicuo(
             alturaMaxima = alturaMaxima,
             distanciaHorizontal = alcanceHorizontal,
-            tiempoVuelo = tiempoVuelo
+            tiempoVuelo = tiempoVuelo,
+            velocidadX = velocidadX,
+            velocidadY = velocidadY
         )
 }

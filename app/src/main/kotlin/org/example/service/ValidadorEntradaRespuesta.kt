@@ -60,19 +60,26 @@ class ValidadorEntradaRespuesta {
     }
 
     /**
-     * Valida en conjunto las tres entradas de texto requeridas por el estudiante.
+     * Valida en conjunto las respuestas numéricas ingresadas por el estudiante.
+     *
+     * Valida las magnitudes principales de trayectoria (alcance, altura y tiempo)
+     * y opcionalmente las componentes de velocidad (Vx, Vy) si fueron ingresadas.
      *
      * @param textoAlcance Cadena ingresada para el alcance horizontal.
      * @param textoAltura Cadena ingresada para la altura máxima.
      * @param textoTiempo Cadena ingresada para el tiempo de vuelo.
+     * @param textoVelocidadX Cadena opcional para la velocidad horizontal Vx.
+     * @param textoVelocidadY Cadena opcional para la velocidad vertical Vy.
      * @return Un par que contiene:
-     *         - [RespuestaEstudiante] instanciada si los tres campos son válidos (o null si hay errores).
+     *         - [RespuestaEstudiante] instanciada si los campos requeridos son válidos (o null si hay errores).
      *         - Lista de cadenas con los mensajes de error detectados.
      */
     fun validarRespuestas(
         textoAlcance: String?,
         textoAltura: String?,
-        textoTiempo: String?
+        textoTiempo: String?,
+        textoVelocidadX: String? = null,
+        textoVelocidadY: String? = null
     ): Pair<RespuestaEstudiante?, List<String>> {
         val errores = mutableListOf<String>()
 
@@ -91,11 +98,36 @@ class ValidadorEntradaRespuesta {
             errores.add(resTiempo.mensajeError)
         }
 
+        var vx = 0.0
+        if (!textoVelocidadX.isNullOrBlank()) {
+            when (val resVx = validarCampo(textoVelocidadX, "Velocidad horizontal (Vx)")) {
+                is ResultadoValidacion.Valido -> vx = resVx.valor
+                is ResultadoValidacion.Invalido -> errores.add(resVx.mensajeError)
+            }
+        }
+
+        var vy = 0.0
+        if (!textoVelocidadY.isNullOrBlank()) {
+            when (val resVy = validarCampo(textoVelocidadY, "Velocidad vertical (Vy)")) {
+                is ResultadoValidacion.Valido -> vy = resVy.valor
+                is ResultadoValidacion.Invalido -> errores.add(resVy.mensajeError)
+            }
+        }
+
         return if (errores.isEmpty()) {
             val alcance = (resAlcance as ResultadoValidacion.Valido).valor
             val altura = (resAltura as ResultadoValidacion.Valido).valor
             val tiempo = (resTiempo as ResultadoValidacion.Valido).valor
-            Pair(RespuestaEstudiante(alcance, altura, tiempo), emptyList())
+            Pair(
+                RespuestaEstudiante(
+                    alcanceHorizontal = alcance,
+                    alturaMaxima = altura,
+                    tiempoVuelo = tiempo,
+                    velocidadX = vx,
+                    velocidadY = vy
+                ),
+                emptyList()
+            )
         } else {
             Pair(null, errores)
         }

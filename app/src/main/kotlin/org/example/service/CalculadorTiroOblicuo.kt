@@ -37,7 +37,9 @@ class CalculadorTiroOblicuo : CalculadorFisico {
         return ResultadoTiroOblicuo(
             alturaMaxima = alturaMaxima,
             distanciaHorizontal = distanciaHorizontal,
-            tiempoVuelo = tiempoVuelo
+            tiempoVuelo = tiempoVuelo,
+            velocidadX = velocidadX,
+            velocidadY = velocidadY
         )
     }
 
