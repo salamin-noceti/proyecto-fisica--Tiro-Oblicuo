@@ -29,6 +29,11 @@ class ThemeDetector {
         RegexOption.IGNORE_CASE
     )
 
+    private val patronTenis = Regex(
+        """\b(tenis|tenista|tenistas|raqueta|raquetas|wimbledon|pelota de tenis|saque de tenis)\b""",
+        RegexOption.IGNORE_CASE
+    )
+
     private val patronAtletismo = Regex(
         """\b(atletismo|atleta|atletas|jabalina|jabalinas|disco|discos|pista|pistas|tartán|tartan|salto|saltos|despegue|corredor|corredores|velocista|velocistas)\b""",
         RegexOption.IGNORE_CASE
@@ -59,6 +64,7 @@ class ThemeDetector {
             patronFutbol.containsMatchIn(contenido) -> TematicaSimulacion.FUTBOL
             patronBasquet.containsMatchIn(contenido) -> TematicaSimulacion.BASQUET
             patronGolf.containsMatchIn(contenido) -> TematicaSimulacion.GOLF
+            patronTenis.containsMatchIn(contenido) -> TematicaSimulacion.TENIS
             patronEdificio.containsMatchIn(contenido) -> TematicaSimulacion.EDIFICIO
             patronAtletismo.containsMatchIn(contenido) -> TematicaSimulacion.ATLETISMO
             patronCanon.containsMatchIn(contenido) -> TematicaSimulacion.CANON

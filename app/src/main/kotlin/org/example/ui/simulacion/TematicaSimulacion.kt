@@ -12,6 +12,7 @@ enum class TematicaSimulacion(
 ) {
     FUTBOL("Fútbol", "⚽"),
     BASQUET("Básquet", "🏀"),
+    TENIS("Tenis", "🎾"),
     CANON("Cañón", "💣"),
     EDIFICIO("Edificio", "🏢"),
     GOLF("Golf", "⛳"),

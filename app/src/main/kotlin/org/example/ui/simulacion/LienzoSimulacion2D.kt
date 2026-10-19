@@ -70,9 +70,16 @@ class LienzoSimulacion2D(
             val sueloY = conversor.sueloPixelY(h)
             themeRenderer.dibujarSuelo(g2d, w, h, sueloY)
 
-            // 4. Dibujar plataforma de elevación si y0 > 0
+            // 4. Dibujar plataforma/soporte de elevación si y0 > 0 (delegado al Strategy temático)
             if (datos.alturaInicial > 0.0) {
-                dibujarPlataformaInicial(g2d, w, h, xMax, yMax, datos.alturaInicial, sueloY)
+                val baseAltoY = conversor.metroAPixelY(datos.alturaInicial, w, h, xMax, yMax)
+                themeRenderer.dibujarPlataformaInicial(
+                    g2d,
+                    conversor.origenPixelX(),
+                    baseAltoY,
+                    sueloY,
+                    datos.alturaInicial
+                )
             }
 
             // 5. Dibujar banderín / objetivo en el alcance teórico total (d)
@@ -183,36 +190,6 @@ class LienzoSimulacion2D(
             maxValor <= 200.0 -> 20.0
             else -> 50.0
         }
-    }
-
-    private fun dibujarPlataformaInicial(
-        g2d: Graphics2D,
-        w: Int,
-        h: Int,
-        xMax: Double,
-        yMax: Double,
-        alturaInicial: Double,
-        sueloY: Double
-    ) {
-        val origenX = conversor.origenPixelX()
-        val baseAltoY = conversor.metroAPixelY(alturaInicial, w, h, xMax, yMax)
-        val anchoPlataforma = 34
-
-        val platRect = RoundRectangle2D.Double(
-            origenX - 20,
-            baseAltoY,
-            anchoPlataforma.toDouble(),
-            sueloY - baseAltoY,
-            6.0,
-            6.0
-        )
-
-        g2d.color = Color(148, 163, 184)
-        g2d.fill(platRect)
-
-        g2d.color = Color(71, 85, 105)
-        g2d.stroke = BasicStroke(1.5f)
-        g2d.draw(platRect)
     }
 
     private fun dibujarGuiaTeorica(

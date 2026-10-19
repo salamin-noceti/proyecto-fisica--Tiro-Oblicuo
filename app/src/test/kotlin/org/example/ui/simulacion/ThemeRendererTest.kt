@@ -56,6 +56,15 @@ class ThemeRendererTest {
         )
         assertEquals(TematicaSimulacion.GOLF, detector.detectar(ejercicioGolf))
 
+        val ejercicioTenis = Ejercicio(
+            id = 8,
+            titulo = "Golpe de tenista",
+            enunciado = "Un tenista golpea una pelota a 1.25 m de altura a 20 m/s y 37°.",
+            dificultad = Dificultad.DIFICIL,
+            datos = IngresoDatos(velocidadInicial = 20.0, angulo = 37.0, alturaInicial = 1.25)
+        )
+        assertEquals(TematicaSimulacion.TENIS, detector.detectar(ejercicioTenis))
+
         val ejercicioEdificio = Ejercicio(
             id = 7,
             titulo = "Lanzamiento desde edificio",
@@ -94,6 +103,7 @@ class ThemeRendererTest {
         assertIs<FutbolThemeRenderer>(factory.obtenerPorTematica(TematicaSimulacion.FUTBOL))
         assertIs<BasquetThemeRenderer>(factory.obtenerPorTematica(TematicaSimulacion.BASQUET))
         assertIs<GolfThemeRenderer>(factory.obtenerPorTematica(TematicaSimulacion.GOLF))
+        assertIs<TenisThemeRenderer>(factory.obtenerPorTematica(TematicaSimulacion.TENIS))
         assertIs<EdificioThemeRenderer>(factory.obtenerPorTematica(TematicaSimulacion.EDIFICIO))
         assertIs<AtletismoThemeRenderer>(factory.obtenerPorTematica(TematicaSimulacion.ATLETISMO))
     }
@@ -108,6 +118,7 @@ class ThemeRendererTest {
             FutbolThemeRenderer(),
             BasquetThemeRenderer(),
             GolfThemeRenderer(),
+            TenisThemeRenderer(),
             EdificioThemeRenderer(),
             AtletismoThemeRenderer()
         )
@@ -126,6 +137,8 @@ class ThemeRendererTest {
                 renderer.dibujarProyectil(g2d, 400.0, 520.0, true)
                 // 6. Objetivo de llegada
                 renderer.dibujarObjetivoLlegada(g2d, 450.0, 520.0, 45.0)
+                // 7. Plataforma / estructura de elevación (y0 > 0)
+                renderer.dibujarPlataformaInicial(g2d, 80.0, 320.0, 520.0, 12.0)
 
                 assertNotNull(renderer.tematica)
             }
