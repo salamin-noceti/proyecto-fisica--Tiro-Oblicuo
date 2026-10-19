@@ -3,20 +3,20 @@
 
 > Documento **generado automáticamente** por la cátedra de Programación II (RepoSense + análisis de calidad POO/SOLID). **No editar a mano**: se regenera en cada evaluación.
 > Rama evaluada: `main`. Análisis **heurístico** (regex + métricas): es una criba para orientar la revisión, **no una nota**.
-> Generado: 2026-10-17.
+> Generado: 2026-10-19.
 
 ## 1. Veredicto
 
 | Aspecto | Resultado |
 |---|---|
 | Índice de calidad POO/SOLID | **2/100** |
-| Código (LOC) | 5,634 |
-| Archivos de código | 61 |
-| Clases (bien usadas) | 68 (8 OK) |
+| Código (LOC) | 5,927 |
+| Archivos de código | 62 |
+| Clases (bien usadas) | 69 (8 OK) |
 | Código dentro de clases (%POO) | 86% |
 | Funciones fuera de clases | 5 |
-| Duplicación | 17.1% |
-| Señales S/O/L/I/D | 39/2/0/0/33 |
+| Duplicación lógica | 5.0% |
+| Señales S/O/L/I/D | 40/2/0/0/34 |
 | Tope duro aplicado | `SUELTAS>=3` → índice ≤ 40 |
 
 > Este informe **describe** lo que el análisis midió con los criterios ya establecidos de la materia. No es una nota.
@@ -27,15 +27,15 @@ Criterios de `CRITERIOS-CALIDAD.md`. **Aprobar** se juega con el perfil `estanda
 
 | Semáforo | Resultado |
 |---|---|
-| Aprobar (`estandar`) | **no cumple** — 1/4 |
-| Destacar (`exigente`) | **no cumple** — 0/5 |
+| Aprobar (`estandar`) | **no cumple** — 2/4 |
+| Destacar (`exigente`) | **no cumple** — 1/5 |
 
 **Criterios para aprobar**
 
 | Criterio | Requisito | Tu resultado | Cumple |
 |---|---|---|---|
 | Código dentro de clases (%POO) | ≥ 85% | 86% | sí |
-| Duplicación | ≤ 10% | 11.1% | no |
+| Duplicación lógica | ≤ 10% | 5.0% | sí |
 | Funciones fuera de clases | ≤ 1 | 5 | no |
 | Señales POO/SOLID críticas | ninguna | Clase demasiado grande (SRP), Baja cohesión (LCOM), Acoplamiento alto (CBO), Switch sobre tipos (OCP) | no |
 
@@ -44,7 +44,7 @@ Criterios de `CRITERIOS-CALIDAD.md`. **Aprobar** se juega con el perfil `estanda
 | Criterio | Requisito | Tu resultado | Cumple |
 |---|---|---|---|
 | Código dentro de clases (%POO) | ≥ 95% | 86% | no |
-| Duplicación | ≤ 5% | 17.1% | no |
+| Duplicación lógica | ≤ 5% | 5.0% | sí |
 | Funciones fuera de clases | ≤ 0 | 5 | no |
 | Señales POO/SOLID críticas | ninguna | Clase demasiado grande (SRP), Baja cohesión (LCOM), Acoplamiento alto (CBO), Switch sobre tipos (OCP) | no |
 | Índice de calidad POO/SOLID | ≥ 60 | 2/100 | no |
@@ -53,7 +53,7 @@ Criterios de `CRITERIOS-CALIDAD.md`. **Aprobar** se juega con el perfil `estanda
 
 | Autor | Commits | Código (LOC) | Tests (LOC) | Docs (LOC) | Días activos | % del código |
 |---|---:|---:|---:|---:|---:|---:|
-| avsalomon | 9 | 5,095 | 1,438 | 0 | 6 | 100% |
+| avsalomon | 10 | 5,415 | 1,451 | 0 | 7 | 100% |
 | Romano-22 | 6 | 0 | 19 | 2 | 5 | 0% |
 
 > _El LOC de autoría lo calcula RepoSense sobre el historial y puede diferir del LOC de código del análisis de calidad (que mira solo el estado de `main`)._
@@ -70,11 +70,11 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 - **Por qué importa:** Ordena y prioriza la revisión: un índice bajo indica varias señales que conviene mirar juntas.
 - **Tu resultado:** índice **2/100**
 
-### 2. Duplicación (DRY) (duplicacion) — con señales
+### 2. Duplicación lógica (DRY) (duplicacion) — con señales
 
-- **Qué mide:** Porcentaje de bloques de código repetidos (similitud) en el repositorio.
-- **Por qué importa:** Cada copia se mantiene por separado: un arreglo hay que repetirlo y los defectos se multiplican.
-- **Tu resultado:** **17.1%** de duplicación
+- **Qué mide:** Porcentaje de bloques de LÓGICA repetidos. Quedan fuera imports/includes, anotaciones, declaraciones de campos y comentarios/Javadoc/docstrings: esos bloques son boilerplate, no lógica.
+- **Por qué importa:** Cada copia de lógica se mantiene por separado: un arreglo hay que repetirlo y los defectos se multiplican.
+- **Tu resultado:** **5.0%** de duplicación lógica
 - **Para investigar la causa:**
     - ¿El trabajo se repartió por pantallas o archivos y se integró copiando y pegando bloques?
     - ¿Qué zonas del sistema cambiaron juntas más de una vez (señal de lógica compartida)?
@@ -84,7 +84,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Qué porción del código vive dentro de clases (no de funciones sueltas).
 - **Por qué importa:** El diseño orientado a objetos es el eje de la materia: el comportamiento debería vivir como método de una clase.
-- **Tu resultado:** **85.5%** del código dentro de clases
+- **Tu resultado:** **85.9%** del código dentro de clases
 
 ### 4. Funciones fuera de clases (sueltas) — con señales
 
@@ -100,7 +100,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Clases con muchas líneas, métodos o campos a la vez.
 - **Por qué importa:** Una clase que hace de todo cambia por muchos motivos y cuesta entenderla y probarla.
-- **Tu resultado:** **27** clase(s) demasiado grande(s)
+- **Tu resultado:** **28** clase(s) demasiado grande(s)
 - **Para investigar la causa:**
     - ¿La clase creció por acumulación de responsabilidades?
     - ¿Qué partes de la clase se usan siempre juntas y cuáles no?
@@ -126,7 +126,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Tamaño de los métodos/funciones y cantidad de parámetros.
 - **Por qué importa:** Una función que hace varias cosas cuesta leerla, nombrarla y reutilizarla.
-- **Tu resultado:** **11** método(s)/función(es) largos o con muchos parámetros
+- **Tu resultado:** **8** método(s)/función(es) largos o con muchos parámetros
 - **Para investigar la causa:**
     - ¿La función creció por acumulación de pasos?
     - ¿Agrupa operaciones que podrían describirse por separado?
@@ -136,7 +136,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Cuánto depende una clase de otros tipos del proyecto.
 - **Por qué importa:** Piezas muy enlazadas hacen que un cambio se propague y que sea difícil reemplazar partes.
-- **Tu resultado:** **41** clase(s) muy acoplada(s)
+- **Tu resultado:** **42** clase(s) muy acoplada(s)
 - **Para investigar la causa:**
     - ¿La clase conoce detalles internos de muchas otras?
     - ¿Se puede cambiar una parte sin tocar las demás?
@@ -174,7 +174,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Instanciación directa de clases concretas y ausencia de interfaces o clases abstractas pese al acoplamiento.
 - **Por qué importa:** Depender de implementaciones concretas dificulta cambiar o probar una parte sin arrastrar las demás.
-- **Tu resultado:** **33** dependencia(s) de concretos sin abstracciones
+- **Tu resultado:** **34** dependencia(s) de concretos sin abstracciones
 - **Para investigar la causa:**
     - ¿La clase crea por dentro a sus colaboradores en vez de recibirlos?
     - ¿Hay puntos de variación que convendría expresar como abstracción?
@@ -194,7 +194,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Clases que exponen campos sin control de acceso.
 - **Por qué importa:** Expone el estado interno y hace que cualquier cambio dependa de quién lo modifica desde afuera.
-- **Tu resultado:** **33** clase(s) con campos públicos
+- **Tu resultado:** **35** clase(s) con campos públicos
 - **Para investigar la causa:**
     - ¿Se accede al campo desde otras clases para evitar un método?
     - ¿Qué reglas deberían respetarse al modificar ese estado?
@@ -210,7 +210,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 Archivos donde el análisis encontró cada señal (sin número de línea, a propósito):
 
-**Clase demasiado grande (SRP) (god)** — 27 archivo(s):
+**Clase demasiado grande (SRP) (god)** — 28 archivo(s):
 - `app/src/main/kotlin/org/example/service/MenuConsoleRunner.kt`
 - `app/src/main/kotlin/org/example/service/ValidadorEntradaRespuesta.kt`
 - `app/src/main/kotlin/org/example/ui/BarraNavegacion.kt`
@@ -227,6 +227,7 @@ Archivos donde el análisis encontró cada señal (sin número de línea, a prop
 - `app/src/main/kotlin/org/example/ui/simulacion/GolfThemeRenderer.kt`
 - `app/src/main/kotlin/org/example/ui/simulacion/LienzoSimulacion2D.kt`
 - `app/src/main/kotlin/org/example/ui/simulacion/PantallaSimulacion.kt`
+- `app/src/main/kotlin/org/example/ui/simulacion/TenisThemeRenderer.kt`
 - `app/src/test/kotlin/org/example/GeneradorEjerciciosBancoAdapterTest.kt`
 - `app/src/test/kotlin/org/example/PantallaEjerciciosSwingTest.kt`
 - `app/src/test/kotlin/org/example/PantallaEjerciciosTest.kt`
@@ -248,15 +249,14 @@ Archivos donde el análisis encontró cada señal (sin número de línea, a prop
 - `app/src/main/kotlin/org/example/ui/simulacion/LienzoSimulacion2D.kt`
 - `app/src/main/kotlin/org/example/ui/simulacion/PantallaSimulacion.kt`
 
-**Métodos/funciones largos o con muchos parámetros (tamano)** — 6 archivo(s):
+**Métodos/funciones largos o con muchos parámetros (tamano)** — 5 archivo(s):
 - `app/src/main/kotlin/org/example/service/SimulacionConsoleRunner.kt`
 - `app/src/main/kotlin/org/example/ui/PantallaEjercicios.kt`
 - `app/src/main/kotlin/org/example/ui/PantallaPractica.kt`
 - `app/src/main/kotlin/org/example/ui/simulacion/LienzoSimulacion2D.kt`
 - `app/src/main/kotlin/org/example/ui/simulacion/PanelControlSimulacion.kt`
-- `app/src/main/kotlin/org/example/ui/simulacion/ThemeRenderer.kt`
 
-**Acoplamiento alto (CBO) (acoplamiento)** — 37 archivo(s):
+**Acoplamiento alto (CBO) (acoplamiento)** — 38 archivo(s):
 - `app/src/main/kotlin/org/example/navigation/GestorNavegacion.kt`
 - `app/src/main/kotlin/org/example/service/BancoEjerciciosService.kt`
 - `app/src/main/kotlin/org/example/service/CalculadorTiroOblicuo.kt`
@@ -281,6 +281,7 @@ Archivos donde el análisis encontró cada señal (sin número de línea, a prop
 - `app/src/main/kotlin/org/example/ui/simulacion/PanelControlSimulacion.kt`
 - `app/src/main/kotlin/org/example/ui/simulacion/PantallaSimulacion.kt`
 - `app/src/main/kotlin/org/example/ui/simulacion/TematicaSimulacion.kt`
+- `app/src/main/kotlin/org/example/ui/simulacion/TenisThemeRenderer.kt`
 - `app/src/main/kotlin/org/example/ui/simulacion/ThemeDetector.kt`
 - `app/src/main/kotlin/org/example/ui/simulacion/ThemeFactory.kt`
 - `app/src/main/kotlin/org/example/ui/simulacion/ThemeRenderer.kt`
@@ -299,7 +300,7 @@ Archivos donde el análisis encontró cada señal (sin número de línea, a prop
 - `app/src/main/kotlin/org/example/service/ValidadorEntradaRespuesta.kt`
 - `app/src/test/kotlin/org/example/ValidadorEntradaRespuestaTest.kt`
 
-**Dependencia de concretos y falta de abstracciones (DIP) (dip)** — 31 archivo(s):
+**Dependencia de concretos y falta de abstracciones (DIP) (dip)** — 32 archivo(s):
 - `app/src/main/kotlin/org/example/service/BancoEjerciciosService.kt`
 - `app/src/main/kotlin/org/example/service/MenuConsoleRunner.kt`
 - `app/src/main/kotlin/org/example/service/ValidadorEntradaRespuesta.kt`
@@ -319,6 +320,7 @@ Archivos donde el análisis encontró cada señal (sin número de línea, a prop
 - `app/src/main/kotlin/org/example/ui/simulacion/PanelControlSimulacion.kt`
 - `app/src/main/kotlin/org/example/ui/simulacion/PantallaSimulacion.kt`
 - `app/src/main/kotlin/org/example/ui/simulacion/TematicaSimulacion.kt`
+- `app/src/main/kotlin/org/example/ui/simulacion/TenisThemeRenderer.kt`
 - `app/src/main/kotlin/org/example/ui/simulacion/ThemeDetector.kt`
 - `app/src/main/kotlin/org/example/ui/simulacion/ThemeFactory.kt`
 - `app/src/main/kotlin/org/example/ui/simulacion/ThemeRenderer.kt`
@@ -346,7 +348,7 @@ Archivos donde el análisis encontró cada señal (sin número de línea, a prop
 - `app/src/test/kotlin/org/example/ui/simulacion/PantallaSimulacionTest.kt`
 - `app/src/test/kotlin/org/example/ui/simulacion/ThemeRendererTest.kt`
 
-**Campos públicos (encapsulación) (encapsulacion)** — 33 archivo(s):
+**Campos públicos (encapsulación) (encapsulacion)** — 35 archivo(s):
 - `app/src/main/kotlin/org/example/model/RespuestaEstudiante.kt`
 - `app/src/main/kotlin/org/example/service/MenuConsoleRunner.kt`
 - `app/src/main/kotlin/org/example/service/ValidadorEntradaRespuesta.kt`
@@ -367,6 +369,8 @@ Archivos donde el análisis encontró cada señal (sin número de línea, a prop
 - `app/src/main/kotlin/org/example/ui/simulacion/LienzoSimulacion2D.kt`
 - `app/src/main/kotlin/org/example/ui/simulacion/PanelControlSimulacion.kt`
 - `app/src/main/kotlin/org/example/ui/simulacion/PantallaSimulacion.kt`
+- `app/src/main/kotlin/org/example/ui/simulacion/TenisThemeRenderer.kt`
+- `app/src/main/kotlin/org/example/ui/simulacion/ThemeRenderer.kt`
 - `app/src/test/kotlin/org/example/GeneradorEjerciciosBancoAdapterTest.kt`
 - `app/src/test/kotlin/org/example/PantallaEjerciciosSwingTest.kt`
 - `app/src/test/kotlin/org/example/PantallaEjerciciosTest.kt`
@@ -383,14 +387,14 @@ Archivos donde el análisis encontró cada señal (sin número de línea, a prop
 
 ## 5. Evolución por commit
 
-Métricas calculadas sobre el estado de `main` en **cada commit** (11 commits con trabajo), del primero al último. La calidad usa el perfil `exigente`; el aporte de código lo mide RepoSense. El índice puede **bajar** al crecer el proyecto: se acumulan señales.
+Métricas calculadas sobre el estado de `main` en **cada commit** (12 commits con trabajo), del primero al último. La calidad usa el perfil `exigente`; el aporte de código lo mide RepoSense. El índice puede **bajar** al crecer el proyecto: se acumulan señales.
 
 ```mermaid
 xychart-beta
     title "Índice POO/SOLID a lo largo de los commits"
-    x-axis ["f5b4533", "0407e5e", "dd3780e", "d36b80c", "34979f5", "5b92c65", "2e89df6", "39d9b06", "0a667a3", "76a2cc8", "4b1ecf0"]
+    x-axis ["f5b4533", "0407e5e", "dd3780e", "d36b80c", "34979f5", "5b92c65", "2e89df6", "39d9b06", "0a667a3", "76a2cc8", "4b1ecf0", "27cb813"]
     y-axis "Índice" 0 --> 100
-    line [0, 0, 0, 50, 25, 10, 17, 15, 4, 3, 2]
+    line [0, 0, 0, 50, 25, 10, 17, 15, 4, 3, 2, 2]
 ```
 
 | # | Fecha | Commit | Autor | LOC | Índice | %POO | Duplic. | Sueltas |
@@ -403,9 +407,10 @@ xychart-beta
 | 6 | 2026-09-07 | `5b92c65` | Romano-22 | 215 | 10 | 109% | 0.0% | 1 |
 | 7 | 2026-10-02 | `2e89df6` | Romano-22 | 277 | 17 | 68% | 0.0% | 1 |
 | 8 | 2026-10-05 | `39d9b06` | avsalomon | 638 | 15 | 77% | 0.0% | 0 |
-| 9 | 2026-10-09 | `0a667a3` | avsalomon | 1,443 | 4 | 77% | 15.6% | 2 |
-| 10 | 2026-10-16 | `76a2cc8` | avsalomon | 3,076 | 3 | 84% | 10.8% | 5 |
-| 11 | 2026-10-16 | `4b1ecf0` | avsalomon | 5,634 | 2 | 86% | 17.1% | 5 |
+| 9 | 2026-10-09 | `0a667a3` | avsalomon | 1,443 | 4 | 77% | 12.0% | 2 |
+| 10 | 2026-10-16 | `76a2cc8` | avsalomon | 3,076 | 3 | 84% | 5.5% | 5 |
+| 11 | 2026-10-16 | `4b1ecf0` | avsalomon | 5,634 | 2 | 86% | 5.1% | 5 |
+| 12 | 2026-10-19 | `27cb813` | avsalomon | 5,927 | 2 | 86% | 5.0% | 5 |
 
 ---
 _Informe generado por la cátedra. Los criterios y umbrales de medición corresponden al perfil `exigente` de `calidad.py`; el semáforo de aprobación, a `CRITERIOS-CALIDAD.md` (ver `README.md`). Ante dudas, revisá el archivo señalado._
