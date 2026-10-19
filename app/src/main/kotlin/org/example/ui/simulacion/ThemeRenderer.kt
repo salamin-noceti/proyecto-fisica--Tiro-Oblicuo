@@ -5,6 +5,7 @@ import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics2D
 import java.awt.geom.Path2D
+import java.awt.geom.RoundRectangle2D
 import java.util.Locale
 
 /**
@@ -58,6 +59,49 @@ interface ThemeRenderer {
      * @param impactoFinalizado `true` si el proyectil ya impactó contra el suelo.
      */
     fun dibujarProyectil(g2d: Graphics2D, px: Double, py: Double, impactoFinalizado: Boolean)
+
+    /**
+     * Dibuja la plataforma, soporte o estructura vertical desde la que parte el lanzamiento cuando
+     * la altura inicial es $y_0 > 0$. La implementación por defecto dibuja una plataforma gris genérica;
+     * cada temática puede sobreescribirla para representar un escenario propio (p. ej. un edificio).
+     *
+     * @param g2d Contexto gráfico 2D.
+     * @param pivoteX Posición horizontal en píxeles del origen de lanzamiento (x = 0).
+     * @param baseY Posición vertical en píxeles del punto de lanzamiento (y = y0).
+     * @param sueloY Posición vertical en píxeles de la línea del suelo (y = 0 m).
+     * @param alturaMetros Altura inicial del lanzamiento en metros.
+     */
+    fun dibujarPlataformaInicial(
+        g2d: Graphics2D,
+        pivoteX: Double,
+        baseY: Double,
+        sueloY: Double,
+        alturaMetros: Double
+    ) {
+        if (sueloY <= baseY) return
+
+        val gPlat = g2d.create() as Graphics2D
+        try {
+            val anchoPlataforma = 34.0
+            val platRect = RoundRectangle2D.Double(
+                pivoteX - 20.0,
+                baseY,
+                anchoPlataforma,
+                sueloY - baseY,
+                6.0,
+                6.0
+            )
+
+            gPlat.color = Color(148, 163, 184)
+            gPlat.fill(platRect)
+
+            gPlat.color = Color(71, 85, 105)
+            gPlat.stroke = BasicStroke(1.5f)
+            gPlat.draw(platRect)
+        } finally {
+            gPlat.dispose()
+        }
+    }
 
     /**
      * Dibuja el banderín o asta de objetivo en la posición del alcance horizontal teórico (x = d).

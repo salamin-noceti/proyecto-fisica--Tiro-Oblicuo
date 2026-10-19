@@ -16,6 +16,7 @@ class ThemeFactory(
         TematicaSimulacion.FUTBOL to FutbolThemeRenderer(),
         TematicaSimulacion.BASQUET to BasquetThemeRenderer(),
         TematicaSimulacion.GOLF to GolfThemeRenderer(),
+        TematicaSimulacion.TENIS to TenisThemeRenderer(),
         TematicaSimulacion.EDIFICIO to EdificioThemeRenderer(),
         TematicaSimulacion.ATLETISMO to AtletismoThemeRenderer()
     )

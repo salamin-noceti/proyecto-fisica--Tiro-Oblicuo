@@ -7,6 +7,7 @@ import java.awt.Graphics2D
 import java.awt.RadialGradientPaint
 import java.awt.geom.Ellipse2D
 import java.awt.geom.Point2D
+import java.awt.geom.Rectangle2D
 import java.awt.geom.RoundRectangle2D
 
 /**
@@ -40,6 +41,75 @@ class EdificioThemeRenderer : ThemeRenderer {
         g2d.color = Color.WHITE
         g2d.stroke = BasicStroke(2.0f)
         g2d.drawLine(0, sueloInt, ancho, sueloInt)
+    }
+
+    override fun dibujarPlataformaInicial(
+        g2d: Graphics2D,
+        pivoteX: Double,
+        baseY: Double,
+        sueloY: Double,
+        alturaMetros: Double
+    ) {
+        if (sueloY <= baseY) return
+
+        val gEdificio = g2d.create() as Graphics2D
+        try {
+            val ancho = 52.0
+            val izquierda = pivoteX - 34.0
+            val derecha = izquierda + ancho
+            val altoFachada = sueloY - baseY
+
+            // Fachada con degradado gris arquitectónico
+            gEdificio.paint = GradientPaint(
+                izquierda.toFloat(), baseY.toFloat(), Color(148, 163, 184),
+                derecha.toFloat(), sueloY.toFloat(), Color(71, 85, 105)
+            )
+            gEdificio.fill(Rectangle2D.Double(izquierda, baseY, ancho, altoFachada))
+
+            // Contorno estructural
+            gEdificio.color = Color(51, 65, 85)
+            gEdificio.stroke = BasicStroke(1.8f)
+            gEdificio.draw(Rectangle2D.Double(izquierda, baseY, ancho, altoFachada))
+
+            // Cornisa / terraza sobresaliente en la parte superior
+            gEdificio.color = Color(100, 116, 139)
+            gEdificio.fill(Rectangle2D.Double(izquierda - 5.0, baseY - 5.0, ancho + 10.0, 7.0))
+            gEdificio.color = Color(51, 65, 85)
+            gEdificio.draw(Rectangle2D.Double(izquierda - 5.0, baseY - 5.0, ancho + 10.0, 7.0))
+
+            // Rejilla de ventanas iluminadas por pisos
+            var pisoY = baseY + 16.0
+            var alterna = true
+            while (pisoY + 13.0 < sueloY - 8.0) {
+                var ventanaX = izquierda + 8.0
+                while (ventanaX + 11.0 < derecha - 7.0) {
+                    gEdificio.color = if (alterna) Color(186, 230, 253) else Color(125, 211, 252)
+                    gEdificio.fill(Rectangle2D.Double(ventanaX, pisoY, 11.0, 13.0))
+                    gEdificio.color = Color(51, 65, 85)
+                    gEdificio.stroke = BasicStroke(1.0f)
+                    gEdificio.draw(Rectangle2D.Double(ventanaX, pisoY, 11.0, 13.0))
+                    // Reflejo diagonal de la ventana
+                    gEdificio.color = Color(255, 255, 255, 90)
+                    gEdificio.drawLine(
+                        ventanaX.toInt() + 2, (pisoY + 11).toInt(),
+                        ventanaX.toInt() + 5, (pisoY + 2).toInt()
+                    )
+                    ventanaX += 18.0
+                }
+                pisoY += 24.0
+                alterna = !alterna
+            }
+
+            // Puerta de acceso en planta baja
+            gEdificio.color = Color(30, 41, 59)
+            gEdificio.fill(Rectangle2D.Double(pivoteX - 10.0, sueloY - 30.0, 20.0, 30.0))
+            gEdificio.color = Color(100, 116, 139)
+            gEdificio.stroke = BasicStroke(1.2f)
+            gEdificio.draw(Rectangle2D.Double(pivoteX - 10.0, sueloY - 30.0, 20.0, 30.0))
+            gEdificio.fill(Ellipse2D.Double(pivoteX + 5.0, sueloY - 16.0, 3.0, 3.0))
+        } finally {
+            gEdificio.dispose()
+        }
     }
 
     override fun dibujarLanzador(
