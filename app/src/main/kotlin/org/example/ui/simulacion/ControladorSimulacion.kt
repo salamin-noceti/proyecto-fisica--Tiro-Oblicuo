@@ -121,6 +121,18 @@ class ControladorSimulacion(
      * Si la animación ya había finalizado por impacto en el suelo, se reinicia automáticamente antes de disparar.
      */
     fun lanzar() {
+        if (datos.velocidadInicial <= 0.0 || resultadoTeorico.tiempoVuelo <= 0.0) {
+            // Si v0 = 0, el proyectil permanece estático en la posición inicial (0, y0)
+            detenerTimer()
+            tiempoActual = 0.0
+            posicionActual = calculadorFisico.calcularPosicion(datos, 0.0)
+            puntosEstela.clear()
+            puntosEstela.add(posicionActual)
+            estado = EstadoSimulacion.FINALIZADO
+            notificarActualizacion()
+            return
+        }
+
         if (estado == EstadoSimulacion.FINALIZADO) {
             reiniciar()
         }

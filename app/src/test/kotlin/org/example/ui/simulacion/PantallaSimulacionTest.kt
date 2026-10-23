@@ -173,4 +173,27 @@ class PantallaSimulacionTest {
             pantalla.controlador.detenerTimer()
         }
     }
+
+    @Test
+    fun `configuracion con v0 igual a 0 en AppState no aplica fallback a 35_3m y mantiene proyectil estatico`() {
+        val appState = AppState()
+        val pantalla = PantallaSimulacion(appState)
+
+        try {
+            appState.actualizarDatos(IngresoDatos(velocidadInicial = 0.0, angulo = 30.0, alturaInicial = 3.0))
+
+            assertTrue(appState.estaInicializado)
+            assertEquals(0.0, pantalla.controlador.datos.velocidadInicial)
+            assertEquals(0.0, pantalla.controlador.resultadoTeorico.distanciaHorizontal)
+            assertEquals(3.0, pantalla.controlador.resultadoTeorico.alturaMaxima)
+            assertEquals(0.0, pantalla.controlador.resultadoTeorico.tiempoVuelo)
+
+            pantalla.botonLanzar.doClick()
+            assertEquals(0.0, pantalla.controlador.posicionActual.x)
+            assertEquals(3.0, pantalla.controlador.posicionActual.y)
+            assertEquals(1, pantalla.controlador.puntosEstela.size)
+        } finally {
+            pantalla.controlador.detenerTimer()
+        }
+    }
 }

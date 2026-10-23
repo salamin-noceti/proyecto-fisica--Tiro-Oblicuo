@@ -5,6 +5,7 @@ import org.example.service.CalculadorTiroOblicuo
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class PanelGraficosCinematicosTest {
@@ -14,7 +15,7 @@ class PanelGraficosCinematicosTest {
     private val resultadoTeorico = calculador.calcular(datosEjemplo)
 
     @Test
-    fun `inicializacion correcta con 3 pestanas cartesianas y componentes instanciados`() {
+    fun `inicializacion correcta con vista exclusiva de 3 pestanas cartesianas`() {
         val panel = PanelGraficosCinematicos()
 
         assertNotNull(panel.renderizadorPosicion)
@@ -22,25 +23,29 @@ class PanelGraficosCinematicosTest {
         assertNotNull(panel.renderizadorAceleracion)
 
         assertEquals(3, panel.tabbedPane.tabCount)
+        assertEquals(PanelGraficosCinematicos.TITULO_PESTANA_POSICION, panel.tabbedPane.getTitleAt(0))
+        assertEquals(PanelGraficosCinematicos.TITULO_PESTANA_VELOCIDAD, panel.tabbedPane.getTitleAt(1))
+        assertEquals(PanelGraficosCinematicos.TITULO_PESTANA_ACELERACION, panel.tabbedPane.getTitleAt(2))
+
         assertTrue(panel.tabbedPane.getTitleAt(0).contains("Posición"))
         assertTrue(panel.tabbedPane.getTitleAt(1).contains("Velocidad"))
         assertTrue(panel.tabbedPane.getTitleAt(2).contains("Aceleración"))
     }
 
     @Test
-    fun `conmutacion fluida entre modo Pestanas y modo Grilla`() {
+    fun `seleccionar pestana renderiza individualmente el grafico activo`() {
         val panel = PanelGraficosCinematicos()
 
-        assertEquals(3, panel.tabbedPane.tabCount)
-        assertEquals(0, panel.panelGrilla.componentCount)
+        assertEquals(0, panel.pestanaActiva)
+        assertSame(panel.renderizadorPosicion.canvas, panel.tabbedPane.selectedComponent)
 
-        panel.mostrarModoGrilla()
-        assertEquals(0, panel.tabbedPane.tabCount)
-        assertEquals(3, panel.panelGrilla.componentCount)
+        panel.seleccionarPestana(1)
+        assertEquals(1, panel.pestanaActiva)
+        assertSame(panel.renderizadorVelocidad.canvas, panel.tabbedPane.selectedComponent)
 
-        panel.mostrarModoPestanas()
-        assertEquals(3, panel.tabbedPane.tabCount)
-        assertEquals(0, panel.panelGrilla.componentCount)
+        panel.seleccionarPestana(2)
+        assertEquals(2, panel.pestanaActiva)
+        assertSame(panel.renderizadorAceleracion.canvas, panel.tabbedPane.selectedComponent)
     }
 
     @Test

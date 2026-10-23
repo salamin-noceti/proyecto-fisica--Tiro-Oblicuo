@@ -112,7 +112,11 @@ class PantallaSimulacion(
 
         // 1. Resolver datos iniciales y temática inicial (desde AppState o valores por defecto)
         val ejercicioInicial = appState.ejercicioActual
-        val datosIniciales = ejercicioInicial?.datos ?: DATOS_POR_DEFECTO
+        val datosIniciales = if (appState.estaInicializado && ejercicioInicial != null) {
+            ejercicioInicial.datos
+        } else {
+            DATOS_POR_DEFECTO
+        }
         val temaInicial = themeFactory.resolverParaEjercicio(ejercicioInicial)
 
         // 2. Inicializar controlador, lienzo y botonera
@@ -133,6 +137,12 @@ class PantallaSimulacion(
 
         // 4. Montar contenedor central con divisor responsivo (Animación 2D + Gráficos Cartesianos)
         panelGraficos.configurarEjercicio(datosIniciales, controlador.resultadoTeorico)
+        panelGraficos.actualizar(
+            tiempoActual = controlador.tiempoActual,
+            puntosEstela = controlador.puntosEstela,
+            resultadoTeorico = controlador.resultadoTeorico,
+            datos = controlador.datos
+        )
 
         contenedorSimulacion.background = Color.WHITE
         contenedorSimulacion.border = CompoundBorder(
@@ -177,13 +187,15 @@ class PantallaSimulacion(
      */
     fun sincronizarConAppState() {
         val ejercicio = appState.ejercicioActual
-        val nuevosDatos = ejercicio?.datos ?: DATOS_POR_DEFECTO
+        val nuevosDatos = if (appState.estaInicializado && ejercicio != null) {
+            ejercicio.datos
+        } else {
+            DATOS_POR_DEFECTO
+        }
 
-        // Actualizar física en el controlador
+        // Actualizar escalas y límites de los tres gráficos cinemáticos cartesianos y reiniciar controlador
+        panelGraficos.configurarEjercicio(nuevosDatos, calculadorFisico.calcular(nuevosDatos))
         controlador.configurarEjercicio(nuevosDatos)
-
-        // Actualizar escalas y límites de los tres gráficos cinemáticos cartesianos
-        panelGraficos.configurarEjercicio(nuevosDatos, controlador.resultadoTeorico)
 
         // Detectar y aplicar la nueva temática dinámica (Patrón Strategy)
         val nuevoTema = themeFactory.resolverParaEjercicio(ejercicio)
