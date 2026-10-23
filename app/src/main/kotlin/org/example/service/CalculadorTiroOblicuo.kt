@@ -17,6 +17,18 @@ import kotlin.math.sqrt
 class CalculadorTiroOblicuo : CalculadorFisico {
 
     override fun calcular(datos: IngresoDatos): ResultadoTiroOblicuo {
+        // Manejo explícito de v0 = 0.0: el objeto no posee impulso cinético inicial.
+        // Retorna x(t) = 0, y(t) = y0, t_vuelo = 0, vx = 0 y vy = 0.
+        if (datos.velocidadInicial <= 0.0) {
+            return ResultadoTiroOblicuo(
+                alturaMaxima = datos.alturaInicial,
+                distanciaHorizontal = 0.0,
+                tiempoVuelo = 0.0,
+                velocidadX = 0.0,
+                velocidadY = 0.0
+            )
+        }
+
         // Las funciones trigonométricas trabajan en radianes, convertimos el ángulo
         val anguloRad = Math.toRadians(datos.angulo)
 
@@ -45,6 +57,16 @@ class CalculadorTiroOblicuo : CalculadorFisico {
     }
 
     override fun calcularPosicion(datos: IngresoDatos, tiempo: Double): PosicionTrayectoria {
+        if (datos.velocidadInicial <= 0.0) {
+            return PosicionTrayectoria(
+                x = 0.0,
+                y = datos.alturaInicial,
+                tiempo = 0.0,
+                velocidadX = 0.0,
+                velocidadY = 0.0
+            )
+        }
+
         val anguloRad = Math.toRadians(datos.angulo)
         val vx = datos.velocidadInicial * cos(anguloRad)
         val vy0 = datos.velocidadInicial * sin(anguloRad)
@@ -71,6 +93,18 @@ class CalculadorTiroOblicuo : CalculadorFisico {
     }
 
     override fun calcularTrayectoria(datos: IngresoDatos, pasos: Int): List<PosicionTrayectoria> {
+        if (datos.velocidadInicial <= 0.0) {
+            return listOf(
+                PosicionTrayectoria(
+                    x = 0.0,
+                    y = datos.alturaInicial,
+                    tiempo = 0.0,
+                    velocidadX = 0.0,
+                    velocidadY = 0.0
+                )
+            )
+        }
+
         val resultado = calcular(datos)
         val n = pasos.coerceAtLeast(2)
         val dt = if (resultado.tiempoVuelo > 0.0) resultado.tiempoVuelo / (n - 1) else 0.0

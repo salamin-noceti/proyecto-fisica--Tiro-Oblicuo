@@ -4,6 +4,7 @@ import org.example.model.IngresoDatos
 import org.example.service.CalculadorFisico
 import org.example.service.CalculadorTiroOblicuo
 import org.example.state.AppState
+import org.example.ui.simulacion.graficos.PanelGraficosCinematicos
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -18,6 +19,7 @@ import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.JSplitPane
 import javax.swing.border.CompoundBorder
 import javax.swing.border.EmptyBorder
 
@@ -69,6 +71,12 @@ class PantallaSimulacion(
     /** Panel con la botonera de control (Lanzar, Pausar, Reiniciar). */
     val panelControl: PanelControlSimulacion
 
+    /** Panel de Gráficos Cinemáticos Cartesianos en Tiempo Real (Issue 8). */
+    val panelGraficos: PanelGraficosCinematicos = PanelGraficosCinematicos()
+
+    /** Divisor responsivo entre el lienzo de animación 2D y el panel de gráficos cinemáticos. */
+    val splitSimulacion: JSplitPane
+
     /**
      * Contenedor central reservado para alojar el lienzo y garantizar compatibilidad
      * con la infraestructura de navegación y pruebas de la Issue 5.
@@ -104,7 +112,11 @@ class PantallaSimulacion(
 
         // 1. Resolver datos iniciales y temática inicial (desde AppState o valores por defecto)
         val ejercicioInicial = appState.ejercicioActual
-        val datosIniciales = ejercicioInicial?.datos ?: DATOS_POR_DEFECTO
+        val datosIniciales = if (appState.estaInicializado && ejercicioInicial != null) {
+            ejercicioInicial.datos
+        } else {
+            DATOS_POR_DEFECTO
+        }
         val temaInicial = themeFactory.resolverParaEjercicio(ejercicioInicial)
 
         // 2. Inicializar controlador, lienzo y botonera
@@ -123,13 +135,28 @@ class PantallaSimulacion(
         val panelNorte = crearPanelNorte()
         add(panelNorte, BorderLayout.NORTH)
 
-        // 4. Montar contenedor central con el lienzo de dibujo
+        // 4. Montar contenedor central con divisor responsivo (Animación 2D + Gráficos Cartesianos)
+        panelGraficos.configurarEjercicio(datosIniciales, controlador.resultadoTeorico)
+        panelGraficos.actualizar(
+            tiempoActual = controlador.tiempoActual,
+            puntosEstela = controlador.puntosEstela,
+            resultadoTeorico = controlador.resultadoTeorico,
+            datos = controlador.datos
+        )
+
         contenedorSimulacion.background = Color.WHITE
         contenedorSimulacion.border = CompoundBorder(
             BorderFactory.createLineBorder(Color(226, 232, 240), 1),
             EmptyBorder(2, 2, 2, 2)
         )
-        contenedorSimulacion.add(lienzoSimulacion, BorderLayout.CENTER)
+
+        splitSimulacion = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, lienzoSimulacion, panelGraficos).apply {
+            isContinuousLayout = true
+            dividerSize = 6
+            border = null
+            resizeWeight = 0.52
+        }
+        contenedorSimulacion.add(splitSimulacion, BorderLayout.CENTER)
         add(contenedorSimulacion, BorderLayout.CENTER)
 
         // 5. Montar panel sur (Botonera de control + Resumen analítico)
@@ -139,7 +166,17 @@ class PantallaSimulacion(
         // 6. Actualizar textos con las condiciones físicas actuales
         actualizarInfoEjercicio()
 
-        // 7. Suscribir a cambios en el estado compartido AppState para actualización reactiva
+        // 7. Sincronizar bucle de tiempo y telemetría en vivo con los gráficos cinemáticos
+        controlador.agregarListener { _, _, puntosEstela ->
+            panelGraficos.actualizar(
+                tiempoActual = controlador.tiempoActual,
+                puntosEstela = puntosEstela,
+                resultadoTeorico = controlador.resultadoTeorico,
+                datos = controlador.datos
+            )
+        }
+
+        // 8. Suscribir a cambios en el estado compartido AppState para actualización reactiva
         appState.agregarListener {
             sincronizarConAppState()
         }
@@ -150,9 +187,14 @@ class PantallaSimulacion(
      */
     fun sincronizarConAppState() {
         val ejercicio = appState.ejercicioActual
-        val nuevosDatos = ejercicio?.datos ?: DATOS_POR_DEFECTO
+        val nuevosDatos = if (appState.estaInicializado && ejercicio != null) {
+            ejercicio.datos
+        } else {
+            DATOS_POR_DEFECTO
+        }
 
-        // Actualizar física en el controlador
+        // Actualizar escalas y límites de los tres gráficos cinemáticos cartesianos y reiniciar controlador
+        panelGraficos.configurarEjercicio(nuevosDatos, calculadorFisico.calcular(nuevosDatos))
         controlador.configurarEjercicio(nuevosDatos)
 
         // Detectar y aplicar la nueva temática dinámica (Patrón Strategy)

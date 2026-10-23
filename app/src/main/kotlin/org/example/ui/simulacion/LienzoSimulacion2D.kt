@@ -82,9 +82,11 @@ class LienzoSimulacion2D(
                 )
             }
 
-            // 5. Dibujar banderín / objetivo en el alcance teórico total (d)
-            val targetX = conversor.metroAPixelX(resultado.distanciaHorizontal, w, h, xMax, yMax)
-            themeRenderer.dibujarObjetivoLlegada(g2d, targetX, sueloY, resultado.distanciaHorizontal)
+            // 5. Dibujar banderín / objetivo en el alcance teórico total (d) solo si existe desplazamiento horizontal
+            if (resultado.distanciaHorizontal > 0.0) {
+                val targetX = conversor.metroAPixelX(resultado.distanciaHorizontal, w, h, xMax, yMax)
+                themeRenderer.dibujarObjetivoLlegada(g2d, targetX, sueloY, resultado.distanciaHorizontal)
+            }
 
             // 6. Dibujar guía teórica punteada de la parábola completa
             dibujarGuiaTeorica(g2d, w, h, xMax, yMax)

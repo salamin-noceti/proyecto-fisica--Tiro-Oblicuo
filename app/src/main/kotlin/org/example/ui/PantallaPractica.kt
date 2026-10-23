@@ -398,19 +398,33 @@ open class PantallaPractica(
         if (respuesta != null) {
             ocultarAlerta()
 
+            // Distinguir si se ingresaron explícitamente valores en 0.0 (caso límite v0 = 0):
+            // evita ejecutar el tiro parabólico por defecto de 35.3 m (v0 = 20 m/s, θ = 30°).
+            val esEntradaCero = respuesta.alcanceHorizontal == 0.0 &&
+                respuesta.alturaMaxima == 0.0 &&
+                respuesta.tiempoVuelo == 0.0 &&
+                respuesta.velocidadX == 0.0 &&
+                respuesta.velocidadY == 0.0
+
+            val ejercicioConfigurado = if (esEntradaCero) {
+                ejercicio.copy(datos = ejercicio.datos.copy(velocidadInicial = 0.0))
+            } else {
+                ejercicio
+            }
+
             // 2. Calcular los datos correctos del sistema
-            val solucionSistema = calculadorFisico.calcular(ejercicio.datos)
-            ejercicio.resultado = solucionSistema
+            val solucionSistema = calculadorFisico.calcular(ejercicioConfigurado.datos)
+            ejercicioConfigurado.resultado = solucionSistema
 
             // 3. Cargar en el estado compartido (AppState)
             appState.actualizar(
-                ejercicio = ejercicio,
+                ejercicio = ejercicioConfigurado,
                 respuesta = respuesta,
                 resultadoCorrecto = solucionSistema
             )
 
             // Notificación compatible al navegador de simulación si existe
-            navegadorSimulacion?.transferirASimulacion(ejercicio, respuesta)
+            navegadorSimulacion?.transferirASimulacion(ejercicioConfigurado, respuesta)
 
             // 4. Cambiar automáticamente la pestaña activa de la ventana a Simulación
             gestorNavegacion.navegarA(SeccionNavegacion.SIMULACION)

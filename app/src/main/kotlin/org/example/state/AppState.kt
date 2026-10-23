@@ -1,8 +1,11 @@
 package org.example.state
 
+import org.example.model.Dificultad
 import org.example.model.Ejercicio
+import org.example.model.IngresoDatos
 import org.example.model.RespuestaEstudiante
 import org.example.model.ResultadoTiroOblicuo
+import org.example.service.CalculadorTiroOblicuo
 
 /**
  * Interfaz funcional para observar cambios en el estado compartido de la aplicación.
@@ -60,6 +63,13 @@ class AppState(
     val resultadoCalculado: ResultadoTiroOblicuo?
         get() = resultadoCorrecto
 
+    /**
+     * Distingue formalmente entre un estado no inicializado (`null`) y un ejercicio
+     * explícitamente configurado (incluso si sus parámetros numéricos son v0 = 0.0).
+     */
+    val estaInicializado: Boolean
+        get() = ejercicioActual != null
+
     private val listeners = mutableListOf<AppStateListener>()
 
     /**
@@ -79,6 +89,36 @@ class AppState(
         this.respuestaEstudiante = respuesta
         this.resultadoCorrecto = resultadoCorrecto
         notificarCambios()
+    }
+
+    /**
+     * Configura o actualiza directamente el ejercicio activo calculando su solución teórica,
+     * garantizando que valores como v0 = 0.0 no caigan en estados nulos ni generen fallbacks.
+     *
+     * @param ejercicio Instancia del ejercicio a activar.
+     */
+    fun actualizarEjercicio(ejercicio: Ejercicio) {
+        val calculador = CalculadorTiroOblicuo()
+        val resultado = calculador.calcular(ejercicio.datos)
+        this.ejercicioActual = ejercicio
+        this.resultadoCorrecto = resultado
+        notificarCambios()
+    }
+
+    /**
+     * Configura parámetros físicos explícitos en el estado compartido sin aplicar fallback a datos por defecto.
+     *
+     * @param datos Condiciones físicas (v0, ángulo, y0).
+     */
+    fun actualizarDatos(datos: IngresoDatos) {
+        val ejercicio = Ejercicio(
+            id = 0,
+            titulo = "Simulación Libre",
+            enunciado = "Parámetros configurados explícitamente con v0 = ${datos.velocidadInicial} m/s",
+            dificultad = Dificultad.FACIL,
+            datos = datos
+        )
+        actualizarEjercicio(ejercicio)
     }
 
     /**
