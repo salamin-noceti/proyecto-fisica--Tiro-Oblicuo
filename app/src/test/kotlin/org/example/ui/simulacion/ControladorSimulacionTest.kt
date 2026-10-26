@@ -121,4 +121,22 @@ class ControladorSimulacionTest {
 
         controlador.detenerTimer()
     }
+
+    @Test
+    fun `lanzar con v0 igual a cero mantiene el proyectil estatico en (0, y0)`() {
+        val datosCero = IngresoDatos(velocidadInicial = 0.0, angulo = 30.0, alturaInicial = 4.0)
+        val controlador = ControladorSimulacion(datosIniciales = datosCero)
+
+        try {
+            controlador.lanzar()
+
+            assertEquals(EstadoSimulacion.FINALIZADO, controlador.estado)
+            assertEquals(0.0, controlador.tiempoActual)
+            assertEquals(0.0, controlador.posicionActual.x)
+            assertEquals(4.0, controlador.posicionActual.y)
+            assertEquals(1, controlador.puntosEstela.size)
+        } finally {
+            controlador.detenerTimer()
+        }
+    }
 }

@@ -128,5 +128,72 @@ class PantallaSimulacionTest {
         assertEquals(10.0, pantalla.controlador.datos.alturaInicial)
         assertTrue(pantalla.labelEjercicioCargado.text.contains("Ejercicio #42: Tiro de Mortero"))
         assertTrue(pantalla.labelEjercicioCargado.text.contains("v₀ = 55.00 m/s"))
+
+        // Verificar que el panel de gráficos cinemáticos actualizó sus escalas
+        assertTrue(pantalla.panelGraficos.renderizadorPosicion.canvas.xMax >= 9.8)
+    }
+
+    @Test
+    fun `panelGraficos se sincroniza en vivo con el avance, pausa y reinicio de la simulacion`() {
+        val pantalla = PantallaSimulacion()
+
+        try {
+            assertNotNull(pantalla.panelGraficos)
+            assertNotNull(pantalla.splitSimulacion)
+
+            // Estado inicial: tiempo 0
+            assertEquals(0.0, pantalla.panelGraficos.renderizadorPosicion.canvas.tiempoActual)
+
+            // 1. Lanzar simulación y avanzar un paso
+            pantalla.botonLanzar.doClick()
+            pantalla.controlador.avanzarPaso(0.5)
+
+            assertTrue(pantalla.controlador.tiempoActual > 0.0)
+            assertEquals(
+                pantalla.controlador.tiempoActual,
+                pantalla.panelGraficos.renderizadorPosicion.canvas.tiempoActual
+            )
+            val seriesPos = pantalla.panelGraficos.renderizadorPosicion.canvas.obtenerSeries()
+            assertTrue(seriesPos[0].puntos.isNotEmpty(), "La serie x(t) debe contener puntos trazados")
+            assertTrue(seriesPos[1].puntos.isNotEmpty(), "La serie y(t) debe contener puntos trazados")
+
+            // 2. Pausar: congela las curvas en el tiempo actual alcanzado
+            pantalla.botonPausar.doClick()
+            assertEquals(EstadoSimulacion.PAUSADO, pantalla.controlador.estado)
+            val tiempoCongelado = pantalla.panelGraficos.renderizadorPosicion.canvas.tiempoActual
+            assertEquals(pantalla.controlador.tiempoActual, tiempoCongelado)
+
+            // 3. Reiniciar: limpia las trayectorias de los gráficos y vuelve a t=0
+            pantalla.botonReiniciar.doClick()
+            assertEquals(EstadoSimulacion.DETENIDO, pantalla.controlador.estado)
+            assertEquals(0.0, pantalla.panelGraficos.renderizadorPosicion.canvas.tiempoActual)
+            val seriesReiniciadas = pantalla.panelGraficos.renderizadorPosicion.canvas.obtenerSeries()
+            assertEquals(1, seriesReiniciadas[0].puntos.size, "Al reiniciar solo queda el punto t=0")
+        } finally {
+            pantalla.controlador.detenerTimer()
+        }
+    }
+
+    @Test
+    fun `configuracion con v0 igual a 0 en AppState no aplica fallback a 35_3m y mantiene proyectil estatico`() {
+        val appState = AppState()
+        val pantalla = PantallaSimulacion(appState)
+
+        try {
+            appState.actualizarDatos(IngresoDatos(velocidadInicial = 0.0, angulo = 30.0, alturaInicial = 3.0))
+
+            assertTrue(appState.estaInicializado)
+            assertEquals(0.0, pantalla.controlador.datos.velocidadInicial)
+            assertEquals(0.0, pantalla.controlador.resultadoTeorico.distanciaHorizontal)
+            assertEquals(3.0, pantalla.controlador.resultadoTeorico.alturaMaxima)
+            assertEquals(0.0, pantalla.controlador.resultadoTeorico.tiempoVuelo)
+
+            pantalla.botonLanzar.doClick()
+            assertEquals(0.0, pantalla.controlador.posicionActual.x)
+            assertEquals(3.0, pantalla.controlador.posicionActual.y)
+            assertEquals(1, pantalla.controlador.puntosEstela.size)
+        } finally {
+            pantalla.controlador.detenerTimer()
+        }
     }
 }

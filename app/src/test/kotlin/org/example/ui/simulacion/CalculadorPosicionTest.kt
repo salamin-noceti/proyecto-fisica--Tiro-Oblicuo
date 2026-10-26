@@ -58,4 +58,28 @@ class CalculadorPosicionTest {
         assertEquals(0.0, puntos.first().y)
         assertEquals(0.0, puntos.last().y)
     }
+
+    @Test
+    fun `velocidad inicial cero devuelve proyectil estatico en (0, y0) sin avanzar 35_3m`() {
+        val datos = IngresoDatos(velocidadInicial = 0.0, angulo = 30.0, alturaInicial = 8.0)
+        val resultado = calculador.calcular(datos)
+
+        assertEquals(0.0, resultado.distanciaHorizontal, "Si v0 = 0, el alcance debe ser 0.0")
+        assertEquals(8.0, resultado.alturaMaxima, "Si v0 = 0, la altura máxima debe ser y0")
+        assertEquals(0.0, resultado.tiempoVuelo, "Si v0 = 0, el tiempo de vuelo debe ser 0.0")
+        assertEquals(0.0, resultado.velocidadX, "Si v0 = 0, vx debe ser 0.0")
+        assertEquals(0.0, resultado.velocidadY, "Si v0 = 0, vy debe ser 0.0")
+
+        val pos = calculador.calcularPosicion(datos, 1.5)
+        assertEquals(0.0, pos.x)
+        assertEquals(8.0, pos.y)
+        assertEquals(0.0, pos.tiempo)
+        assertEquals(0.0, pos.velocidadX)
+        assertEquals(0.0, pos.velocidadY)
+
+        val trayectoria = calculador.calcularTrayectoria(datos, 60)
+        assertEquals(1, trayectoria.size, "Con v0 = 0 no debe trazarse ninguna parábola")
+        assertEquals(0.0, trayectoria.first().x)
+        assertEquals(8.0, trayectoria.first().y)
+    }
 }
