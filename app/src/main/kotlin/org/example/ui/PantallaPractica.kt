@@ -13,6 +13,7 @@ import org.example.service.GeneradorEjerciciosService
 import org.example.service.NavegadorSimulacionService
 import org.example.service.ValidadorEntradaRespuesta
 import org.example.state.AppState
+import org.example.ui.practica.componentes.DialogoAdvertenciaFormato
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Cursor
@@ -160,6 +161,9 @@ open class PantallaPractica(
     /** Botón principal visible con el texto exacto requerido. */
     val botonEnviar: JButton
 
+    /** Diálogo modal e indicador de advertencia de formato de decimales y margen de tolerancia. */
+    val dialogoAdvertencia: DialogoAdvertenciaFormato = DialogoAdvertenciaFormato()
+
     /** Ejercicio seleccionado y visualizado actualmente. */
     var ejercicioActual: Ejercicio? = null
         private set
@@ -247,6 +251,11 @@ open class PantallaPractica(
         campoTiempo = JTextField().apply { font = Font(Font.SANS_SERIF, Font.PLAIN, 14) }
         campoVelocidadX = JTextField().apply { font = Font(Font.SANS_SERIF, Font.PLAIN, 14) }
         campoVelocidadY = JTextField().apply { font = Font(Font.SANS_SERIF, Font.PLAIN, 14) }
+
+        dialogoAdvertencia.vincularCampos(
+            campos = listOf(campoAlcance, campoAltura, campoTiempo, campoVelocidadX, campoVelocidadY),
+            anfitrion = this
+        )
 
         val panelRespuestas = crearPanelFormularioRespuestas()
         panelTarjetaPrincipal.add(panelRespuestas)
