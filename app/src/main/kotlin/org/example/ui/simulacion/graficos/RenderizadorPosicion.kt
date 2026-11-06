@@ -57,8 +57,6 @@ class RenderizadorPosicion(
         resultadoTeorico: ResultadoTiroOblicuo,
         datos: IngresoDatos
     ) {
-        canvas.tiempoActual = tiempoActual
-
         val puntosX = puntosEstela.map { PuntoGrafico(it.tiempo, it.x) }
         val puntosY = puntosEstela.map { PuntoGrafico(it.tiempo, it.y) }
 
@@ -84,7 +82,7 @@ class RenderizadorPosicion(
             unidad = "m"
         )
 
-        canvas.actualizarSeries(listOf(serieX, serieY))
+        canvas.actualizarSeries(listOf(serieX, serieY), tiempoActual)
     }
 
     override fun reiniciar() {

@@ -32,26 +32,29 @@ import javax.swing.border.EmptyBorder
  * @param gestorNavegacion Instancia del gestor de navegación que controla el estado de la aplicación.
  */
 class BarraNavegacion(
-    val gestorNavegacion: GestorNavegacion
+    private val gestorNavegacion: GestorNavegacion
 ) : JPanel(BorderLayout()) {
 
     // Paleta de colores para la barra de navegación
     companion object {
-        val COLOR_FONDO_BARRA: Color = Color(15, 23, 42) // Slate 900
-        val COLOR_BORDE_INFERIOR: Color = Color(30, 41, 59) // Slate 800
+        private val COLOR_FONDO_BARRA: Color = Color(15, 23, 42) // Slate 900
+        private val COLOR_BORDE_INFERIOR: Color = Color(30, 41, 59) // Slate 800
 
         val COLOR_BOTON_ACTIVO_FONDO: Color = Color(37, 99, 235) // Azul primario vibrante
-        val COLOR_BOTON_ACTIVO_TEXTO: Color = Color(255, 255, 255) // Blanco
+        private val COLOR_BOTON_ACTIVO_TEXTO: Color = Color(255, 255, 255) // Blanco
 
         val COLOR_BOTON_INACTIVO_FONDO: Color = Color(30, 41, 59) // Slate 800
-        val COLOR_BOTON_INACTIVO_TEXTO: Color = Color(203, 213, 225) // Slate 300
-        val COLOR_BOTON_HOVER_FONDO: Color = Color(51, 65, 85) // Slate 700
+        private val COLOR_BOTON_INACTIVO_TEXTO: Color = Color(203, 213, 225) // Slate 300
+        private val COLOR_BOTON_HOVER_FONDO: Color = Color(51, 65, 85) // Slate 700
     }
 
+    private val _botones: Map<SeccionNavegacion, JButton>
+
     /**
-     * Mapa de botones indexados por su respectiva sección de navegación.
+     * Vista inmutable del mapa de botones indexados por su respectiva sección de navegación.
      */
     val botones: Map<SeccionNavegacion, JButton>
+        get() = _botones.toMap()
 
     init {
         background = COLOR_FONDO_BARRA
@@ -93,7 +96,7 @@ class BarraNavegacion(
             panelPestanias.add(boton)
         }
 
-        botones = mapaBotones.toMap()
+        _botones = mapaBotones.toMap()
         add(panelPestanias, BorderLayout.EAST)
 
         // Suscripción al gestor de navegación para refrescar los estilos cuando cambie la sección

@@ -199,7 +199,7 @@ class PantallaSimulacion(
 
         // Detectar y aplicar la nueva temática dinámica (Patrón Strategy)
         val nuevoTema = themeFactory.resolverParaEjercicio(ejercicio)
-        lienzoSimulacion.themeRenderer = nuevoTema
+        lienzoSimulacion.actualizarThemeRenderer(nuevoTema)
 
         actualizarInfoEjercicio()
         revalidate()
@@ -210,7 +210,7 @@ class PantallaSimulacion(
      * Permite conmutar manualmente la temática visual (por ejemplo para pruebas o preferencias del usuario).
      */
     fun cambiarTematica(tematica: TematicaSimulacion) {
-        lienzoSimulacion.themeRenderer = themeFactory.obtenerPorTematica(tematica)
+        lienzoSimulacion.actualizarThemeRenderer(themeFactory.obtenerPorTematica(tematica))
         actualizarInfoEjercicio()
         lienzoSimulacion.repaint()
     }

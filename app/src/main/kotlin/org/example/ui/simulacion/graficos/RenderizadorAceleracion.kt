@@ -51,8 +51,6 @@ class RenderizadorAceleracion(
         resultadoTeorico: ResultadoTiroOblicuo,
         datos: IngresoDatos
     ) {
-        canvas.tiempoActual = tiempoActual
-
         val valorGravedad = -CalculadorTiroOblicuo.GRAVEDAD
 
         val puntosAx = puntosEstela.map { PuntoGrafico(it.tiempo, 0.0) }
@@ -76,7 +74,7 @@ class RenderizadorAceleracion(
             unidad = "m/s²"
         )
 
-        canvas.actualizarSeries(listOf(serieAx, serieAy))
+        canvas.actualizarSeries(listOf(serieAx, serieAy), tiempoActual)
     }
 
     override fun reiniciar() {

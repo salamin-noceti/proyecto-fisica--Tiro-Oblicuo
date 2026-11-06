@@ -26,10 +26,22 @@ import javax.swing.JPanel
  * @param themeRenderer Estrategia de dibujo temático inicial.
  */
 class LienzoSimulacion2D(
-    val controlador: ControladorSimulacion,
-    val conversor: ConversorCoordenadas = ConversorCoordenadas(),
-    var themeRenderer: ThemeRenderer = CanonThemeRenderer()
+    private val controlador: ControladorSimulacion,
+    private val conversor: ConversorCoordenadas = ConversorCoordenadas(),
+    themeRenderer: ThemeRenderer = CanonThemeRenderer()
 ) : JPanel() {
+
+    /** Estrategia de renderizado temático activa (encapsulada con setter privado). */
+    var themeRenderer: ThemeRenderer = themeRenderer
+        private set
+
+    /**
+     * Actualiza la estrategia visual de la escena ([ThemeRenderer]) y solicita el repintado del lienzo.
+     */
+    fun actualizarThemeRenderer(nuevoRenderer: ThemeRenderer) {
+        this.themeRenderer = nuevoRenderer
+        repaint()
+    }
 
     init {
         preferredSize = Dimension(740, 420)

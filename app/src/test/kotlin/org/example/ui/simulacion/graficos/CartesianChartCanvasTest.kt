@@ -62,7 +62,7 @@ class CartesianChartCanvasTest {
         assertEquals(2, canvas.obtenerSeries()[0].puntos.size)
         assertEquals(10.0, canvas.obtenerSeries()[0].valorActual)
 
-        canvas.tiempoActual = 1.0
+        canvas.actualizarTiempoActual(1.0)
         canvas.limpiar()
         assertEquals(0.0, canvas.tiempoActual)
         assertTrue(canvas.obtenerSeries()[0].puntos.isEmpty())
@@ -108,8 +108,7 @@ class CartesianChartCanvasTest {
             valorActual = 25.0,
             unidad = "m"
         )
-        canvas.actualizarSeries(listOf(serie))
-        canvas.tiempoActual = 2.5
+        canvas.actualizarSeries(listOf(serie), 2.5)
 
         val imagen = BufferedImage(400, 300, BufferedImage.TYPE_INT_ARGB)
         val g = imagen.createGraphics()

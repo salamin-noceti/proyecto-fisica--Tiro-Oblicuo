@@ -5,9 +5,20 @@ import org.example.model.Ejercicio
 import org.example.model.IngresoDatos
 
 /**
+ * Abstracción para el repositorio de consulta y resolución de ejercicios del banco (DIP).
+ */
+interface RepositorioEjerciciosService {
+    fun obtenerTodos(): List<Ejercicio>
+    fun obtenerPorDificultad(dificultad: Dificultad): List<Ejercicio>
+    fun obtenerPorId(id: Int): Ejercicio?
+    fun resolverEjercicio(id: Int, calculador: CalculadorFisico): Ejercicio?
+    fun resolverEjercicio(ejercicio: Ejercicio, calculador: CalculadorFisico): Ejercicio
+}
+
+/**
  * Servicio que expone y gestiona el banco de ejercicios predefinidos de la guía oficial.
  */
-class BancoEjerciciosService {
+class BancoEjerciciosService : RepositorioEjerciciosService {
 
     private val ejercicios: List<Ejercicio> = listOf(
         // ── FÁCIL ────────────────────────────────────────────────────────────
@@ -83,25 +94,25 @@ class BancoEjerciciosService {
     /**
      * Devuelve todos los ejercicios del banco.
      */
-    fun obtenerTodos(): List<Ejercicio> = ejercicios
+    override fun obtenerTodos(): List<Ejercicio> = ejercicios
 
     /**
      * Devuelve únicamente los ejercicios correspondientes a la dificultad solicitada.
      */
-    fun obtenerPorDificultad(dificultad: Dificultad): List<Ejercicio> =
+    override fun obtenerPorDificultad(dificultad: Dificultad): List<Ejercicio> =
         ejercicios.filter { it.dificultad == dificultad }
 
     /**
      * Busca un ejercicio por su ID. Devuelve null si no existe.
      */
-    fun obtenerPorId(id: Int): Ejercicio? = ejercicios.find { it.id == id }
+    override fun obtenerPorId(id: Int): Ejercicio? = ejercicios.find { it.id == id }
 
     /**
      * Resuelve un ejercicio por su ID calculando los resultados físicos y
      * almacenándolos en su propiedad [Ejercicio.resultado].
      * Devuelve el ejercicio actualizado, o null si el ID no existe.
      */
-    fun resolverEjercicio(id: Int, calculador: CalculadorFisico): Ejercicio? {
+    override fun resolverEjercicio(id: Int, calculador: CalculadorFisico): Ejercicio? {
         val ejercicio = obtenerPorId(id) ?: return null
         return resolverEjercicio(ejercicio, calculador)
     }
@@ -111,7 +122,7 @@ class BancoEjerciciosService {
      * almacenándolos en su propiedad [Ejercicio.resultado].
      * Devuelve el ejercicio actualizado.
      */
-    fun resolverEjercicio(ejercicio: Ejercicio, calculador: CalculadorFisico): Ejercicio {
+    override fun resolverEjercicio(ejercicio: Ejercicio, calculador: CalculadorFisico): Ejercicio {
         ejercicio.resultado = calculador.calcular(ejercicio.datos)
         return ejercicio
     }

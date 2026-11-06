@@ -7,25 +7,25 @@ import javax.swing.SwingUtilities
 /**
  * Punto de entrada principal para la aplicación "Simulación Tiro: Laboratorio de Tiro Oblicuo".
  *
- * Conecta e inicia de manera limpia la ventana gráfica principal de escritorio en el
- * hilo de despacho de eventos de Swing (Event Dispatch Thread - EDT).
- * Admite el argumento opcional `--console` para ejecutar el menú por consola si se requiere.
+ * Simplifica el arranque a una única función de entrada delegando la inicialización
+ * en el objeto encapsulado [LanzadorAplicacion].
  *
  * @param args Argumentos pasados por línea de comandos.
  */
-fun main(args: Array<String>) {
-    if (args.contains("--console")) {
-        MenuConsoleRunner().iniciar()
-    } else {
-        SwingUtilities.invokeLater {
-            VentanaPrincipal.iniciar()
-        }
-    }
-}
+fun main(args: Array<String> = emptyArray()) = LanzadorAplicacion.ejecutar(args)
 
 /**
- * Sobrecarga sin argumentos para ejecuciones directas desde el entorno de ejecución o IDE.
+ * Objeto responsable de orquestar el arranque de la aplicación en modo gráfico (EDT)
+ * o en modo consola (`--console`).
  */
-fun main() {
-    main(emptyArray())
+private object LanzadorAplicacion {
+    fun ejecutar(args: Array<String>) {
+        if (args.contains("--console")) {
+            MenuConsoleRunner().iniciar()
+        } else {
+            SwingUtilities.invokeLater {
+                VentanaPrincipal.iniciar()
+            }
+        }
+    }
 }

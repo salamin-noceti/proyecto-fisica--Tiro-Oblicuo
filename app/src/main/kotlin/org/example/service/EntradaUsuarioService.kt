@@ -11,7 +11,7 @@ package org.example.service
  * @property lector Función proveedora de cadenas desde la consola (por defecto invoca [readln]).
  */
 class EntradaUsuarioService(
-    private val lector: () -> String = { readln() },
+    private val lector: () -> String = ::readln,
     private val validador: ValidadorEntradaRespuesta = ValidadorEntradaRespuesta()
 ) {
 
@@ -51,17 +51,19 @@ class EntradaUsuarioService(
      * @return Valor [Double] válido ingresado por el usuario.
      */
     fun pedirDecimal(mensaje: String, nombreCampo: String = "Valor"): Double {
-        while (true) {
+        var valorValido: Double? = null
+        while (valorValido == null) {
             println(mensaje)
             val entrada = lector()
 
-            when (val resultado = validador.validarCampo(entrada, nombreCampo)) {
-                is ResultadoValidacion.Valido -> return resultado.valor
-                is ResultadoValidacion.Invalido -> {
-                    println("   ⚠️ ${resultado.mensajeError}")
+            validador.validarCampo(entrada, nombreCampo).procesar(
+                onValido = { valorValido = it },
+                onInvalido = { mensajeError ->
+                    println("   ⚠️ $mensajeError")
                     println()
                 }
-            }
+            )
         }
+        return valorValido
     }
 }

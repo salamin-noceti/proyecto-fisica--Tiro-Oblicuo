@@ -70,6 +70,14 @@ class PanelResumenCalificacion : JPanel(BorderLayout(0, 12)) {
      * Actualiza el encabezado de calificación y reconstruye las tarjetas comparativas según el [reporte].
      */
     fun actualizarConReporte(reporte: ReporteAutocorreccion) {
+        actualizarTextosBanner(reporte)
+        aplicarEstiloBanner(reporte)
+        reconstruirTarjetasParametros(reporte.evaluaciones)
+        revalidate()
+        repaint()
+    }
+
+    private fun actualizarTextosBanner(reporte: ReporteAutocorreccion) {
         val d = reporte.ejercicio.datos
         labelDatosEjercicio.text = String.format(
             Locale.US,
@@ -80,16 +88,17 @@ class PanelResumenCalificacion : JPanel(BorderLayout(0, 12)) {
             d.angulo,
             d.alturaInicial
         )
-
-        labelResumenConteo.text = "📊 Calificación: ${reporte.textoResumenAciertos()} (${String.format(Locale.US, "%.0f%%", reporte.porcentajeAcierto)})"
+        val pct = String.format(Locale.US, "%.0f%%", reporte.porcentajeAcierto)
+        labelResumenConteo.text = "📊 Calificación: ${reporte.textoResumenAciertos()} ($pct)"
         labelEstadoGeneral.text = reporte.mensajeGeneral
+    }
 
+    private fun aplicarEstiloBanner(reporte: ReporteAutocorreccion) {
         val (fondoBanner, bordeBanner, colorTextoEstado) = when {
             reporte.respuestaEstudiante == null -> Triple(COLOR_NEUTRO_FONDO, COLOR_NEUTRO_BORDE, COLOR_NEUTRO_TEXTO)
             reporte.esExcelente() -> Triple(COLOR_VERDE_FONDO, COLOR_VERDE_BORDE, COLOR_VERDE_TEXTO)
             else -> Triple(COLOR_ROJO_FONDO, COLOR_ROJO_BORDE, COLOR_ROJO_TEXTO)
         }
-
         panelBannerEstado.background = fondoBanner
         panelBannerEstado.border = CompoundBorder(
             BorderFactory.createMatteBorder(0, 5, 0, 0, bordeBanner),
@@ -99,14 +108,13 @@ class PanelResumenCalificacion : JPanel(BorderLayout(0, 12)) {
             )
         )
         labelEstadoGeneral.foreground = colorTextoEstado
+    }
 
+    private fun reconstruirTarjetasParametros(evaluaciones: List<EvaluacionParametro>) {
         contenedorTarjetas.removeAll()
-        for (evaluacion in reporte.evaluaciones) {
+        for (evaluacion in evaluaciones) {
             contenedorTarjetas.add(crearTarjetaParametro(evaluacion))
         }
-
-        revalidate()
-        repaint()
     }
 
     private fun configurarBannerInicial() {

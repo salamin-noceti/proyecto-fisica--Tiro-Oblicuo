@@ -58,8 +58,6 @@ class RenderizadorVelocidad(
         resultadoTeorico: ResultadoTiroOblicuo,
         datos: IngresoDatos
     ) {
-        canvas.tiempoActual = tiempoActual
-
         val puntosVx = puntosEstela.map { PuntoGrafico(it.tiempo, it.velocidadX) }
         val puntosVy = puntosEstela.map { PuntoGrafico(it.tiempo, it.velocidadY) }
 
@@ -85,7 +83,7 @@ class RenderizadorVelocidad(
             unidad = "m/s"
         )
 
-        canvas.actualizarSeries(listOf(serieVx, serieVy))
+        canvas.actualizarSeries(listOf(serieVx, serieVy), tiempoActual)
     }
 
     override fun reiniciar() {

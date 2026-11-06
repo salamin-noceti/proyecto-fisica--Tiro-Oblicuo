@@ -9,7 +9,7 @@ import org.example.model.Ejercicio
  * @param detector Detector de temática para análisis de ejercicios.
  */
 class ThemeFactory(
-    val detector: ThemeDetector = ThemeDetector()
+    private val detector: ThemeDetector = ThemeDetector()
 ) {
     private val renderizadores: Map<TematicaSimulacion, ThemeRenderer> = mapOf(
         TematicaSimulacion.CANON to CanonThemeRenderer(),
