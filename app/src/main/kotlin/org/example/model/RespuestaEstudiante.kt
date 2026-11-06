@@ -36,6 +36,17 @@ data class RespuestaEstudiante(
     }
 
     /**
+     * Indica si todos los parámetros numéricos ingresados por el estudiante son explícitamente 0.0
+     * (caso límite de velocidad inicial nula v0 = 0).
+     */
+    fun esEntradaEnCero(): Boolean =
+        alcanceHorizontal == 0.0 &&
+            alturaMaxima == 0.0 &&
+            tiempoVuelo == 0.0 &&
+            velocidadX == 0.0 &&
+            velocidadY == 0.0
+
+    /**
      * Convierte la respuesta del estudiante a una instancia de [ResultadoTiroOblicuo],
      * permitiendo una integración transparente con los motores de cálculo y simulación existentes.
      */

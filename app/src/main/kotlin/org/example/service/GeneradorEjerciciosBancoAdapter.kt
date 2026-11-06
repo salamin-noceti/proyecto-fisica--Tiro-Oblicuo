@@ -12,7 +12,7 @@ import org.example.model.Ejercicio
  * entre los ejercicios disponibles para la dificultad indicada.
  */
 class GeneradorEjerciciosBancoAdapter(
-    private val banco: BancoEjerciciosService = BancoEjerciciosService()
+    private val banco: RepositorioEjerciciosService = BancoEjerciciosService()
 ) : GeneradorEjerciciosService {
 
     private val indicesPorDificultad = mutableMapOf<Dificultad, Int>()

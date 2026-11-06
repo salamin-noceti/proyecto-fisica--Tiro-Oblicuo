@@ -18,6 +18,20 @@ class SimulacionConsoleRunner(
 ) : NavegadorSimulacionService {
 
     override fun transferirASimulacion(ejercicio: Ejercicio, respuesta: RespuestaEstudiante) {
+        imprimirEncabezadoYRespuestas(ejercicio, respuesta)
+
+        val solucionSistema = calculador.calcular(ejercicio.datos)
+        ejercicio.resultado = solucionSistema
+
+        imprimirResultadosSimulacion(solucionSistema)
+        imprimirComparativaPreliminar(respuesta, solucionSistema)
+
+        println()
+        println("   Presioná ENTER para continuar...")
+        readlnOrNull()
+    }
+
+    private fun imprimirEncabezadoYRespuestas(ejercicio: Ejercicio, respuesta: RespuestaEstudiante) {
         println()
         println("╔══════════════════════════════════════════════════════════════════╗")
         println("║         🚀 SIMULADOR DE TIRO OBLICUO · MÓDULO EN VIVO            ║")
@@ -32,18 +46,20 @@ class SimulacionConsoleRunner(
         println("      • Altura máxima:      ${formatear(respuesta.alturaMaxima)} m")
         println("      • Tiempo de vuelo:    ${formatear(respuesta.tiempoVuelo)} s")
         println()
+    }
 
-        // Ejecutar simulación analítica del sistema
-        val solucionSistema = calculador.calcular(ejercicio.datos)
-        ejercicio.resultado = solucionSistema
-
+    private fun imprimirResultadosSimulacion(solucionSistema: org.example.model.ResultadoTiroOblicuo) {
         println("   🔬 Resultados calculados por la simulación teórica:")
         println("      • Alcance horizontal real: ${formatear(solucionSistema.distanciaHorizontal)} m")
         println("      • Altura máxima real:      ${formatear(solucionSistema.alturaMaxima)} m")
         println("      • Tiempo de vuelo real:    ${formatear(solucionSistema.tiempoVuelo)} s")
         println()
+    }
 
-        // Tolerancia de comparación (0.1 unidades)
+    private fun imprimirComparativaPreliminar(
+        respuesta: RespuestaEstudiante,
+        solucionSistema: org.example.model.ResultadoTiroOblicuo
+    ) {
         val margen = 0.1
         val errorAlcance = abs(respuesta.alcanceHorizontal - solucionSistema.distanciaHorizontal)
         val errorAltura = abs(respuesta.alturaMaxima - solucionSistema.alturaMaxima)
@@ -63,10 +79,6 @@ class SimulacionConsoleRunner(
                 println("      - Diferencia en tiempo de vuelo:    Δ = ${formatear(errorTiempo)} s")
             }
         }
-
-        println()
-        println("   Presioná ENTER para continuar...")
-        readlnOrNull()
     }
 
     private fun formatear(valor: Double): String = String.format(Locale.US, "%.2f", valor)

@@ -62,28 +62,34 @@ data class SerieCartesiana(
  * @param etiquetaEjeY Rótulo del eje vertical (ej. "Posición (m)").
  */
 class CartesianChartCanvas(
-    var titulo: String = "Gráfico Cartesiano",
-    var etiquetaEjeX: String = "t (s)",
-    var etiquetaEjeY: String = "y"
+    val titulo: String = "Gráfico Cartesiano",
+    val etiquetaEjeX: String = "t (s)",
+    val etiquetaEjeY: String = "y"
 ) : JPanel() {
 
     /** Límite inferior del dominio horizontal (X). */
     var xMin: Double = 0.0
+        private set
 
     /** Límite superior del dominio horizontal (X). */
     var xMax: Double = 10.0
+        private set
 
     /** Límite inferior del rango vertical (Y). */
     var yMin: Double = 0.0
+        private set
 
     /** Límite superior del rango vertical (Y). */
     var yMax: Double = 10.0
+        private set
 
     /** Instante de tiempo actual simulado para el marcador/cursor vertical. */
     var tiempoActual: Double = 0.0
+        private set
 
     /** Indica si se debe dibujar la línea vertical indicadora del tiempo actual. */
     var mostrarCursorTiempo: Boolean = true
+        private set
 
     /** Series de datos activas en el gráfico. */
     private var series: List<SerieCartesiana> = emptyList()
@@ -143,10 +149,19 @@ class CartesianChartCanvas(
     fun obtenerSeries(): List<SerieCartesiana> = series
 
     /**
-     * Actualiza las series a graficar y redibuja el componente.
+     * Actualiza las series a graficar y opcionalmente el tiempo actual, redibujando el componente.
      */
-    fun actualizarSeries(nuevasSeries: List<SerieCartesiana>) {
+    fun actualizarSeries(nuevasSeries: List<SerieCartesiana>, nuevoTiempo: Double = tiempoActual) {
+        this.tiempoActual = nuevoTiempo
         this.series = nuevasSeries
+        repaint()
+    }
+
+    /**
+     * Actualiza el instante de tiempo actual del cursor vertical.
+     */
+    fun actualizarTiempoActual(nuevoTiempo: Double) {
+        this.tiempoActual = nuevoTiempo
         repaint()
     }
 

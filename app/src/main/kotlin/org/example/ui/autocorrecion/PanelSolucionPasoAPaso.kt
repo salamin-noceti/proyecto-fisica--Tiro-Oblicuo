@@ -130,47 +130,47 @@ class PanelSolucionPasoAPaso(
         return JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             background = Color.WHITE
-            border = CompoundBorder(
-                BorderFactory.createMatteBorder(0, 4, 0, 0, Color(37, 99, 235)),
-                CompoundBorder(
-                    BorderFactory.createLineBorder(Color(226, 232, 240), 1),
-                    EmptyBorder(12, 14, 12, 14)
-                )
-            )
-
-            val labelEncabezado = JLabel(paso.tituloCompleto()).apply {
-                font = Font(Font.SANS_SERIF, Font.BOLD, 13)
-                foreground = Color(30, 41, 59)
-            }
-
-            val labelExplicacion = JLabel("<html><div style='color:#64748b;'>${paso.explicacionDidactica}</div></html>").apply {
-                font = Font(Font.SANS_SERIF, Font.PLAIN, 11)
-            }
-
-            val labelFormula = JLabel("📐 Fórmula: ${paso.formulaSimbolica}").apply {
-                font = Font(Font.MONOSPACED, Font.BOLD, 12)
-                foreground = Color(37, 99, 235)
-            }
-
-            val labelSustitucion = JLabel("🔢 Reemplazo: ${paso.sustitucionNumerica}").apply {
-                font = Font(Font.MONOSPACED, Font.PLAIN, 12)
-                foreground = Color(51, 65, 85)
-            }
-
-            val labelResultado = JLabel("🎯 Resultado exacto: ${paso.resultadoFormateado}").apply {
-                font = Font(Font.SANS_SERIF, Font.BOLD, 12)
-                foreground = Color(16, 185, 129)
-            }
-
-            add(labelEncabezado)
-            add(Box.createRigidArea(Dimension(0, 4)))
-            add(labelExplicacion)
-            add(Box.createRigidArea(Dimension(0, 8)))
-            add(labelFormula)
-            add(Box.createRigidArea(Dimension(0, 4)))
-            add(labelSustitucion)
-            add(Box.createRigidArea(Dimension(0, 6)))
-            add(labelResultado)
+            border = construirBordePaso()
+            agregarEtiquetasPaso(this, paso)
         }
     }
+
+    private fun construirBordePaso(): CompoundBorder =
+        CompoundBorder(
+            BorderFactory.createMatteBorder(0, 4, 0, 0, Color(37, 99, 235)),
+            CompoundBorder(
+                BorderFactory.createLineBorder(Color(226, 232, 240), 1),
+                EmptyBorder(12, 14, 12, 14)
+            )
+        )
+
+    private fun agregarEtiquetasPaso(panel: JPanel, paso: PasoSolucion) {
+        val labelEncabezado = crearEtiqueta(paso.tituloCompleto(), Font.SANS_SERIF, Font.BOLD, 13, Color(30, 41, 59))
+        val labelExplicacion = crearEtiqueta(
+            "<html><div style='color:#64748b;'>${paso.explicacionDidactica}</div></html>",
+            Font.SANS_SERIF,
+            Font.PLAIN,
+            11,
+            Color(100, 116, 139)
+        )
+        val labelFormula = crearEtiqueta("📐 Fórmula: ${paso.formulaSimbolica}", Font.MONOSPACED, Font.BOLD, 12, Color(37, 99, 235))
+        val labelSustitucion = crearEtiqueta("🔢 Reemplazo: ${paso.sustitucionNumerica}", Font.MONOSPACED, Font.PLAIN, 12, Color(51, 65, 85))
+        val labelResultado = crearEtiqueta("🎯 Resultado exacto: ${paso.resultadoFormateado}", Font.SANS_SERIF, Font.BOLD, 12, Color(16, 185, 129))
+
+        panel.add(labelEncabezado)
+        panel.add(Box.createRigidArea(Dimension(0, 4)))
+        panel.add(labelExplicacion)
+        panel.add(Box.createRigidArea(Dimension(0, 8)))
+        panel.add(labelFormula)
+        panel.add(Box.createRigidArea(Dimension(0, 4)))
+        panel.add(labelSustitucion)
+        panel.add(Box.createRigidArea(Dimension(0, 6)))
+        panel.add(labelResultado)
+    }
+
+    private fun crearEtiqueta(texto: String, familia: String, estilo: Int, tamano: Int, color: Color): JLabel =
+        JLabel(texto).apply {
+            font = Font(familia, estilo, tamano)
+            foreground = color
+        }
 }

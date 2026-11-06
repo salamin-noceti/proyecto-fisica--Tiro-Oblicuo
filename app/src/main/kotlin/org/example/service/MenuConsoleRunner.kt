@@ -12,7 +12,7 @@ import java.util.Locale
  * acceder a la pantalla interactiva de ejercicios para el estudiante (Issue 6).
  */
 class MenuConsoleRunner(
-    private val banco: BancoEjerciciosService = BancoEjerciciosService(),
+    private val banco: RepositorioEjerciciosService = BancoEjerciciosService(),
     private val entrada: EntradaUsuarioService = EntradaUsuarioService(),
     private val calculador: CalculadorFisico = CalculadorTiroOblicuo(),
     private val pantallaEjercicios: PantallaEjercicios = PantallaEjercicios(entrada = entrada)

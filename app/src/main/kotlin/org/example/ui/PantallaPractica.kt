@@ -68,10 +68,10 @@ import javax.swing.border.EmptyBorder
 open class PantallaPractica(
     open val gestorNavegacion: GestorNavegacion = GestorNavegacion(),
     open val appState: AppState = gestorNavegacion.appState,
-    open val generadorService: GeneradorEjerciciosService = GeneradorEjerciciosBancoAdapter(),
-    open val navegadorSimulacion: NavegadorSimulacionService? = null,
-    open val calculadorFisico: CalculadorFisico = CalculadorTiroOblicuo(),
-    open val validador: ValidadorEntradaRespuesta = ValidadorEntradaRespuesta()
+    protected open val generadorService: GeneradorEjerciciosService = GeneradorEjerciciosBancoAdapter(),
+    protected open val navegadorSimulacion: NavegadorSimulacionService? = null,
+    protected open val calculadorFisico: CalculadorFisico = CalculadorTiroOblicuo(),
+    protected open val validador: ValidadorEntradaRespuesta = ValidadorEntradaRespuesta()
 ) : JPanel(BorderLayout()) {
 
     /**
@@ -390,7 +390,6 @@ open class PantallaPractica(
     fun procesarEnvioASimulacion(): Boolean {
         val ejercicio = ejercicioActual ?: return false
 
-        // 1. Validar las respuestas ingresadas
         val (respuesta, errores) = validador.validarRespuestas(
             textoAlcance = campoAlcance.text,
             textoAltura = campoAltura.text,
@@ -399,49 +398,42 @@ open class PantallaPractica(
             textoVelocidadY = campoVelocidadY.text
         )
 
-        if (errores.isNotEmpty()) {
+        if (errores.isNotEmpty() || respuesta == null) {
             mostrarAlerta(errores)
             return false
         }
 
-        if (respuesta != null) {
-            ocultarAlerta()
+        ocultarAlerta()
+        val ejercicioConfigurado = prepararEjercicioParaSimulacion(ejercicio, respuesta)
+        transferirDatosASimulacion(ejercicioConfigurado, respuesta)
+        return true
+    }
 
-            // Distinguir si se ingresaron explícitamente valores en 0.0 (caso límite v0 = 0):
-            // evita ejecutar el tiro parabólico por defecto de 35.3 m (v0 = 20 m/s, θ = 30°).
-            val esEntradaCero = respuesta.alcanceHorizontal == 0.0 &&
-                respuesta.alturaMaxima == 0.0 &&
-                respuesta.tiempoVuelo == 0.0 &&
-                respuesta.velocidadX == 0.0 &&
-                respuesta.velocidadY == 0.0
-
-            val ejercicioConfigurado = if (esEntradaCero) {
-                ejercicio.copy(datos = ejercicio.datos.copy(velocidadInicial = 0.0))
-            } else {
-                ejercicio
-            }
-
-            // 2. Calcular los datos correctos del sistema
-            val solucionSistema = calculadorFisico.calcular(ejercicioConfigurado.datos)
-            ejercicioConfigurado.resultado = solucionSistema
-
-            // 3. Cargar en el estado compartido (AppState)
-            appState.actualizar(
-                ejercicio = ejercicioConfigurado,
-                respuesta = respuesta,
-                resultadoCorrecto = solucionSistema
-            )
-
-            // Notificación compatible al navegador de simulación si existe
-            navegadorSimulacion?.transferirASimulacion(ejercicioConfigurado, respuesta)
-
-            // 4. Cambiar automáticamente la pestaña activa de la ventana a Simulación
-            gestorNavegacion.navegarA(SeccionNavegacion.SIMULACION)
-
-            return true
+    private fun prepararEjercicioParaSimulacion(
+        ejercicio: Ejercicio,
+        respuesta: RespuestaEstudiante
+    ): Ejercicio {
+        val ejercicioAjustado = if (respuesta.esEntradaEnCero()) {
+            ejercicio.copy(datos = ejercicio.datos.copy(velocidadInicial = 0.0))
+        } else {
+            ejercicio
         }
+        ejercicioAjustado.resultado = calculadorFisico.calcular(ejercicioAjustado.datos)
+        return ejercicioAjustado
+    }
 
-        return false
+    private fun transferirDatosASimulacion(
+        ejercicioConfigurado: Ejercicio,
+        respuesta: RespuestaEstudiante
+    ) {
+        val solucionSistema = ejercicioConfigurado.resultado ?: calculadorFisico.calcular(ejercicioConfigurado.datos)
+        appState.actualizar(
+            ejercicio = ejercicioConfigurado,
+            respuesta = respuesta,
+            resultadoCorrecto = solucionSistema
+        )
+        navegadorSimulacion?.transferirASimulacion(ejercicioConfigurado, respuesta)
+        gestorNavegacion.navegarA(SeccionNavegacion.SIMULACION)
     }
 
     /**
@@ -575,71 +567,53 @@ open class PantallaPractica(
                 EmptyBorder(8, 12, 10, 12)
             )
 
-            val gbc = GridBagConstraints().apply {
-                fill = GridBagConstraints.HORIZONTAL
-                insets = Insets(4, 6, 4, 6)
-            }
-
-            // Fila 0: Alcance horizontal y Altura máxima
-            gbc.gridx = 0
-            gbc.gridy = 0
-            gbc.weightx = 0.2
-            add(JLabel("Alcance horizontal (m):*"), gbc)
-
-            gbc.gridx = 1
-            gbc.gridy = 0
-            gbc.weightx = 0.3
-            add(campoAlcance, gbc)
-
-            gbc.gridx = 2
-            gbc.gridy = 0
-            gbc.weightx = 0.2
-            add(JLabel("Altura máxima (m):*"), gbc)
-
-            gbc.gridx = 3
-            gbc.gridy = 0
-            gbc.weightx = 0.3
-            add(campoAltura, gbc)
-
-            // Fila 1: Tiempo de vuelo y Velocidad X
-            gbc.gridx = 0
-            gbc.gridy = 1
-            gbc.weightx = 0.2
-            add(JLabel("Tiempo de vuelo (s):*"), gbc)
-
-            gbc.gridx = 1
-            gbc.gridy = 1
-            gbc.weightx = 0.3
-            add(campoTiempo, gbc)
-
-            gbc.gridx = 2
-            gbc.gridy = 1
-            gbc.weightx = 0.2
-            add(JLabel("Velocidad horizontal Vx (m/s):"), gbc)
-
-            gbc.gridx = 3
-            gbc.gridy = 1
-            gbc.weightx = 0.3
-            add(campoVelocidadX, gbc)
-
-            // Fila 2: Velocidad Y
-            gbc.gridx = 0
-            gbc.gridy = 2
-            gbc.weightx = 0.2
-            add(JLabel("Velocidad vertical Vy (m/s):"), gbc)
-
-            gbc.gridx = 1
-            gbc.gridy = 2
-            gbc.weightx = 0.3
-            add(campoVelocidadY, gbc)
-
-            gbc.gridx = 2
-            gbc.gridy = 2
-            gbc.gridwidth = 2
-            gbc.weightx = 0.5
-            val labelAclaracion = JLabel("<html><small style='color: #64748b;'>* Campos obligatorios para verificación de trayectoria</small></html>")
-            add(labelAclaracion, gbc)
+            agregarCampoEnGrilla(this, "Alcance horizontal (m):*", campoAlcance, 0, 0)
+            agregarCampoEnGrilla(this, "Altura máxima (m):*", campoAltura, 2, 0)
+            agregarCampoEnGrilla(this, "Tiempo de vuelo (s):*", campoTiempo, 0, 1)
+            agregarCampoEnGrilla(this, "Velocidad horizontal Vx (m/s):", campoVelocidadX, 2, 1)
+            agregarCampoEnGrilla(this, "Velocidad vertical Vy (m/s):", campoVelocidadY, 0, 2)
+            agregarAclaracionFormulario(this)
         }
+    }
+
+    private fun agregarCampoEnGrilla(
+        panel: JPanel,
+        etiqueta: String,
+        campo: JTextField,
+        columnaBase: Int,
+        fila: Int
+    ) {
+        val gbcEtiqueta = GridBagConstraints().apply {
+            fill = GridBagConstraints.HORIZONTAL
+            insets = Insets(4, 6, 4, 6)
+            gridx = columnaBase
+            gridy = fila
+            weightx = 0.2
+        }
+        val gbcCampo = GridBagConstraints().apply {
+            fill = GridBagConstraints.HORIZONTAL
+            insets = Insets(4, 6, 4, 6)
+            gridx = columnaBase + 1
+            gridy = fila
+            weightx = 0.3
+        }
+        panel.add(JLabel(etiqueta), gbcEtiqueta)
+        panel.add(campo, gbcCampo)
+    }
+
+    private fun agregarAclaracionFormulario(panel: JPanel) {
+        val gbc = GridBagConstraints().apply {
+            fill = GridBagConstraints.HORIZONTAL
+            insets = Insets(4, 6, 4, 6)
+            gridx = 2
+            gridy = 2
+            gridwidth = 2
+            weightx = 0.5
+        }
+        val labelAclaracion = JLabel(
+            "<html><small style='color: #64748b;'>* Campos obligatorios para verificación de trayectoria</small></html>"
+        )
+        panel.add(labelAclaracion, gbc)
     }
 
     private fun etiquetaDificultad(dificultad: Dificultad): String = when (dificultad) {

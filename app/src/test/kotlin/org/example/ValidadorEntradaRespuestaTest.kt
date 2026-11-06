@@ -12,17 +12,37 @@ class ValidadorEntradaRespuestaTest {
 
     private val validador = ValidadorEntradaRespuesta()
 
+    private fun exigirError(resultado: ResultadoValidacion): String {
+        var errorCapturado: String? = null
+        resultado.procesar(
+            onValido = { errorCapturado = null },
+            onInvalido = { errorCapturado = it }
+        )
+        assertNotNull(errorCapturado, "Se esperaba un resultado inválido")
+        return errorCapturado!!
+    }
+
+    private fun exigirValor(resultado: ResultadoValidacion): Double {
+        var valorCapturado: Double? = null
+        resultado.procesar(
+            onValido = { valorCapturado = it },
+            onInvalido = { valorCapturado = null }
+        )
+        assertNotNull(valorCapturado, "Se esperaba un resultado válido")
+        return valorCapturado!!
+    }
+
     @Test
     fun `validarCampo detecta entradas vacias o en blanco`() {
         val resNulo = validador.validarCampo(null, "Alcance")
         val resVacio = validador.validarCampo("", "Alcance")
         val resEspacios = validador.validarCampo("   ", "Alcance")
 
-        assertTrue(resNulo is ResultadoValidacion.Invalido)
-        assertTrue(resVacio is ResultadoValidacion.Invalido)
-        assertTrue(resEspacios is ResultadoValidacion.Invalido)
+        exigirError(resNulo)
+        val mensajeVacio = exigirError(resVacio)
+        exigirError(resEspacios)
 
-        assertTrue(resVacio.mensajeError.contains("no puede estar vacío"))
+        assertTrue(mensajeVacio.contains("no puede estar vacío"))
     }
 
     @Test
@@ -30,17 +50,17 @@ class ValidadorEntradaRespuestaTest {
         val resTexto = validador.validarCampo("abc", "Altura")
         val resMixto = validador.validarCampo("12a", "Altura")
 
-        assertTrue(resTexto is ResultadoValidacion.Invalido)
-        assertTrue(resMixto is ResultadoValidacion.Invalido)
-        assertTrue(resTexto.mensajeError.contains("Valor no numérico"))
+        val mensajeTexto = exigirError(resTexto)
+        exigirError(resMixto)
+        assertTrue(mensajeTexto.contains("Valor no numérico"))
     }
 
     @Test
     fun `validarCampo rechaza valores negativos`() {
         val resNegativo = validador.validarCampo("-10.5", "Tiempo")
 
-        assertTrue(resNegativo is ResultadoValidacion.Invalido)
-        assertTrue(resNegativo.mensajeError.contains("no puede ser negativo"))
+        val mensajeNegativo = exigirError(resNegativo)
+        assertTrue(mensajeNegativo.contains("no puede ser negativo"))
     }
 
     @Test
@@ -48,10 +68,8 @@ class ValidadorEntradaRespuestaTest {
         val resPunto = validador.validarCampo("24.75", "Alcance")
         val resComa = validador.validarCampo("24,75", "Alcance")
 
-        assertTrue(resPunto is ResultadoValidacion.Valido)
-        assertTrue(resComa is ResultadoValidacion.Valido)
-        assertEquals(24.75, resPunto.valor)
-        assertEquals(24.75, resComa.valor)
+        assertEquals(24.75, exigirValor(resPunto))
+        assertEquals(24.75, exigirValor(resComa))
     }
 
     @Test

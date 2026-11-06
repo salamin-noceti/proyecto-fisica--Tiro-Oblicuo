@@ -83,16 +83,20 @@ class ControladorSimulacion(
     var posicionActual: PosicionTrayectoria = calculadorFisico.calcularPosicion(datosIniciales, 0.0)
         private set
 
+    private val _puntosEstela: MutableList<PosicionTrayectoria> = mutableListOf(posicionActual)
+
     /**
-     * Historial de puntos físicos recorridos por el proyectil durante el vuelo actual,
+     * Vista inmutable del historial de puntos físicos recorridos por el proyectil durante el vuelo actual,
      * utilizado para renderizar la estela / curva de la trayectoria.
      */
-    val puntosEstela: MutableList<PosicionTrayectoria> = mutableListOf(posicionActual)
+    val puntosEstela: List<PosicionTrayectoria>
+        get() = _puntosEstela.toList()
 
     /**
      * Factor de escala temporal de la animación (1.0 = tiempo real).
      */
     var factorVelocidad: Double = 1.0
+        private set
 
     private val listeners = mutableListOf<SimulacionListener>()
 
@@ -126,8 +130,8 @@ class ControladorSimulacion(
             detenerTimer()
             tiempoActual = 0.0
             posicionActual = calculadorFisico.calcularPosicion(datos, 0.0)
-            puntosEstela.clear()
-            puntosEstela.add(posicionActual)
+            _puntosEstela.clear()
+            _puntosEstela.add(posicionActual)
             estado = EstadoSimulacion.FINALIZADO
             notificarActualizacion()
             return
@@ -162,8 +166,8 @@ class ControladorSimulacion(
         detenerTimer()
         tiempoActual = 0.0
         posicionActual = calculadorFisico.calcularPosicion(datos, 0.0)
-        puntosEstela.clear()
-        puntosEstela.add(posicionActual)
+        _puntosEstela.clear()
+        _puntosEstela.add(posicionActual)
         estado = EstadoSimulacion.DETENIDO
         notificarActualizacion()
     }
@@ -187,13 +191,13 @@ class ControladorSimulacion(
             // Impacto en el suelo alcanzado: t = t_vuelo, y = 0
             tiempoActual = tiempoVuelo
             posicionActual = calculadorFisico.calcularPosicion(datos, tiempoVuelo)
-            puntosEstela.add(posicionActual)
+            _puntosEstela.add(posicionActual)
             detenerTimer()
             estado = EstadoSimulacion.FINALIZADO
         } else {
             tiempoActual = nuevoTiempo
             posicionActual = calculadorFisico.calcularPosicion(datos, nuevoTiempo)
-            puntosEstela.add(posicionActual)
+            _puntosEstela.add(posicionActual)
         }
 
         notificarActualizacion()

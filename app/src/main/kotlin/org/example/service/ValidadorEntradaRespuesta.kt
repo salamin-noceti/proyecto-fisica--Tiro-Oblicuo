@@ -7,16 +7,36 @@ import org.example.model.RespuestaEstudiante
  */
 sealed class ResultadoValidacion {
     /**
+     * Procesa polimórficamente el resultado de validación invocando el callback correspondiente,
+     * cumpliendo con el Principio Abierto/Cerrado (OCP) sin requerir condicionales `when` o `is`.
+     *
+     * @param onValido Acción a ejecutar cuando el valor numérico es válido.
+     * @param onInvalido Acción a ejecutar cuando existe un mensaje de error de validación.
+     */
+    abstract fun procesar(
+        onValido: (Double) -> Unit,
+        onInvalido: (String) -> Unit
+    )
+
+    /**
      * Indica que el campo contiene un valor numérico válido y no negativo.
      * @property valor Número decimal parseado.
      */
-    data class Valido(val valor: Double) : ResultadoValidacion()
+    data class Valido(val valor: Double) : ResultadoValidacion() {
+        override fun procesar(onValido: (Double) -> Unit, onInvalido: (String) -> Unit) {
+            onValido(valor)
+        }
+    }
 
     /**
      * Indica que ocurrió un error de validación (campo vacío, texto no numérico, etc.).
      * @property mensajeError Mensaje explicativo para el usuario.
      */
-    data class Invalido(val mensajeError: String) : ResultadoValidacion()
+    data class Invalido(val mensajeError: String) : ResultadoValidacion() {
+        override fun procesar(onValido: (Double) -> Unit, onInvalido: (String) -> Unit) {
+            onInvalido(mensajeError)
+        }
+    }
 }
 
 /**
@@ -82,42 +102,42 @@ class ValidadorEntradaRespuesta {
         textoVelocidadY: String? = null
     ): Pair<RespuestaEstudiante?, List<String>> {
         val errores = mutableListOf<String>()
-
-        val resAlcance = validarCampo(textoAlcance, "Alcance horizontal")
-        if (resAlcance is ResultadoValidacion.Invalido) {
-            errores.add(resAlcance.mensajeError)
-        }
-
-        val resAltura = validarCampo(textoAltura, "Altura máxima")
-        if (resAltura is ResultadoValidacion.Invalido) {
-            errores.add(resAltura.mensajeError)
-        }
-
-        val resTiempo = validarCampo(textoTiempo, "Tiempo de vuelo")
-        if (resTiempo is ResultadoValidacion.Invalido) {
-            errores.add(resTiempo.mensajeError)
-        }
-
+        var alcance = 0.0
+        var altura = 0.0
+        var tiempo = 0.0
         var vx = 0.0
+        var vy = 0.0
+
+        validarCampo(textoAlcance, "Alcance horizontal").procesar(
+            onValido = { alcance = it },
+            onInvalido = { errores.add(it) }
+        )
+
+        validarCampo(textoAltura, "Altura máxima").procesar(
+            onValido = { altura = it },
+            onInvalido = { errores.add(it) }
+        )
+
+        validarCampo(textoTiempo, "Tiempo de vuelo").procesar(
+            onValido = { tiempo = it },
+            onInvalido = { errores.add(it) }
+        )
+
         if (!textoVelocidadX.isNullOrBlank()) {
-            when (val resVx = validarCampo(textoVelocidadX, "Velocidad horizontal (Vx)")) {
-                is ResultadoValidacion.Valido -> vx = resVx.valor
-                is ResultadoValidacion.Invalido -> errores.add(resVx.mensajeError)
-            }
+            validarCampo(textoVelocidadX, "Velocidad horizontal (Vx)").procesar(
+                onValido = { vx = it },
+                onInvalido = { errores.add(it) }
+            )
         }
 
-        var vy = 0.0
         if (!textoVelocidadY.isNullOrBlank()) {
-            when (val resVy = validarCampo(textoVelocidadY, "Velocidad vertical (Vy)")) {
-                is ResultadoValidacion.Valido -> vy = resVy.valor
-                is ResultadoValidacion.Invalido -> errores.add(resVy.mensajeError)
-            }
+            validarCampo(textoVelocidadY, "Velocidad vertical (Vy)").procesar(
+                onValido = { vy = it },
+                onInvalido = { errores.add(it) }
+            )
         }
 
         return if (errores.isEmpty()) {
-            val alcance = (resAlcance as ResultadoValidacion.Valido).valor
-            val altura = (resAltura as ResultadoValidacion.Valido).valor
-            val tiempo = (resTiempo as ResultadoValidacion.Valido).valor
             Pair(
                 RespuestaEstudiante(
                     alcanceHorizontal = alcance,

@@ -94,9 +94,9 @@ class VentanaPrincipal(
     val pantallaSimulacion: PantallaSimulacion = PantallaSimulacion(gestorNavegacion.appState)
     val pantallaAutocorrecion: PantallaAutocorrecion = PantallaAutocorrecion(gestorNavegacion.appState)
 
-    // Contenedor dinámico central y su administrador de diseño
-    val layoutCentral: CardLayout = CardLayout()
-    val panelContenidoCentral: JPanel = JPanel(layoutCentral)
+    // Contenedor dinámico central y su administrador de diseño (encapsulados internamente)
+    private val layoutCentral: CardLayout = CardLayout()
+    private val panelContenidoCentral: JPanel = JPanel(layoutCentral)
 
     // Barra de estado inferior
     private val labelEstadoSeccion: JLabel = JLabel()
