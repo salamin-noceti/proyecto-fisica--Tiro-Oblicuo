@@ -285,14 +285,14 @@ xychart-beta
 | 2026-10-23 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 2 / 1 |
 | 2026-10-26 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 0 / 1 |
 
-#### Aportes fuera del calendario de clases
+#### Aportes fuera del calendario de clases — avsalomon
 
-**2 fechas fuera del calendario** · 2 commits · 2 merges
+**avsalomon — 2 fechas fuera del calendario** · 2 commits · 2 merges
 
-| Fecha | Repositorios | Commits / merges |
-|---|---|--:|
-| 2026-10-30 | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-11-06 | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
+| Alumno | Fecha | Repositorios | Commits / merges |
+|---|---|---|---|
+| avsalomon (`avsalomon`) | 2026-10-30 | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
+| avsalomon (`avsalomon`) | 2026-11-06 | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
 
 ### Romano-22
 
@@ -318,9 +318,9 @@ xychart-beta
 | 2026-10-23 | No | sin actividad | 0 / 0 |
 | 2026-10-26 | No | sin actividad | 0 / 0 |
 
-#### Aportes fuera del calendario de clases
+#### Aportes fuera del calendario de clases — Romano-22
 
-_Sin aportes fuera del calendario de clases._
+_Sin aportes fuera del calendario de clases para Romano-22._
 
 <!-- actividad-clases:fin -->
 
