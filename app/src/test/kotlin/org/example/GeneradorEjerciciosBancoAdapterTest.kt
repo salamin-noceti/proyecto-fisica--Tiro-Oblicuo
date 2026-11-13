@@ -9,9 +9,8 @@ import kotlin.test.assertNotNull
 class GeneradorEjerciciosBancoAdapterTest {
 
     @Test
-    fun `obtener ejercicio por cada dificultad disponible`() {
+    fun testObtenerEjercicioPorCadaDificultadDisponible() {
         val adapter = GeneradorEjerciciosBancoAdapter()
-
         val facil = adapter.obtenerEjercicioPorDificultad(Dificultad.FACIL)
         val medio = adapter.obtenerEjercicioPorDificultad(Dificultad.MEDIO)
         val dificil = adapter.obtenerEjercicioPorDificultad(Dificultad.DIFICIL)
@@ -19,16 +18,14 @@ class GeneradorEjerciciosBancoAdapterTest {
         assertEquals(Dificultad.FACIL, facil.dificultad)
         assertEquals(Dificultad.MEDIO, medio.dificultad)
         assertEquals(Dificultad.DIFICIL, dificil.dificultad)
-
         assertNotNull(facil.enunciado)
         assertNotNull(medio.enunciado)
         assertNotNull(dificil.enunciado)
     }
 
     @Test
-    fun `rotacion ciclica de ejercicios por dificultad`() {
+    fun testRotacionCiclicaDeEjerciciosPorDificultad() {
         val adapter = GeneradorEjerciciosBancoAdapter()
-
         val ej1 = adapter.obtenerEjercicioPorDificultad(Dificultad.FACIL)
         val ej2 = adapter.obtenerEjercicioPorDificultad(Dificultad.FACIL)
         val ej3 = adapter.obtenerEjercicioPorDificultad(Dificultad.FACIL)
@@ -37,6 +34,6 @@ class GeneradorEjerciciosBancoAdapterTest {
         assertEquals(1, ej1.id)
         assertEquals(2, ej2.id)
         assertEquals(3, ej3.id)
-        assertEquals(1, ej4.id) // Vuelve a empezar cíclicamente
+        assertEquals(1, ej4.id)
     }
 }

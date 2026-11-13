@@ -12,9 +12,10 @@ import org.example.model.Ejercicio
  * entre los ejercicios disponibles para la dificultad indicada.
  */
 class GeneradorEjerciciosBancoAdapter(
-    private val banco: RepositorioEjerciciosService = BancoEjerciciosService()
+    bancoOpcional: RepositorioEjerciciosService? = null
 ) : GeneradorEjerciciosService {
 
+    private val banco: RepositorioEjerciciosService = bancoOpcional ?: BancoEjerciciosService()
     private val indicesPorDificultad = mutableMapOf<Dificultad, Int>()
 
     override fun obtenerEjercicioPorDificultad(dificultad: Dificultad): Ejercicio {

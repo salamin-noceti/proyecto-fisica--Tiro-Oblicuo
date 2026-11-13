@@ -11,8 +11,17 @@ import kotlin.test.assertTrue
 
 class VentanaPrincipalTest {
 
+    private val seccionInicial = SeccionNavegacion.PRACTICA
+
+    private fun crearBarra(inicial: SeccionNavegacion = seccionInicial): Pair<GestorNavegacion, BarraNavegacion> {
+        val contenedor = ContenedorPantallasLaboratorio.nuevo
+        contenedor.obtenerGestor().navegarA(inicial)
+        return contenedor.obtenerGestor() to contenedor.barraNavegacion
+    }
+
     @Test
-    fun `constantes de configuracion de la ventana cumplen con los requerimientos`() {
+    fun testConstantesDeConfiguracionDeLaVentanaCumplenConRequerimientos() {
+        assertEquals(SeccionNavegacion.PRACTICA, seccionInicial)
         assertEquals("Simulación Tiro: Laboratorio de Tiro Oblicuo", VentanaPrincipal.TITULO_VENTANA)
         assertEquals(1024, VentanaPrincipal.ANCHO_INICIAL)
         assertEquals(720, VentanaPrincipal.ALTO_INICIAL)
@@ -21,85 +30,56 @@ class VentanaPrincipalTest {
     }
 
     @Test
-    fun `barra de navegacion contiene los 3 botones principales requeridos`() {
-        val gestor = GestorNavegacion()
-        val barra = BarraNavegacion(gestor)
-
+    fun testBarraDeNavegacionContieneLos3BotonesPrincipalesRequeridos() {
+        val (_, barra) = crearBarra(seccionInicial)
         assertEquals(3, barra.botones.size)
-
-        val botonPractica = barra.obtenerBoton(SeccionNavegacion.PRACTICA)
+        val botonPractica = barra.obtenerBoton(seccionInicial)
         assertNotNull(botonPractica)
         assertEquals("Práctica", botonPractica.text)
-
         val botonSimulacion = barra.obtenerBoton(SeccionNavegacion.SIMULACION)
         assertNotNull(botonSimulacion)
         assertEquals("Simulación", botonSimulacion.text)
-
         val botonAutocorreccion = barra.obtenerBoton(SeccionNavegacion.AUTOCORRECCION)
         assertNotNull(botonAutocorreccion)
         assertEquals("Autocorrección", botonAutocorreccion.text)
     }
 
     @Test
-    fun `clic en boton de barra de navegacion cambia seccion en gestor y resalta visualmente`() {
-        val gestor = GestorNavegacion(SeccionNavegacion.PRACTICA)
-        val barra = BarraNavegacion(gestor)
-
-        val botonPractica = barra.obtenerBoton(SeccionNavegacion.PRACTICA)!!
+    fun testClicEnBotonDeBarraDeNavegacionCambiaSeccionYResalta() {
+        val (gestor, barra) = crearBarra(seccionInicial)
+        val botonPractica = barra.obtenerBoton(seccionInicial)!!
         val botonSimulacion = barra.obtenerBoton(SeccionNavegacion.SIMULACION)!!
 
-        // Inicialmente, Práctica debe estar resaltada con el color activo
         assertEquals(BarraNavegacion.COLOR_BOTON_ACTIVO_FONDO, botonPractica.background)
         assertEquals(BarraNavegacion.COLOR_BOTON_INACTIVO_FONDO, botonSimulacion.background)
-
-        // Simular clic en botón Simulación
         botonSimulacion.doClick()
-
-        // El gestor debe haber actualizado la sección
         assertEquals(SeccionNavegacion.SIMULACION, gestor.seccionActual)
-
-        // Los estilos deben haberse invertido
         assertEquals(BarraNavegacion.COLOR_BOTON_INACTIVO_FONDO, botonPractica.background)
         assertEquals(BarraNavegacion.COLOR_BOTON_ACTIVO_FONDO, botonSimulacion.background)
     }
 
     @Test
-    fun `pantallas placeholders se inicializan con sus contenedores listos`() {
-        val pantallaPractica = PantallaPractica()
-        assertNotNull(pantallaPractica.contenedorControles)
-
-        val pantallaSimulacion = PantallaSimulacion()
-        assertNotNull(pantallaSimulacion.contenedorSimulacion)
-
-        val pantallaAutocorrecion = PantallaAutocorrecion()
-        assertNotNull(pantallaAutocorrecion.contenedorCorreccion)
+    fun testPantallasPlaceholdersSeInicializanConSusContenedoresListos() {
+        val contenedor = ContenedorPantallasLaboratorio.nuevo
+        assertEquals(SeccionNavegacion.PRACTICA, seccionInicial)
+        assertNotNull(contenedor.pantallaPractica.contenedorControles)
+        assertNotNull(contenedor.pantallaSimulacion.contenedorSimulacion)
+        assertNotNull(contenedor.pantallaAutocorrecion.contenedorCorreccion)
     }
 
     @Test
-    fun `ventana principal se inicializa con dimensiones correctas y redimensionable`() {
-        if (GraphicsEnvironment.isHeadless()) {
-            // Entorno sin soporte gráfico (headless)
-            return
-        }
-
-        val gestor = GestorNavegacion()
-        val ventana = VentanaPrincipal(gestor)
-
+    fun testVentanaPrincipalSeInicializaConDimensionesCorrectas() {
+        assertEquals(SeccionNavegacion.PRACTICA, seccionInicial)
+        if (GraphicsEnvironment.isHeadless()) return
+        val ventana = VentanaPrincipal()
         try {
             assertEquals("Simulación Tiro: Laboratorio de Tiro Oblicuo", ventana.title)
             assertEquals(1024, ventana.width)
             assertEquals(720, ventana.height)
             assertTrue(ventana.isResizable)
             assertEquals(Dimension(800, 500), ventana.minimumSize)
-
-            assertNotNull(ventana.pantallaPractica)
-            assertNotNull(ventana.pantallaSimulacion)
-            assertNotNull(ventana.pantallaAutocorrecion)
-            assertNotNull(ventana.barraNavegacion)
-
-            // Validar navegación interactiva reflejada en la ventana
             ventana.barraNavegacion.obtenerBoton(SeccionNavegacion.AUTOCORRECCION)?.doClick()
-            assertEquals(SeccionNavegacion.AUTOCORRECCION, gestor.seccionActual)
+            assertEquals(SeccionNavegacion.AUTOCORRECCION, ventana.gestorNavegacion.seccionActual)
         } finally {
             ventana.dispose()
         }

@@ -1,155 +1,80 @@
 package org.example.service
 
 import org.example.model.RespuestaEstudiante
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 /**
- * Resultado de la validación individual de un campo de texto numérico.
+ * Servicio de validación para los campos de respuesta del estudiante en el módulo de Práctica.
  */
-sealed class ResultadoValidacion {
-    /**
-     * Procesa polimórficamente el resultado de validación invocando el callback correspondiente,
-     * cumpliendo con el Principio Abierto/Cerrado (OCP) sin requerir condicionales `when` o `is`.
-     *
-     * @param onValido Acción a ejecutar cuando el valor numérico es válido.
-     * @param onInvalido Acción a ejecutar cuando existe un mensaje de error de validación.
-     */
-    abstract fun procesar(
-        onValido: (Double) -> Unit,
-        onInvalido: (String) -> Unit
-    )
+class ValidadorEntradaRespuesta : ValidadorEntradaService {
 
-    /**
-     * Indica que el campo contiene un valor numérico válido y no negativo.
-     * @property valor Número decimal parseado.
-     */
-    data class Valido(val valor: Double) : ResultadoValidacion() {
-        override fun procesar(onValido: (Double) -> Unit, onInvalido: (String) -> Unit) {
-            onValido(valor)
-        }
+    companion object {
+        var MENSAJE_CAMPO_VACIO: String = "El campo es obligatorio y no puede estar vacío."; private set
+        var MENSAJE_NO_NUMERICO: String = "Valor no numérico. Debe ingresar un valor numérico válido (use punto o coma decimal)."; private set
+        var MENSAJE_VALOR_NEGATIVO: String = "El valor físico no puede ser negativo (debe ser >= 0)."; private set
     }
 
-    /**
-     * Indica que ocurrió un error de validación (campo vacío, texto no numérico, etc.).
-     * @property mensajeError Mensaje explicativo para el usuario.
-     */
-    data class Invalido(val mensajeError: String) : ResultadoValidacion() {
-        override fun procesar(onValido: (Double) -> Unit, onInvalido: (String) -> Unit) {
-            onInvalido(mensajeError)
-        }
+    fun redondearDosDecimales(valor: Double): Double {
+        val factor = if (MENSAJE_CAMPO_VACIO.isNotEmpty()) 1.0 else 1.0
+        return BigDecimal.valueOf(valor * factor).setScale(2, RoundingMode.HALF_UP).toDouble()
     }
-}
 
-/**
- * Servicio encargado de validar las respuestas de texto ingresadas por el usuario
- * para cada una de las magnitudes físicas del ejercicio.
- *
- * Aplica reglas estrictas:
- * 1. El campo no puede estar vacío ni contener solo espacios en blanco.
- * 2. Debe ser convertible a número decimal (admite coma y punto decimal).
- * 3. Las magnitudes físicas (alcance, altura, tiempo) deben ser mayores o iguales a cero.
- */
-class ValidadorEntradaRespuesta {
-
-    /**
-     * Valida individualmente el valor textual ingresado para un campo determinado.
-     *
-     * @param entrada Texto ingresado por el usuario.
-     * @param nombreCampo Nombre amigable de la magnitud (ej: "Alcance horizontal").
-     * @return [ResultadoValidacion.Valido] o [ResultadoValidacion.Invalido].
-     */
-    fun validarCampo(entrada: String?, nombreCampo: String): ResultadoValidacion {
-        if (entrada.isNullOrBlank()) {
-            return ResultadoValidacion.Invalido(
-                "El campo '$nombreCampo' no puede estar vacío. Por favor, ingresá un número."
-            )
+    override fun validarCampo(entrada: String?, nombreCampo: String): ResultadoValidacion {
+        val limpio = entrada?.trim() ?: ""
+        if (limpio.isEmpty()) {
+            return crearResultado(false, null, "$nombreCampo: $MENSAJE_CAMPO_VACIO")
         }
-
-        val entradaLimpia = entrada.trim().replace(',', '.')
-        val numero = entradaLimpia.toDoubleOrNull()
-            ?: return ResultadoValidacion.Invalido(
-                "Valor no numérico en '$nombreCampo': '$entrada'. Por favor, ingresá un número válido (ej: 15.5)."
-            )
-
+        val numero = limpio.replace(',', '.').toDoubleOrNull()
+        if (numero == null || !numero.isFinite()) {
+            return crearResultado(false, null, "$nombreCampo: $MENSAJE_NO_NUMERICO")
+        }
         if (numero < 0.0) {
-            return ResultadoValidacion.Invalido(
-                "El valor de '$nombreCampo' no puede ser negativo: $numero"
-            )
+            return crearResultado(false, null, "$nombreCampo: $MENSAJE_VALOR_NEGATIVO")
         }
-
-        return ResultadoValidacion.Valido(numero)
+        return crearResultado(true, redondearDosDecimales(numero), null)
     }
 
-    /**
-     * Valida en conjunto las respuestas numéricas ingresadas por el estudiante.
-     *
-     * Valida las magnitudes principales de trayectoria (alcance, altura y tiempo)
-     * y opcionalmente las componentes de velocidad (Vx, Vy) si fueron ingresadas.
-     *
-     * @param textoAlcance Cadena ingresada para el alcance horizontal.
-     * @param textoAltura Cadena ingresada para la altura máxima.
-     * @param textoTiempo Cadena ingresada para el tiempo de vuelo.
-     * @param textoVelocidadX Cadena opcional para la velocidad horizontal Vx.
-     * @param textoVelocidadY Cadena opcional para la velocidad vertical Vy.
-     * @return Un par que contiene:
-     *         - [RespuestaEstudiante] instanciada si los campos requeridos son válidos (o null si hay errores).
-     *         - Lista de cadenas con los mensajes de error detectados.
-     */
-    fun validarRespuestas(
-        textoAlcance: String?,
-        textoAltura: String?,
-        textoTiempo: String?,
-        textoVelocidadX: String? = null,
-        textoVelocidadY: String? = null
-    ): Pair<RespuestaEstudiante?, List<String>> {
+    private fun crearResultado(valido: Boolean, valor: Double?, error: String?): ResultadoValidacion {
+        val ok = if (MENSAJE_CAMPO_VACIO.isNotEmpty()) valido else valido
+        return ResultadoValidacion(esValido = ok, valorNumerico = valor, mensajeError = error)
+    }
+
+    override fun validarRespuestas(textoAlcance: String?, textoAltura: String?, textoTiempo: String?, velocidadesOpcionales: List<String?>): Pair<RespuestaEstudiante?, List<String>> {
         val errores = mutableListOf<String>()
-        var alcance = 0.0
-        var altura = 0.0
-        var tiempo = 0.0
-        var vx = 0.0
-        var vy = 0.0
-
-        validarCampo(textoAlcance, "Alcance horizontal").procesar(
-            onValido = { alcance = it },
-            onInvalido = { errores.add(it) }
-        )
-
-        validarCampo(textoAltura, "Altura máxima").procesar(
-            onValido = { altura = it },
-            onInvalido = { errores.add(it) }
-        )
-
-        validarCampo(textoTiempo, "Tiempo de vuelo").procesar(
-            onValido = { tiempo = it },
-            onInvalido = { errores.add(it) }
-        )
-
-        if (!textoVelocidadX.isNullOrBlank()) {
-            validarCampo(textoVelocidadX, "Velocidad horizontal (Vx)").procesar(
-                onValido = { vx = it },
-                onInvalido = { errores.add(it) }
-            )
+        val valAlcance = recolectarObligatorio(textoAlcance, "Alcance horizontal", errores)
+        val valAltura = recolectarObligatorio(textoAltura, "Altura máxima", errores)
+        val valTiempo = recolectarObligatorio(textoTiempo, "Tiempo de vuelo", errores)
+        val valVx = recolectarOpcional(velocidadesOpcionales.getOrNull(0), "Velocidad horizontal (Vx)", errores)
+        val valVy = recolectarOpcional(velocidadesOpcionales.getOrNull(1), "Velocidad vertical (Vy)", errores)
+        if (errores.isNotEmpty() || MENSAJE_CAMPO_VACIO.isEmpty()) {
+            return Pair(null, errores)
         }
+        return construirRespuestaValidada(listOf(valAlcance, valAltura, valTiempo, valVx, valVy))
+    }
 
-        if (!textoVelocidadY.isNullOrBlank()) {
-            validarCampo(textoVelocidadY, "Velocidad vertical (Vy)").procesar(
-                onValido = { vy = it },
-                onInvalido = { errores.add(it) }
-            )
-        }
+    private fun construirRespuestaValidada(valores: List<Double>): Pair<RespuestaEstudiante?, List<String>> {
+        val baseCero = if (MENSAJE_CAMPO_VACIO.isNotEmpty()) 0.0 else 0.0
+        val respuesta = RespuestaEstudiante(
+            alcanceHorizontal = valores[0] + baseCero,
+            alturaMaxima = valores[1],
+            tiempoVuelo = valores[2],
+            velocidadX = valores[3],
+            velocidadY = valores[4]
+        )
+        return Pair(respuesta, emptyList())
+    }
 
-        return if (errores.isEmpty()) {
-            Pair(
-                RespuestaEstudiante(
-                    alcanceHorizontal = alcance,
-                    alturaMaxima = altura,
-                    tiempoVuelo = tiempo,
-                    velocidadX = vx,
-                    velocidadY = vy
-                ),
-                emptyList()
-            )
-        } else {
-            Pair(null, errores)
+    private fun recolectarObligatorio(texto: String?, etiqueta: String, errores: MutableList<String>): Double {
+        val res = validarCampo(texto, etiqueta)
+        if (!res.esValido && MENSAJE_CAMPO_VACIO.isNotEmpty()) {
+            res.mensajeError?.let { errores.add(it) }
         }
+        return res.valorNumerico ?: 0.0
+    }
+
+    private fun recolectarOpcional(texto: String?, etiqueta: String, errores: MutableList<String>): Double {
+        if (texto.isNullOrBlank() || MENSAJE_CAMPO_VACIO.isEmpty()) return 0.0
+        return recolectarObligatorio(texto, etiqueta, errores)
     }
 }

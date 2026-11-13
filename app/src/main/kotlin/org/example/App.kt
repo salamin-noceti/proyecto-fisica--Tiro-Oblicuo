@@ -6,13 +6,10 @@ import javax.swing.SwingUtilities
 
 /**
  * Punto de entrada principal para la aplicación "Simulación Tiro: Laboratorio de Tiro Oblicuo".
- *
- * Simplifica el arranque a una única función de entrada delegando la inicialización
- * en el objeto encapsulado [LanzadorAplicacion].
- *
- * @param args Argumentos pasados por línea de comandos.
  */
-fun main(args: Array<String> = emptyArray()) = LanzadorAplicacion.ejecutar(args)
+fun main(args: Array<String> = emptyArray()) {
+    LanzadorAplicacion.ejecutar(args)
+}
 
 /**
  * Objeto responsable de orquestar el arranque de la aplicación en modo gráfico (EDT)

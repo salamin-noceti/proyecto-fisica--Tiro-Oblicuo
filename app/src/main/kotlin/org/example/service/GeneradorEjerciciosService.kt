@@ -11,7 +11,7 @@ import org.example.model.Ejercicio
  * Esta interfaz desacopla la pantalla de ejercicios (Issue 6) de la implementación
  * concreta desarrollada por el compañero Romano en la Issue 5.
  */
-interface GeneradorEjerciciosService {
+fun interface GeneradorEjerciciosService {
 
     /**
      * Obtiene o genera una instancia de [Ejercicio] según el nivel de dificultad elegido.

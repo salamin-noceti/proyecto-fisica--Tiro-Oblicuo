@@ -7,5 +7,13 @@ package org.example.model
 enum class Dificultad {
     FACIL,
     MEDIO,
-    DIFICIL
+    DIFICIL;
+
+    fun etiqueta(): String {
+        return when (this) {
+            FACIL -> "Fácil"
+            MEDIO -> "Medio"
+            DIFICIL -> "Difícil"
+        }
+    }
 }

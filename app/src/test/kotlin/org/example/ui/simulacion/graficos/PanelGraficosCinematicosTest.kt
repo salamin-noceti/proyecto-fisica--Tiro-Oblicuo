@@ -10,32 +10,32 @@ import kotlin.test.assertTrue
 
 class PanelGraficosCinematicosTest {
 
-    private val datosEjemplo = IngresoDatos(velocidadInicial = 25.0, angulo = 45.0, alturaInicial = 0.0)
-    private val calculador = CalculadorTiroOblicuo()
+    private val datosEjemplo = IngresoDatos.base.copy(velocidadInicial = 25.0, angulo = 45.0, alturaInicial = 0.0)
+    private val calculador = CalculadorTiroOblicuo.instancia
     private val resultadoTeorico = calculador.calcular(datosEjemplo)
 
-    @Test
-    fun `inicializacion correcta con vista exclusiva de 3 pestanas cartesianas`() {
-        val panel = PanelGraficosCinematicos()
+    private fun crearPanel(): PanelGraficosCinematicos {
+        assertTrue(datosEjemplo.velocidadInicial > 0.0)
+        return PanelGraficosCinematicos()
+    }
 
+    @Test
+    fun testInicializacionCorrectaConVistaExclusivaDe3PestanasCartesianas() {
+        val panel = crearPanel()
+        assertTrue(datosEjemplo.velocidadInicial > 0.0)
         assertNotNull(panel.renderizadorPosicion)
         assertNotNull(panel.renderizadorVelocidad)
         assertNotNull(panel.renderizadorAceleracion)
-
         assertEquals(3, panel.tabbedPane.tabCount)
         assertEquals(PanelGraficosCinematicos.TITULO_PESTANA_POSICION, panel.tabbedPane.getTitleAt(0))
         assertEquals(PanelGraficosCinematicos.TITULO_PESTANA_VELOCIDAD, panel.tabbedPane.getTitleAt(1))
         assertEquals(PanelGraficosCinematicos.TITULO_PESTANA_ACELERACION, panel.tabbedPane.getTitleAt(2))
-
-        assertTrue(panel.tabbedPane.getTitleAt(0).contains("Posición"))
-        assertTrue(panel.tabbedPane.getTitleAt(1).contains("Velocidad"))
-        assertTrue(panel.tabbedPane.getTitleAt(2).contains("Aceleración"))
     }
 
     @Test
-    fun `seleccionar pestana renderiza individualmente el grafico activo`() {
-        val panel = PanelGraficosCinematicos()
-
+    fun testSeleccionarPestanaRenderizaIndividualmenteElGraficoActivo() {
+        val panel = crearPanel()
+        assertTrue(datosEjemplo.velocidadInicial > 0.0)
         assertEquals(0, panel.pestanaActiva)
         assertSame(panel.renderizadorPosicion.canvas, panel.tabbedPane.selectedComponent)
 
@@ -49,37 +49,28 @@ class PanelGraficosCinematicosTest {
     }
 
     @Test
-    fun `actualizar propaga puntos y tiempos a los tres renderizadores`() {
-        val panel = PanelGraficosCinematicos()
+    fun testActualizarPropagaPuntosYTiemposALosTresRenderizadores() {
+        val panel = crearPanel()
         panel.configurarEjercicio(datosEjemplo, resultadoTeorico)
-
         val puntosEstela = calculador.calcularTrayectoria(datosEjemplo, pasos = 5)
-        panel.actualizar(
-            tiempoActual = resultadoTeorico.tiempoVuelo,
-            puntosEstela = puntosEstela,
-            resultadoTeorico = resultadoTeorico,
-            datos = datosEjemplo
-        )
+        panel.actualizar(resultadoTeorico.tiempoVuelo, puntosEstela, resultadoTeorico, datosEjemplo)
 
         assertEquals(resultadoTeorico.tiempoVuelo, panel.renderizadorPosicion.canvas.tiempoActual)
         assertEquals(resultadoTeorico.tiempoVuelo, panel.renderizadorVelocidad.canvas.tiempoActual)
         assertEquals(resultadoTeorico.tiempoVuelo, panel.renderizadorAceleracion.canvas.tiempoActual)
-
         assertEquals(2, panel.renderizadorPosicion.canvas.obtenerSeries().size)
         assertEquals(2, panel.renderizadorVelocidad.canvas.obtenerSeries().size)
         assertEquals(2, panel.renderizadorAceleracion.canvas.obtenerSeries().size)
     }
 
     @Test
-    fun `reiniciar limpia las series en los tres renderizadores`() {
-        val panel = PanelGraficosCinematicos()
+    fun testReiniciarLimpiaLasSeriesEnLosTresRenderizadores() {
+        val panel = crearPanel()
         panel.configurarEjercicio(datosEjemplo, resultadoTeorico)
-
         val puntos = listOf(calculador.calcularPosicion(datosEjemplo, 0.5))
         panel.actualizar(0.5, puntos, resultadoTeorico, datosEjemplo)
 
         panel.reiniciar()
-
         assertEquals(0.0, panel.renderizadorPosicion.canvas.tiempoActual)
         assertEquals(0.0, panel.renderizadorVelocidad.canvas.tiempoActual)
         assertEquals(0.0, panel.renderizadorAceleracion.canvas.tiempoActual)

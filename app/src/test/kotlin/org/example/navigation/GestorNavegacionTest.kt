@@ -7,49 +7,51 @@ import kotlin.test.assertTrue
 
 class GestorNavegacionTest {
 
-    @Test
-    fun `estado inicial por defecto es PRACTICA`() {
-        val gestor = GestorNavegacion()
-        assertEquals(SeccionNavegacion.PRACTICA, gestor.seccionActual)
+    private val seccionBase = SeccionNavegacion.PRACTICA
+
+    private fun crearGestor(inicial: SeccionNavegacion = seccionBase): GestorNavegacion {
+        return GestorNavegacion(inicial)
     }
 
     @Test
-    fun `estado inicial personalizado se respeta`() {
-        val gestor = GestorNavegacion(SeccionNavegacion.SIMULACION)
+    fun testEstadoInicialPorDefectoEsPractica() {
+        val gestor = crearGestor(seccionBase)
+        assertEquals(seccionBase, gestor.seccionActual)
+    }
+
+    @Test
+    fun testEstadoInicialPersonalizadoSeRespeta() {
+        val gestor = crearGestor(SeccionNavegacion.SIMULACION)
+        assertTrue(gestor.seccionActual != seccionBase)
         assertEquals(SeccionNavegacion.SIMULACION, gestor.seccionActual)
     }
 
     @Test
-    fun `navegacion a una seccion diferente cambia el estado y retorna true`() {
-        val gestor = GestorNavegacion()
+    fun testNavegacionAUnaSeccionDiferenteCambiaElEstadoYRetornaTrue() {
+        val gestor = crearGestor(seccionBase)
         val resultado = gestor.navegarA(SeccionNavegacion.SIMULACION)
-
         assertTrue(resultado)
         assertEquals(SeccionNavegacion.SIMULACION, gestor.seccionActual)
     }
 
     @Test
-    fun `navegacion a la misma seccion retorna false y no cambia el estado`() {
-        val gestor = GestorNavegacion(SeccionNavegacion.PRACTICA)
-        val resultado = gestor.navegarA(SeccionNavegacion.PRACTICA)
-
+    fun testNavegacionALaMismaSeccionRetornaFalseYNoCambiaElEstado() {
+        val gestor = crearGestor(seccionBase)
+        val resultado = gestor.navegarA(seccionBase)
         assertFalse(resultado)
-        assertEquals(SeccionNavegacion.PRACTICA, gestor.seccionActual)
+        assertEquals(seccionBase, gestor.seccionActual)
     }
 
     @Test
-    fun `notifica a los escuchadores cuando cambia la seccion`() {
-        val gestor = GestorNavegacion()
+    fun testNotificaALosEscuchadoresCuandoCambiaLaSeccion() {
+        val gestor = crearGestor(seccionBase)
         val seccionesNotificadas = mutableListOf<SeccionNavegacion>()
-
-        val listener = NavegacionListener { nuevaSeccion ->
-            seccionesNotificadas.add(nuevaSeccion)
-        }
+        val listener = NavegacionListener { nuevaSeccion -> seccionesNotificadas.add(nuevaSeccion) }
         gestor.agregarListener(listener)
 
         gestor.navegarA(SeccionNavegacion.SIMULACION)
         gestor.navegarA(SeccionNavegacion.AUTOCORRECCION)
-        gestor.navegarA(SeccionNavegacion.AUTOCORRECCION) // redundante
+        gestor.navegarA(SeccionNavegacion.AUTOCORRECCION)
 
         assertEquals(2, seccionesNotificadas.size)
         assertEquals(SeccionNavegacion.SIMULACION, seccionesNotificadas[0])
@@ -57,18 +59,13 @@ class GestorNavegacionTest {
     }
 
     @Test
-    fun `remover listener previene recepcion de notificaciones futuras`() {
-        val gestor = GestorNavegacion()
+    fun testRemoverListenerPrevieneRecepcionDeNotificacionesFuturas() {
+        val gestor = crearGestor(seccionBase)
         var notificado = false
-
-        val listener = NavegacionListener {
-            notificado = true
-        }
+        val listener = NavegacionListener { notificado = true }
         gestor.agregarListener(listener)
         gestor.removerListener(listener)
-
         gestor.navegarA(SeccionNavegacion.SIMULACION)
-
         assertFalse(notificado)
     }
 }
