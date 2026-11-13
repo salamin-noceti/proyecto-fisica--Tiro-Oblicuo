@@ -3,20 +3,20 @@
 
 > Documento **generado automáticamente** por la cátedra de Programación II (RepoSense + análisis de calidad POO/SOLID). **No editar a mano**: se regenera en cada evaluación.
 > Rama evaluada: `main`. Análisis **heurístico** (regex + métricas): es una criba para orientar la revisión, **no una nota**.
-> Generado: 2026-11-06.
+> Generado: 2026-11-13.
 
 ## 1. Veredicto
 
 | Aspecto | Resultado |
 |---|---|
-| Índice de calidad POO/SOLID | **42/100** |
+| Índice de calidad POO/SOLID | **40/100** |
 | Código (LOC) | 8,525 |
 | Archivos de código | 81 |
-| Clases (bien usadas) | 97 (13 OK) |
+| Clases (bien usadas) | 97 (18 OK) |
 | Código dentro de clases (%POO) | 99% |
-| Funciones fuera de clases | 1 |
-| Duplicación lógica | 4.1% |
-| Señales S/O/L/I/D | 30/0/0/0/32 |
+| Funciones fuera de clases | 0 |
+| Duplicación lógica | 7.2% |
+| Señales S/O/L/I/D | 26/0/1/0/32 |
 
 > Este informe **describe** lo que el análisis midió con los criterios ya establecidos de la materia. No es una nota.
 
@@ -27,26 +27,26 @@ Criterios de `CRITERIOS-CALIDAD.md`. **Aprobar** se juega con el perfil `estanda
 | Semáforo | Resultado |
 |---|---|
 | Aprobar (`estandar`) | **no cumple** — 3/4 |
-| Destacar (`exigente`) | **no cumple** — 3/5 |
+| Destacar (`exigente`) | **no cumple** — 2/5 |
 
 **Criterios para aprobar**
 
 | Criterio | Requisito | Tu resultado | Cumple |
 |---|---|---|---|
 | Código dentro de clases (%POO) | ≥ 85% | 99% | sí |
-| Duplicación lógica | ≤ 10% | 4.1% | sí |
-| Funciones fuera de clases | ≤ 1 | 1 | sí |
-| Señales POO/SOLID críticas | ninguna | Baja cohesión (LCOM), Acoplamiento alto (CBO) | no |
+| Duplicación lógica | ≤ 10% | 7.2% | sí |
+| Funciones fuera de clases | ≤ 1 | 0 | sí |
+| Señales POO/SOLID críticas | ninguna | Baja cohesión (LCOM), Complejidad alta, Acoplamiento alto (CBO), Override vacío / 'no implementado' (LSP) | no |
 
 **Criterios para destacar**
 
 | Criterio | Requisito | Tu resultado | Cumple |
 |---|---|---|---|
 | Código dentro de clases (%POO) | ≥ 95% | 99% | sí |
-| Duplicación lógica | ≤ 5% | 4.1% | sí |
-| Funciones fuera de clases | ≤ 1 | 1 | sí |
-| Señales POO/SOLID críticas | ninguna | Clase demasiado grande (SRP), Baja cohesión (LCOM), Complejidad alta, Acoplamiento alto (CBO) | no |
-| Índice de calidad POO/SOLID | ≥ 60 | 42/100 | no |
+| Duplicación lógica | ≤ 5% | 7.2% | no |
+| Funciones fuera de clases | ≤ 1 | 0 | sí |
+| Señales POO/SOLID críticas | ninguna | Clase demasiado grande (SRP), Baja cohesión (LCOM), Complejidad alta, Acoplamiento alto (CBO), Override vacío / 'no implementado' (LSP) | no |
+| Índice de calidad POO/SOLID | ≥ 60 | 40/100 | no |
 
 ### Cómo se calcula el %POO (y por qué no sube solo)
 
@@ -60,8 +60,8 @@ Sube cuando el código que hoy está **fuera** de clases pasa a ser método de u
 
 | Autor | Commits | Código (LOC) | Tests (LOC) | Docs (LOC) | Días activos | % del código |
 |---|---:|---:|---:|---:|---:|---:|
-| avsalomon | 14 | 7,656 | 2,229 | 51 | 11 | 100% |
-| Romano-22 | 6 | 0 | 19 | 0 | 5 | 0% |
+| avsalomon | 15 | 5,656 | 1,581 | 51 | 12 | 100% |
+| Romano-22 | 6 | 0 | 14 | 0 | 5 | 0% |
 
 > _El LOC de autoría lo calcula RepoSense sobre el historial y puede diferir del LOC de código del análisis de calidad (que mira solo el estado de `main`)._
 
@@ -73,12 +73,13 @@ Reúne lo que el análisis marcó y lo que todavía falta para cada semáforo. C
 
 | Falla | Tu resultado | Requisito | Archivos |
 |---|---|---|---|
-| Señales POO/SOLID críticas | Baja cohesión (LCOM), Acoplamiento alto (CBO) | Aprobar: ninguna<br>Destacar: ninguna | `app/src/main/kotlin/org/example/service/EvaluadorRespuestas.kt`, `app/src/main/kotlin/org/example/state/AppState.kt`, `app/src/main/kotlin/org/example/ui/PantallaPractica.kt`, `app/src/main/kotlin/org/example/ui/VentanaPrincipal.kt`, `app/src/main/kotlin/org/example/ui/autocorrecion/PanelResumenCalificacion.kt`, `app/src/main/kotlin/org/example/ui/practica/componentes/DialogoAdvertenciaFormato.kt` (+5 más) |
-| Índice de calidad POO/SOLID | 42/100 | Destacar: ≥ 60 | — |
-| Métodos/funciones largos o con muchos parámetros | **30** método(s)/función(es) largos o con muchos parámetros | Sin señales | `app/src/main/kotlin/org/example/service/BancoEjerciciosService.kt`, `app/src/main/kotlin/org/example/ui/PantallaEjercicios.kt`, `app/src/main/kotlin/org/example/ui/PantallaPractica.kt`, `app/src/main/kotlin/org/example/ui/autocorrecion/PanelResumenCalificacion.kt`, `app/src/main/kotlin/org/example/ui/autocorrecion/PanelSolucionPasoAPaso.kt`, `app/src/main/kotlin/org/example/ui/practica/componentes/ControladorAdvertenciaFormato.kt` (+3 más) |
+| Señales POO/SOLID críticas | Baja cohesión (LCOM), Complejidad alta, Acoplamiento alto (CBO), Override vacío / 'no implementado' (LSP) | Aprobar: ninguna<br>Destacar: ninguna | `app/src/main/kotlin/org/example/service/EvaluadorRespuestas.kt`, `app/src/main/kotlin/org/example/service/ValidadorEntradaRespuesta.kt`, `app/src/main/kotlin/org/example/state/AppState.kt`, `app/src/main/kotlin/org/example/ui/PantallaPractica.kt`, `app/src/main/kotlin/org/example/ui/VentanaPrincipal.kt`, `app/src/main/kotlin/org/example/ui/autocorrecion/PanelResumenCalificacion.kt` (+9 más) |
+| Duplicación lógica | 7.2% | Destacar: ≤ 5% | `app/src/main/kotlin/org/example/ui/simulacion/FutbolThemeRenderer.kt`, `app/src/main/kotlin/org/example/ui/simulacion/graficos/RenderizadorPosicion.kt` |
+| Índice de calidad POO/SOLID | 40/100 | Destacar: ≥ 60 | — |
+| Métodos/funciones largos o con muchos parámetros | **49** método(s)/función(es) largos o con muchos parámetros | Sin señales | `app/src/main/kotlin/org/example/service/EvaluadorRespuestas.kt`, `app/src/main/kotlin/org/example/service/ValidadorEntradaRespuesta.kt`, `app/src/main/kotlin/org/example/ui/PantallaEjercicios.kt`, `app/src/main/kotlin/org/example/ui/PantallaPractica.kt`, `app/src/main/kotlin/org/example/ui/autocorrecion/PanelResumenCalificacion.kt`, `app/src/main/kotlin/org/example/ui/autocorrecion/PanelSolucionPasoAPaso.kt` (+12 más) |
 | Dependencia de concretos y falta de abstracciones (DIP) | **32** dependencia(s) de concretos sin abstracciones | Sin señales | `app/src/main/kotlin/org/example/service/BancoEjerciciosService.kt`, `app/src/main/kotlin/org/example/service/CalculadorTiroOblicuo.kt`, `app/src/main/kotlin/org/example/service/EvaluadorRespuestas.kt`, `app/src/main/kotlin/org/example/service/MenuConsoleRunner.kt`, `app/src/main/kotlin/org/example/service/ValidadorEntradaRespuesta.kt`, `app/src/main/kotlin/org/example/ui/PantallaEjercicios.kt` (+26 más) |
-| Clase sin métodos (solo datos) | **21** clase(s) sin métodos (solo datos) | Sin señales | `app/src/main/kotlin/org/example/model/ReporteAutocorreccion.kt`, `app/src/main/kotlin/org/example/model/RespuestaEstudiante.kt`, `app/src/main/kotlin/org/example/navigation/SeccionNavegacion.kt`, `app/src/main/kotlin/org/example/service/EvaluadorRespuestas.kt`, `app/src/main/kotlin/org/example/ui/practica/componentes/ControladorAdvertenciaFormato.kt`, `app/src/test/kotlin/org/example/GeneradorEjerciciosBancoAdapterTest.kt` (+14 más) |
-| Campos públicos (encapsulación) | **57** clase(s) con campos públicos | Sin señales | `app/src/main/kotlin/org/example/model/ReporteAutocorreccion.kt`, `app/src/main/kotlin/org/example/model/RespuestaEstudiante.kt`, `app/src/main/kotlin/org/example/service/EvaluadorRespuestas.kt`, `app/src/main/kotlin/org/example/service/MenuConsoleRunner.kt`, `app/src/main/kotlin/org/example/service/SimulacionConsoleRunner.kt`, `app/src/main/kotlin/org/example/service/ValidadorEntradaRespuesta.kt` (+47 más) |
+| Clase sin métodos (solo datos) | **15** clase(s) sin métodos (solo datos) | Sin señales | `app/src/test/kotlin/org/example/GeneradorEjerciciosBancoAdapterTest.kt`, `app/src/test/kotlin/org/example/navigation/GestorNavegacionTest.kt`, `app/src/test/kotlin/org/example/service/EvaluadorRespuestasTest.kt`, `app/src/test/kotlin/org/example/ui/VentanaPrincipalTest.kt`, `app/src/test/kotlin/org/example/ui/VerificacionVisualVentanaTest.kt`, `app/src/test/kotlin/org/example/ui/autocorrecion/PantallaAutocorreccionTest.kt` (+9 más) |
+| Campos públicos (encapsulación) | **40** clase(s) con campos públicos | Sin señales | `app/src/main/kotlin/org/example/model/ReporteAutocorreccion.kt`, `app/src/main/kotlin/org/example/model/RespuestaEstudiante.kt`, `app/src/main/kotlin/org/example/service/EvaluadorRespuestas.kt`, `app/src/main/kotlin/org/example/service/MenuConsoleRunner.kt`, `app/src/main/kotlin/org/example/state/AppState.kt`, `app/src/main/kotlin/org/example/ui/BarraNavegacion.kt` (+32 más) |
 
 ## 4. Aspectos evaluados
 
@@ -88,26 +89,26 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Un resumen numérico (0-100) que combina la riqueza de clases bien usadas con la penalización por señales POO/SOLID y duplicación, y luego aplica topes duros.
 - **Por qué importa:** Ordena y prioriza la revisión: un índice bajo indica varias señales que conviene mirar juntas.
-- **Tu resultado:** índice **42/100**
+- **Tu resultado:** índice **40/100**
 
 ### 2. Duplicación lógica (DRY) (duplicacion) — sin señales
 
 - **Qué mide:** Porcentaje de bloques de LÓGICA repetidos. Quedan fuera imports/includes, anotaciones, declaraciones de campos y comentarios/Javadoc/docstrings: esos bloques son boilerplate, no lógica.
 - **Por qué importa:** Cada copia de lógica se mantiene por separado: un arreglo hay que repetirlo y los defectos se multiplican.
-- **Tu resultado:** **4.1%** de duplicación lógica
+- **Tu resultado:** **7.2%** de duplicación lógica
 
 ### 3. Adopción de POO (% de código en clases) (poo) — sin señales
 
 - **Qué mide:** Proporción de las **líneas de lógica** que viven dentro de una clase. Quedan fuera `package`/`import`/`using`/anotaciones y comentarios/Javadoc/docstrings: no son código que pueda estar dentro de una clase y, si contaran, el porcentaje quedaría topado por el boilerplate de cada archivo.
 - **Por qué importa:** El diseño orientado a objetos es el eje de la materia: el comportamiento debería vivir como método de una clase.
-- **Tu resultado:** **98.8%** del código dentro de clases
+- **Tu resultado:** **98.6%** del código dentro de clases
 - **Cómo leerlo:** Es una **proporción**, no un acumulado: agregar código dentro de una clase no la sube por sí solo (numerador y denominador crecen juntos). Sube cuando el código que está **fuera** de clases (funciones sueltas, `main`, constantes de módulo, scripts) pasa a ser método de una clase o deja de existir. La medición se hace sobre `main`: el trabajo que todavía vive en otra rama no se refleja hasta que se integra.
 
 ### 4. Funciones fuera de clases (sueltas) — sin señales
 
 - **Qué mide:** Funciones de nivel de módulo que no pertenecen a ninguna clase (en esta materia el comportamiento debe ser método de una clase).
 - **Por qué importa:** Son la forma más directa de código procedural en un proyecto que debería ser orientado a objetos.
-- **Tu resultado:** **1** función(es) fuera de clases
+- **Tu resultado:** **0** función(es) fuera de clases
 
 ### 5. Clase demasiado grande (SRP) (god) — con señales
 
@@ -133,7 +134,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Complejidad ciclomática: cantidad de caminos posibles dentro de un método o función (condicionales, bucles, casos).
 - **Por qué importa:** Muchos caminos = difícil de seguir y de probar; suelen esconderse casos sin cubrir.
-- **Tu resultado:** **1** método(s)/función(es) con complejidad alta
+- **Tu resultado:** **3** método(s)/función(es) con complejidad alta
 - **Para investigar la causa:**
     - ¿Se agregaron condiciones a medida que aparecían casos nuevos?
     - ¿Se probaron todos los caminos o solo el caso principal?
@@ -143,7 +144,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Tamaño de los métodos/funciones y cantidad de parámetros.
 - **Por qué importa:** Una función que hace varias cosas cuesta leerla, nombrarla y reutilizarla.
-- **Tu resultado:** **30** método(s)/función(es) largos o con muchos parámetros
+- **Tu resultado:** **49** método(s)/función(es) largos o con muchos parámetros
 - **Para investigar la causa:**
     - ¿La función creció por acumulación de pasos?
     - ¿Agrupa operaciones que podrían describirse por separado?
@@ -177,11 +178,15 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 - **Por qué importa:** Obliga a implementar operaciones que no se usan y acopla a los clientes a métodos que no necesitan.
 - **Tu resultado:** **0** interfaz(es) con demasiados métodos
 
-### 13. Override vacío o 'no implementado' (LSP) (lsp) — sin señales
+### 13. Override vacío o 'no implementado' (LSP) (lsp) — con señales
 
 - **Qué mide:** Métodos sobrescritos que quedan vacíos o lanzan 'no implementado'.
 - **Por qué importa:** Suele indicar que la jerarquía no representa bien el problema y rompe la sustitución entre clases.
-- **Tu resultado:** **0** override(s) vacío(s) o 'no implementado'
+- **Tu resultado:** **1** override(s) vacío(s) o 'no implementado'
+- **Para investigar la causa:**
+    - ¿Por qué ese método no tiene comportamiento en esa clase?
+    - ¿La clase hereda algo que en realidad no le corresponde?
+    - ¿Qué contrato se esperaba cumplir al heredar?
 
 ### 14. Dependencia de concretos y falta de abstracciones (DIP) (dip) — con señales
 
@@ -197,7 +202,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Clases que solo acumulan campos y no tienen comportamiento.
 - **Por qué importa:** Separar datos de comportamiento reparte por el proyecto la lógica que debería estar cerca de esos datos.
-- **Tu resultado:** **21** clase(s) sin métodos (solo datos)
+- **Tu resultado:** **15** clase(s) sin métodos (solo datos)
 - **Para investigar la causa:**
     - ¿Dónde vive el comportamiento que opera sobre esos datos?
     - ¿La clase representa un concepto del dominio o un contenedor técnico?
@@ -207,7 +212,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Clases que exponen campos sin control de acceso.
 - **Por qué importa:** Expone el estado interno y hace que cualquier cambio dependa de quién lo modifica desde afuera.
-- **Tu resultado:** **57** clase(s) con campos públicos
+- **Tu resultado:** **40** clase(s) con campos públicos
 - **Para investigar la causa:**
     - ¿Se accede al campo desde otras clases para evitar un método?
     - ¿Qué reglas deberían respetarse al modificar ese estado?
@@ -221,14 +226,14 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 ## 5. Evolución por commit
 
-Métricas calculadas sobre el estado de `main` en **cada commit** (14 commits con trabajo), del primero al último. La calidad usa el perfil `exigente`; el aporte de código lo mide RepoSense. El índice puede **bajar** al crecer el proyecto: se acumulan señales.
+Métricas calculadas sobre el estado de `main` en **cada commit** (20 commits con trabajo), del primero al último. La calidad usa el perfil `exigente`; el aporte de código lo mide RepoSense. El índice puede **bajar** al crecer el proyecto: se acumulan señales.
 
 ```mermaid
 xychart-beta
     title "Índice POO/SOLID a lo largo de los commits"
-    x-axis ["f5b4533", "0407e5e", "dd3780e", "d36b80c", "34979f5", "5b92c65", "2e89df6", "39d9b06", "0a667a3", "76a2cc8", "4b1ecf0", "27cb813", "5bef311", "e6fe907"]
+    x-axis ["f5b4533", "0407e5e", "dd3780e", "d36b80c", "34979f5", "5b92c65", "2e89df6", "39d9b06", "0a667a3", "76a2cc8", "4b1ecf0", "27cb813", "5bef311", "e6fe907", "0c98bef", "99acd6f", "102d464", "83d8f29", "619c674", "a4c334e"]
     y-axis "Índice" 0 --> 100
-    line [0, 0, 0, 50, 35, 18, 41, 34, 7, 5, 3, 3, 2, 2]
+    line [0, 0, 0, 50, 60, 60, 65, 67, 35, 52, 36, 34, 32, 34, 40, 40, 40, 40, 40, 84]
 ```
 
 | # | Fecha | Commit | Autor | LOC | Índice | %POO | Duplic. | Sueltas |
@@ -237,93 +242,22 @@ xychart-beta
 | 2 | 2026-08-14 | `0407e5e` | Romano-22 | 0 | 0 | 0% | 0.0% | 0 |
 | 3 | 2026-08-28 | `dd3780e` | dqmdz-etec | 0 | 0 | 0% | 0.0% | 0 |
 | 4 | 2026-08-28 | `d36b80c` | avsalomon | 65 | 50 | 15% | 0.0% | 0 |
-| 5 | 2026-09-04 | `34979f5` | avsalomon | 133 | 35 | 54% | 0.0% | 1 |
-| 6 | 2026-09-07 | `5b92c65` | Romano-22 | 215 | 18 | 62% | 0.0% | 1 |
-| 7 | 2026-10-02 | `2e89df6` | Romano-22 | 277 | 41 | 77% | 0.0% | 1 |
-| 8 | 2026-10-05 | `39d9b06` | avsalomon | 638 | 34 | 87% | 0.0% | 0 |
-| 9 | 2026-10-09 | `0a667a3` | avsalomon | 1,443 | 7 | 93% | 12.0% | 1 |
-| 10 | 2026-10-16 | `76a2cc8` | avsalomon | 3,076 | 5 | 96% | 5.5% | 1 |
-| 11 | 2026-10-16 | `4b1ecf0` | avsalomon | 5,634 | 3 | 98% | 5.1% | 1 |
-| 12 | 2026-10-19 | `27cb813` | avsalomon | 5,927 | 3 | 98% | 5.0% | 1 |
-| 13 | 2026-10-26 | `5bef311` | avsalomon | 7,177 | 2 | 98% | 4.7% | 1 |
-| 14 | 2026-10-30 | `e6fe907` | avsalomon | 8,435 | 2 | 99% | 4.3% | 1 |
-
-<!-- actividad-clases:inicio -->
-## Actividad en días de clase
-
-> Período evaluado **2026-08-14 → 2026-11-07** · **20 clases** (lunes, viernes) · días de clase del calendario, extendidos hasta la fecha de corte.
->
-> `Commits` = commits de trabajo (no-merge); `Merges` = merges de PR (también son push). Los días sin actividad dicen **sin actividad**. El cuadro principal usa sólo las fechas de clase del calendario oficial.
->
-> **Aportes fuera del calendario:** cada alumno tiene un cuadro aparte con las fechas no lectivas con actividad, desde **2026-08-14** hasta **2026-11-07** (ventana de aportes). Esas fechas no forman parte del cuadro principal, pero se muestran para no perder trabajo hecho en fines de semana, feriados o después del período.
->
-> Se recorre `git log --all` sobre un mirror (todas las ramas y `refs/pull/*`), con deduplicación por commit. Fecha = fecha de autor en UTC-3. Los commits locales no pusheados no se ven. Si el trabajo fue en pareja y el commit es de otra persona, figura a nombre del autor del commit; para reflejarlo, usar `Co-authored-by` o una nota manual.
->
-> Sección informativa: no modifica el semáforo de aprobación.
-
-### avsalomon
-
-**11/20 clases con actividad** · 14 commits · 16 merges
-
-| Fecha | Marca | Repositorios | Commits / merges |
-|---|:--:|---|--:|
-| 2026-08-14 | No | sin actividad | 0 / 0 |
-| 2026-08-21 | No | sin actividad | 0 / 0 |
-| 2026-08-24 | No | sin actividad | 0 / 0 |
-| 2026-08-28 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-08-31 | No | sin actividad | 0 / 0 |
-| 2026-09-04 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 2 |
-| 2026-09-07 | No | sin actividad | 0 / 0 |
-| 2026-09-14 | No | sin actividad | 0 / 0 |
-| 2026-09-25 | No | sin actividad | 0 / 0 |
-| 2026-09-28 | No | sin actividad | 0 / 0 |
-| 2026-10-02 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 0 |
-| 2026-10-05 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 2 |
-| 2026-10-09 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 3 / 3 |
-| 2026-10-16 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 2 / 3 |
-| 2026-10-19 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-10-23 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 2 / 1 |
-| 2026-10-26 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 0 / 1 |
-| 2026-10-30 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-11-02 | No | sin actividad | 0 / 0 |
-| 2026-11-06 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-
-#### Aportes fuera del calendario de clases — avsalomon
-
-_Sin aportes fuera del calendario de clases para avsalomon._
-
-### Romano-22
-
-**5/20 clases con actividad** · 12 commits · 5 merges
-
-| Fecha | Marca | Repositorios | Commits / merges |
-|---|:--:|---|--:|
-| 2026-08-14 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 4 / 1 |
-| 2026-08-21 | No | sin actividad | 0 / 0 |
-| 2026-08-24 | No | sin actividad | 0 / 0 |
-| 2026-08-28 | No | sin actividad | 0 / 0 |
-| 2026-08-31 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 2 / 0 |
-| 2026-09-04 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 4 / 2 |
-| 2026-09-07 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-09-14 | No | sin actividad | 0 / 0 |
-| 2026-09-25 | No | sin actividad | 0 / 0 |
-| 2026-09-28 | No | sin actividad | 0 / 0 |
-| 2026-10-02 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-10-05 | No | sin actividad | 0 / 0 |
-| 2026-10-09 | No | sin actividad | 0 / 0 |
-| 2026-10-16 | No | sin actividad | 0 / 0 |
-| 2026-10-19 | No | sin actividad | 0 / 0 |
-| 2026-10-23 | No | sin actividad | 0 / 0 |
-| 2026-10-26 | No | sin actividad | 0 / 0 |
-| 2026-10-30 | No | sin actividad | 0 / 0 |
-| 2026-11-02 | No | sin actividad | 0 / 0 |
-| 2026-11-06 | No | sin actividad | 0 / 0 |
-
-#### Aportes fuera del calendario de clases — Romano-22
-
-_Sin aportes fuera del calendario de clases para Romano-22._
-
-<!-- actividad-clases:fin -->
+| 5 | 2026-09-04 | `34979f5` | avsalomon | 133 | 60 | 54% | 0.0% | 0 |
+| 6 | 2026-09-07 | `5b92c65` | Romano-22 | 215 | 60 | 54% | 0.0% | 0 |
+| 7 | 2026-10-02 | `2e89df6` | Romano-22 | 277 | 65 | 77% | 0.0% | 0 |
+| 8 | 2026-10-05 | `39d9b06` | avsalomon | 638 | 67 | 87% | 0.0% | 0 |
+| 9 | 2026-10-09 | `0a667a3` | avsalomon | 1,443 | 35 | 93% | 12.0% | 0 |
+| 10 | 2026-10-16 | `76a2cc8` | avsalomon | 3,076 | 52 | 96% | 5.5% | 0 |
+| 11 | 2026-10-16 | `4b1ecf0` | avsalomon | 5,634 | 36 | 98% | 9.1% | 0 |
+| 12 | 2026-10-19 | `27cb813` | avsalomon | 5,927 | 34 | 98% | 9.5% | 0 |
+| 13 | 2026-10-26 | `5bef311` | avsalomon | 7,177 | 32 | 98% | 8.4% | 0 |
+| 14 | 2026-10-30 | `e6fe907` | avsalomon | 8,435 | 34 | 98% | 7.4% | 0 |
+| 15 | 2026-11-06 | `0c98bef` | avsalomon | 8,525 | 40 | 99% | 7.2% | 0 |
+| 16 | 2026-11-07 | `99acd6f` | dqmdz-etec | 8,525 | 40 | 99% | 7.2% | 0 |
+| 17 | 2026-11-07 | `102d464` | dqmdz-etec | 8,525 | 40 | 99% | 7.2% | 0 |
+| 18 | 2026-11-07 | `83d8f29` | dqmdz-etec | 8,525 | 40 | 99% | 7.2% | 0 |
+| 19 | 2026-11-07 | `619c674` | dqmdz-etec | 8,525 | 40 | 99% | 7.2% | 0 |
+| 20 | 2026-11-13 | `a4c334e` | avsalomon | 6,308 | 84 | 99% | 1.8% | 0 |
 
 ---
 _Informe generado por la cátedra. Los criterios y umbrales de medición corresponden al perfil `exigente` de `calidad.py`; el semáforo de aprobación, a `CRITERIOS-CALIDAD.md` (ver `README.md`). Ante dudas, revisá el archivo señalado._
