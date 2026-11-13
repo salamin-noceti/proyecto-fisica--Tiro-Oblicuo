@@ -8,7 +8,7 @@ import org.example.model.RespuestaEstudiante
  * para la transferencia de flujo y datos desde la pantalla de ejercicios (Issue 6)
  * hacia el módulo o pantalla de simulación y verificación física (Issues 7 y 9).
  */
-interface NavegadorSimulacionService {
+fun interface NavegadorSimulacionService {
 
     /**
      * Transfiere el control, el ejercicio resuelto y los valores numéricos

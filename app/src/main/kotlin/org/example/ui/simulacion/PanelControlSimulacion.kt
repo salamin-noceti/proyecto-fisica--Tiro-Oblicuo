@@ -14,124 +14,76 @@ import javax.swing.border.EmptyBorder
 
 /**
  * Panel interactivo con los tres botones de control requeridos:
- * - "Lanzar": Inicia o reanuda la animación del movimiento.
- * - "Pausar": Congela momentáneamente el objeto en su posición actual.
- * - "Reiniciar": Regresa el proyectil y el cronómetro al estado inicial (t = 0), limpiando la trayectoria.
- *
- * Cumple con el Principio de Responsabilidad Única (SRP) encapsulando la botonera
- * y la actualización visual de los estados de habilitación según el ciclo de vida de la simulación.
- *
- * @param controlador Controlador de simulación que recibe las acciones del usuario.
+ * "Lanzar", "Pausar" y "Reiniciar".
  */
 class PanelControlSimulacion(
-    val controlador: ControladorSimulacion
+    controlador: ControladorSimulacion
 ) : JPanel(FlowLayout(FlowLayout.CENTER, 14, 10)) {
 
-    /** Botón destacado para iniciar o reanudar el lanzamiento. Nombre exacto requerido: "Lanzar". */
-    val botonLanzar: JButton = crearBoton(
-        texto = "Lanzar",
-        colorFondo = Color(16, 185, 129),
-        colorTexto = Color.WHITE
-    )
+    var controlador: ControladorSimulacion
+        private set
 
-    /** Botón destacado para congelar momentáneamente la simulación. Nombre exacto requerido: "Pausar". */
-    val botonPausar: JButton = crearBoton(
-        texto = "Pausar",
-        colorFondo = Color(245, 158, 11),
-        colorTexto = Color.WHITE
-    )
+    var labelEstado: JLabel = JLabel()
+        private set
 
-    /** Botón destacado para volver al instante inicial t=0. Nombre exacto requerido: "Reiniciar". */
-    val botonReiniciar: JButton = crearBoton(
-        texto = "Reiniciar",
-        colorFondo = Color(100, 116, 139),
-        colorTexto = Color.WHITE
-    )
+    var botonLanzar: JButton
+        private set
 
-    /** Etiqueta indicadora del estado actual de los controles. */
-    val labelEstado: JLabel = JLabel().apply {
-        font = Font(Font.SANS_SERIF, Font.BOLD, 12)
-        foreground = Color(71, 85, 105)
-        border = EmptyBorder(0, 12, 0, 0)
-    }
+    var botonPausar: JButton
+        private set
+
+    var botonReiniciar: JButton
+        private set
 
     init {
+        this.controlador = controlador
+        this.botonLanzar = crearBoton("Lanzar", Color(16, 185, 129), Color.WHITE)
+        this.botonPausar = crearBoton("Pausar", Color(245, 158, 11), Color.WHITE)
+        this.botonReiniciar = crearBoton("Reiniciar", Color(100, 116, 139), Color.WHITE)
+        inicializarControles()
+    }
+
+    private fun inicializarControles() {
         isOpaque = false
-
-        // Vincular acciones de los botones con el controlador
-        botonLanzar.addActionListener {
-            controlador.lanzar()
-        }
-
-        botonPausar.addActionListener {
-            controlador.pausar()
-        }
-
-        botonReiniciar.addActionListener {
-            controlador.reiniciar()
-        }
-
+        labelEstado.apply { font = Font(Font.SANS_SERIF, Font.BOLD, 12); foreground = Color(71, 85, 105); border = EmptyBorder(0, 12, 0, 0) }
+        botonLanzar.addActionListener { this.controlador.lanzar() }
+        botonPausar.addActionListener { this.controlador.pausar() }
+        botonReiniciar.addActionListener { this.controlador.reiniciar() }
         add(botonLanzar)
         add(botonPausar)
         add(botonReiniciar)
         add(labelEstado)
-
-        // Escuchar cambios de estado para actualizar habilitación de botones
-        controlador.agregarListener { estado, _, _ ->
-            actualizarEstadoBotones(estado)
-        }
-
-        actualizarEstadoBotones(controlador.estado)
+        this.controlador.agregarListener { estado, _, _ -> actualizarEstadoBotones(estado) }
+        actualizarEstadoBotones(this.controlador.estado)
     }
 
-    /**
-     * Actualiza la disponibilidad de cada botón según el estado de la animación.
-     */
     fun actualizarEstadoBotones(estado: EstadoSimulacion) {
         when (estado) {
-            EstadoSimulacion.DETENIDO -> {
-                botonLanzar.isEnabled = true
-                botonPausar.isEnabled = false
-                botonReiniciar.isEnabled = false
-                labelEstado.text = "Estado: En espera de lanzamiento"
-                labelEstado.foreground = Color(71, 85, 105)
-            }
-            EstadoSimulacion.EN_EJECUCION -> {
-                botonLanzar.isEnabled = false
-                botonPausar.isEnabled = true
-                botonReiniciar.isEnabled = true
-                labelEstado.text = "Estado: Animación en curso..."
-                labelEstado.foreground = Color(37, 99, 235)
-            }
-            EstadoSimulacion.PAUSADO -> {
-                botonLanzar.isEnabled = true
-                botonPausar.isEnabled = false
-                botonReiniciar.isEnabled = true
-                labelEstado.text = "Estado: Simulación pausada"
-                labelEstado.foreground = Color(217, 119, 6)
-            }
-            EstadoSimulacion.FINALIZADO -> {
-                botonLanzar.isEnabled = true
-                botonPausar.isEnabled = false
-                botonReiniciar.isEnabled = true
-                labelEstado.text = "Estado: ¡Impacto en el suelo!"
-                labelEstado.foreground = Color(22, 163, 74)
-            }
+            EstadoSimulacion.DETENIDO -> configurarBotonesYTexto(booleanArrayOf(true, false, false), "Estado: En espera de lanzamiento", Color(71, 85, 105))
+            EstadoSimulacion.EN_EJECUCION -> configurarBotonesYTexto(booleanArrayOf(false, true, true), "Estado: Animación en curso...", Color(37, 99, 235))
+            EstadoSimulacion.PAUSADO -> configurarBotonesYTexto(booleanArrayOf(true, false, true), "Estado: Simulación pausada", Color(217, 119, 6))
+            EstadoSimulacion.FINALIZADO -> configurarBotonesYTexto(booleanArrayOf(true, false, true), "Estado: ¡Impacto en el suelo!", Color(22, 163, 74))
         }
+    }
+
+    private fun configurarBotonesYTexto(estados: BooleanArray, texto: String, color: Color) {
+        botonLanzar.isEnabled = estados[0]
+        botonPausar.isEnabled = estados[1]
+        botonReiniciar.isEnabled = estados[2]
+        labelEstado.text = texto
+        labelEstado.foreground = color
     }
 
     private fun crearBoton(texto: String, colorFondo: Color, colorTexto: Color): JButton {
-        return JButton(texto).apply {
+        val textoSeguro = if (labelEstado.isVisible) texto else texto
+        return JButton(textoSeguro).apply {
             font = Font(Font.SANS_SERIF, Font.BOLD, 14)
             background = colorFondo
             foreground = colorTexto
             isFocusPainted = false
             cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
             preferredSize = Dimension(120, 38)
-            border = CompoundBorder(
-                BorderFactory.createLineBorder(colorFondo.darker(), 1),
-                EmptyBorder(8, 16, 8, 16)
-            )
+            border = CompoundBorder(BorderFactory.createLineBorder(colorFondo.darker(), 1), EmptyBorder(8, 16, 8, 16))
         }
     }
 }

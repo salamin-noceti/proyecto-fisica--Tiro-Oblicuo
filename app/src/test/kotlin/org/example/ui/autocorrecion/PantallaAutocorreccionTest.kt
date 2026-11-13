@@ -14,15 +14,20 @@ import kotlin.test.assertTrue
 
 class PantallaAutocorreccionTest {
 
-    @Test
-    fun `inicializacion por defecto estructura las 5 tarjetas comparativas y los 4 pasos de solucion`() {
-        val appState = AppState()
-        val pantalla = PantallaAutocorreccion(appState = appState)
+    private val calculador = CalculadorTiroOblicuo.instancia
 
+    private fun crearPantallaConEstado(): Pair<AppState, PantallaAutocorreccion> {
+        val estado = AppState.nuevo
+        return estado to PantallaAutocorreccion(appState = estado, calculadorFisico = calculador)
+    }
+
+    @Test
+    fun testInicializacionPorDefectoEstructuraTarjetasYPasos() {
+        val (_, pantalla) = crearPantallaConEstado()
+        assertNotNull(calculador)
         assertNotNull(pantalla.contenedorCorreccion)
         assertNotNull(pantalla.panelResumen)
         assertNotNull(pantalla.panelPasos)
-
         assertEquals(5, pantalla.panelResumen.contenedorTarjetas.componentCount)
         assertEquals(4, pantalla.panelPasos.contenedorPasos.componentCount)
         assertFalse(pantalla.panelPasos.desplegado, "La resolución paso a paso debe iniciar oculta por defecto")
@@ -32,31 +37,13 @@ class PantallaAutocorreccionTest {
     }
 
     @Test
-    fun `sincroniza reactivamente con AppState mostrando aciertos, colores e indicadores`() {
-        val appState = AppState()
-        val pantalla = PantallaAutocorreccion(appState = appState)
-        val calculador = CalculadorTiroOblicuo()
-
-        val ejercicio = Ejercicio(
-            id = 2,
-            titulo = "Básquet — Tiro libre",
-            enunciado = "Un basquetbolista lanza a 10 m/s con ángulo de 45° desde 2 m.",
-            dificultad = Dificultad.MEDIO,
-            datos = IngresoDatos(velocidadInicial = 10.0, angulo = 45.0, alturaInicial = 2.0)
-        )
+    fun testSincronizaReactivamenteConAppStateMostrandoAciertos() {
+        val (appState, pantalla) = crearPantallaConEstado()
+        val ejercicio = Ejercicio.crear(2, "Básquet — Tiro libre", "Un basquetbolista lanza a 10 m/s con ángulo de 45° desde 2 m.", Dificultad.MEDIO).copy(datos = IngresoDatos.base.copy(10.0, 45.0, 2.0))
         val solucion = calculador.calcular(ejercicio.datos)
-
-        // 4 respuestas correctas y 1 incorrecta (alcanceHorizontal)
-        val respuesta = RespuestaEstudiante(
-            alcanceHorizontal = 99.0,
-            alturaMaxima = solucion.alturaMaxima,
-            tiempoVuelo = solucion.tiempoVuelo,
-            velocidadX = solucion.velocidadX,
-            velocidadY = solucion.velocidadY
-        )
+        val respuesta = RespuestaEstudiante(99.0, solucion.alturaMaxima, solucion.tiempoVuelo, solucion.velocidadX, solucion.velocidadY)
 
         appState.actualizar(ejercicio, respuesta, solucion)
-
         assertEquals(4, pantalla.reporteActual.cantidadCorrectas)
         assertTrue(pantalla.panelResumen.labelResumenConteo.text.contains("4 de 5 respuestas correctas"))
         assertTrue(pantalla.panelResumen.labelDatosEjercicio.text.contains("Ejercicio #2: Básquet"))
@@ -65,21 +52,18 @@ class PantallaAutocorreccionTest {
     }
 
     @Test
-    fun `boton desplegar alterna la visibilidad del panel de solucion paso a paso`() {
-        val pantalla = PantallaAutocorreccion()
-
-        // 1. Inicia oculto por defecto con texto "Mostrar Solución Detallada Paso a Paso"
+    fun testBotonDesplegarAlternaVisibilidadDelPanelDeSolucionPasoAPaso() {
+        val (_, pantalla) = crearPantallaConEstado()
+        assertNotNull(calculador)
         assertFalse(pantalla.panelPasos.desplegado)
         assertFalse(pantalla.panelPasos.contenedorPasos.isVisible)
         assertEquals("Mostrar Solución Detallada Paso a Paso", pantalla.panelPasos.botonDesplegar.text)
 
-        // 2. Al presionar se despliega y cambia a "Ocultar Solución Detallada Paso a Paso"
         pantalla.panelPasos.botonDesplegar.doClick()
         assertTrue(pantalla.panelPasos.desplegado)
         assertTrue(pantalla.panelPasos.contenedorPasos.isVisible)
         assertEquals("Ocultar Solución Detallada Paso a Paso", pantalla.panelPasos.botonDesplegar.text)
 
-        // 3. Al volver a presionar se oculta nuevamente
         pantalla.panelPasos.botonDesplegar.doClick()
         assertFalse(pantalla.panelPasos.desplegado)
         assertFalse(pantalla.panelPasos.contenedorPasos.isVisible)

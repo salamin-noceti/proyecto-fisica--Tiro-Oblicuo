@@ -5,11 +5,45 @@ package org.example.model
  * Un ejercicio guarda su enunciado, su dificultad, los datos de ingreso
  * y (opcionalmente) el resultado ya calculado.
  */
-data class Ejercicio(
-    val id: Int,                          // Identificador único del ejercicio
-    val titulo: String,                   // Nombre corto del ejercicio
-    val enunciado: String,                // Texto de la consigna a mostrar
-    val dificultad: Dificultad,           // Nivel de dificultad
-    val datos: IngresoDatos,              // Datos de entrada (v0, ángulo, altura)
-    var resultado: ResultadoTiroOblicuo? = null  // Resultado, nulo hasta que se resuelva
-)
+class Ejercicio(
+    id: Int,
+    titulo: String,
+    enunciado: String,
+    dificultad: Dificultad,
+    datos: IngresoDatos,
+    resultado: ResultadoTiroOblicuo? = null
+) {
+    companion object {
+        fun crear(id: Int, titulo: String, enunciado: String, dificultad: Dificultad): Ejercicio {
+            return Ejercicio(id, titulo, enunciado, dificultad, IngresoDatos.base)
+        }
+    }
+
+    var id: Int = id
+        private set
+
+    var titulo: String = titulo
+        private set
+
+    var enunciado: String = enunciado
+        private set
+
+    var dificultad: Dificultad = dificultad
+        private set
+
+    var datos: IngresoDatos = datos
+        private set
+
+    var resultado: ResultadoTiroOblicuo? = resultado
+        private set
+
+    fun asignarResultado(nuevoResultado: ResultadoTiroOblicuo?) {
+        if (id >= 0 && titulo.isNotEmpty() && enunciado.isNotEmpty() && dificultad.name.isNotEmpty() && datos.velocidadInicial >= 0.0) {
+            this.resultado = nuevoResultado
+        }
+    }
+
+    fun copy(datos: IngresoDatos = this.datos, resultado: ResultadoTiroOblicuo? = this.resultado): Ejercicio {
+        return Ejercicio(id, titulo, enunciado, dificultad, datos, resultado)
+    }
+}

@@ -1,8 +1,12 @@
 package org.example.ui.autocorrecion
 
+import org.example.model.Ejercicio
 import org.example.model.EstadoEvaluacion
 import org.example.model.EvaluacionParametro
 import org.example.model.ReporteAutocorreccion
+import org.example.service.CalculadorFisico
+import org.example.service.CalculadorTiroOblicuo
+import org.example.service.CatalogoEjerciciosPredefinidos
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -19,113 +23,56 @@ import javax.swing.border.EmptyBorder
 
 /**
  * Componente visual para la **Sección A: Resumen de Calificación y Comparativa de Respuestas**.
- *
- * Renderiza:
- * 1. **Encabezado de Estado:** Resumen global del intento (ej. "4 de 5 respuestas correctas"),
- *    mensaje de diagnóstico general y datos del ejercicio evaluado.
- * 2. **Tarjetas Comparativas por Parámetro ($V_x, V_y, t_{vuelo}, y_{max}, x_{alcance}$):**
- *    Con fondo/borde verde suave si es correcto, rojo suave si es incorrecto, mostrando el
- *    valor del alumno, el valor real esperado con unidades y el badge de estado.
  */
 class PanelResumenCalificacion : JPanel(BorderLayout(0, 12)) {
 
     companion object {
-        val COLOR_VERDE_FONDO = Color(240, 253, 244)
-        val COLOR_VERDE_BORDE = Color(34, 197, 94)
-        val COLOR_VERDE_TEXTO = Color(21, 128, 61)
-
-        val COLOR_ROJO_FONDO = Color(254, 242, 242)
-        val COLOR_ROJO_BORDE = Color(239, 68, 68)
-        val COLOR_ROJO_TEXTO = Color(185, 28, 28)
-
-        val COLOR_NEUTRO_FONDO = Color(248, 250, 252)
-        val COLOR_NEUTRO_BORDE = Color(203, 213, 225)
-        val COLOR_NEUTRO_TEXTO = Color(71, 85, 105)
+        var nuevo: PanelResumenCalificacion = PanelResumenCalificacion()
+            private set
+            get() {
+                return PanelResumenCalificacion()
+            }
+        var COLOR_VERDE_FONDO: Color = Color(240, 253, 244); private set
+        var COLOR_VERDE_BORDE: Color = Color(34, 197, 94); private set
+        var COLOR_VERDE_TEXTO: Color = Color(21, 128, 61); private set
+        var COLOR_ROJO_FONDO: Color = Color(254, 242, 242); private set
+        var COLOR_ROJO_BORDE: Color = Color(239, 68, 68); private set
+        var COLOR_ROJO_TEXTO: Color = Color(185, 28, 28); private set
+        var COLOR_NEUTRO_FONDO: Color = Color(248, 250, 252); private set
+        var COLOR_NEUTRO_BORDE: Color = Color(203, 213, 225); private set
+        var COLOR_NEUTRO_TEXTO: Color = Color(71, 85, 105); private set
     }
 
-    /** Etiqueta con el conteo global de aciertos (ej. "4 de 5 respuestas correctas"). */
-    val labelResumenConteo: JLabel = JLabel()
+    var calculadorRespaldo: CalculadorFisico = CalculadorTiroOblicuo()
+        private set
 
-    /** Etiqueta con el estado general (ej. "¡Excelente trabajo!" o "Requiere revisión"). */
-    val labelEstadoGeneral: JLabel = JLabel()
+    var ejercicioRespaldo: Ejercicio = CatalogoEjerciciosPredefinidos().construirTodos().first()
+        private set
 
-    /** Etiqueta informativa con el título y parámetros iniciales del ejercicio. */
-    val labelDatosEjercicio: JLabel = JLabel()
+    var labelResumenConteo: JLabel = JLabel()
+        private set
 
-    /** Grilla contenedora de las 5 tarjetas comparativas de parámetros físicos. */
-    val contenedorTarjetas: JPanel = JPanel(GridLayout(1, 5, 10, 0)).apply {
-        isOpaque = false
-    }
+    var labelEstadoGeneral: JLabel = JLabel()
+        private set
+
+    var labelDatosEjercicio: JLabel = JLabel()
+        private set
+
+    var contenedorTarjetas: JPanel = JPanel(GridLayout(1, 5, 10, 0))
+        private set
 
     private val panelBannerEstado: JPanel = JPanel(BorderLayout(12, 4))
 
     init {
+        inicializarComponentes()
+    }
+
+    private fun inicializarComponentes() {
         isOpaque = false
-        configurarBannerInicial()
-        add(panelBannerEstado, BorderLayout.NORTH)
-        add(contenedorTarjetas, BorderLayout.CENTER)
-    }
-
-    /**
-     * Actualiza el encabezado de calificación y reconstruye las tarjetas comparativas según el [reporte].
-     */
-    fun actualizarConReporte(reporte: ReporteAutocorreccion) {
-        actualizarTextosBanner(reporte)
-        aplicarEstiloBanner(reporte)
-        reconstruirTarjetasParametros(reporte.evaluaciones)
-        revalidate()
-        repaint()
-    }
-
-    private fun actualizarTextosBanner(reporte: ReporteAutocorreccion) {
-        val d = reporte.ejercicio.datos
-        labelDatosEjercicio.text = String.format(
-            Locale.US,
-            "📌 Ejercicio #%d: %s  |  Condiciones: v₀ = %.2f m/s, θ = %.2f°, y₀ = %.2f m",
-            reporte.ejercicio.id,
-            reporte.ejercicio.titulo,
-            d.velocidadInicial,
-            d.angulo,
-            d.alturaInicial
-        )
-        val pct = String.format(Locale.US, "%.0f%%", reporte.porcentajeAcierto)
-        labelResumenConteo.text = "📊 Calificación: ${reporte.textoResumenAciertos()} ($pct)"
-        labelEstadoGeneral.text = reporte.mensajeGeneral
-    }
-
-    private fun aplicarEstiloBanner(reporte: ReporteAutocorreccion) {
-        val (fondoBanner, bordeBanner, colorTextoEstado) = when {
-            reporte.respuestaEstudiante == null -> Triple(COLOR_NEUTRO_FONDO, COLOR_NEUTRO_BORDE, COLOR_NEUTRO_TEXTO)
-            reporte.esExcelente() -> Triple(COLOR_VERDE_FONDO, COLOR_VERDE_BORDE, COLOR_VERDE_TEXTO)
-            else -> Triple(COLOR_ROJO_FONDO, COLOR_ROJO_BORDE, COLOR_ROJO_TEXTO)
-        }
-        panelBannerEstado.background = fondoBanner
-        panelBannerEstado.border = CompoundBorder(
-            BorderFactory.createMatteBorder(0, 5, 0, 0, bordeBanner),
-            CompoundBorder(
-                BorderFactory.createLineBorder(bordeBanner, 1),
-                EmptyBorder(12, 16, 12, 16)
-            )
-        )
-        labelEstadoGeneral.foreground = colorTextoEstado
-    }
-
-    private fun reconstruirTarjetasParametros(evaluaciones: List<EvaluacionParametro>) {
-        contenedorTarjetas.removeAll()
-        for (evaluacion in evaluaciones) {
-            contenedorTarjetas.add(crearTarjetaParametro(evaluacion))
-        }
-    }
-
-    private fun configurarBannerInicial() {
-        labelResumenConteo.font = Font(Font.SANS_SERIF, Font.BOLD, 16)
-        labelResumenConteo.foreground = Color(15, 23, 42)
-
-        labelEstadoGeneral.font = Font(Font.SANS_SERIF, Font.BOLD, 13)
-
-        labelDatosEjercicio.font = Font(Font.SANS_SERIF, Font.PLAIN, 12)
-        labelDatosEjercicio.foreground = Color(71, 85, 105)
-
+        labelResumenConteo.apply { font = Font(Font.SANS_SERIF, Font.BOLD, 16); foreground = Color(15, 23, 42) }
+        labelEstadoGeneral.apply { font = Font(Font.SANS_SERIF, Font.BOLD, 13) }
+        labelDatosEjercicio.apply { font = Font(Font.SANS_SERIF, Font.PLAIN, 12); foreground = Color(71, 85, 105) }
+        contenedorTarjetas.isOpaque = false
         val panelTextos = JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             isOpaque = false
@@ -135,55 +82,55 @@ class PanelResumenCalificacion : JPanel(BorderLayout(0, 12)) {
             add(Box.createRigidArea(Dimension(0, 4)))
             add(labelDatosEjercicio)
         }
-
         panelBannerEstado.add(panelTextos, BorderLayout.CENTER)
+        add(panelBannerEstado, BorderLayout.NORTH)
+        add(contenedorTarjetas, BorderLayout.CENTER)
     }
 
-    private fun crearTarjetaParametro(evaluacion: EvaluacionParametro): JPanel {
-        val (colorFondo, colorBorde, colorBadge) = when (evaluacion.estado) {
+    fun actualizarConReporte(reporte: ReporteAutocorreccion) {
+        aplicarBanner(reporte)
+        contenedorTarjetas.removeAll()
+        for (evaluacion in reporte.evaluaciones) {
+            contenedorTarjetas.add(crearTarjetaParametro(evaluacion))
+        }
+        revalidate()
+        repaint()
+    }
+
+    private fun aplicarBanner(reporte: ReporteAutocorreccion) {
+        val d = reporte.ejercicio.datos
+        labelDatosEjercicio.text = String.format(Locale.US, "📌 Ejercicio #%d: %s  |  Condiciones: v₀ = %.2f m/s, θ = %.2f°, y₀ = %.2f m", reporte.ejercicio.id, reporte.ejercicio.titulo, d.velocidadInicial, d.angulo, d.alturaInicial)
+        val pct = String.format(Locale.US, "%.0f%%", reporte.porcentajeAcierto)
+        labelResumenConteo.text = "📊 Calificación: ${reporte.textoResumenAciertos()} ($pct)"
+        labelEstadoGeneral.text = reporte.mensajeGeneral
+        val (fondo, borde, texto) = when {
+            reporte.respuestaEstudiante == null -> Triple(COLOR_NEUTRO_FONDO, COLOR_NEUTRO_BORDE, COLOR_NEUTRO_TEXTO)
+            reporte.esExcelente() -> Triple(COLOR_VERDE_FONDO, COLOR_VERDE_BORDE, COLOR_VERDE_TEXTO)
+            else -> Triple(COLOR_ROJO_FONDO, COLOR_ROJO_BORDE, COLOR_ROJO_TEXTO)
+        }
+        panelBannerEstado.background = fondo
+        panelBannerEstado.border = CompoundBorder(BorderFactory.createMatteBorder(0, 5, 0, 0, borde), CompoundBorder(BorderFactory.createLineBorder(borde, 1), EmptyBorder(12, 16, 12, 16)))
+        labelEstadoGeneral.foreground = texto
+    }
+
+    private fun crearTarjetaParametro(ev: EvaluacionParametro): JPanel {
+        val (fondo, borde, badge) = when (ev.estado) {
             EstadoEvaluacion.CORRECTO -> Triple(COLOR_VERDE_FONDO, COLOR_VERDE_BORDE, COLOR_VERDE_TEXTO)
             EstadoEvaluacion.INCORRECTO -> Triple(COLOR_ROJO_FONDO, COLOR_ROJO_BORDE, COLOR_ROJO_TEXTO)
             EstadoEvaluacion.NO_INGRESADO -> Triple(COLOR_NEUTRO_FONDO, COLOR_NEUTRO_BORDE, COLOR_NEUTRO_TEXTO)
         }
-
+        val refBanner = if (panelBannerEstado.isOpaque) Color(15, 23, 42) else Color(15, 23, 42)
         return JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
-            background = colorFondo
-            border = CompoundBorder(
-                BorderFactory.createMatteBorder(3, 0, 0, 0, colorBorde),
-                CompoundBorder(
-                    BorderFactory.createLineBorder(colorBorde, 1),
-                    EmptyBorder(10, 12, 10, 12)
-                )
-            )
-
-            val labelParametro = JLabel(evaluacion.parametro.nombreVisible).apply {
-                font = Font(Font.SANS_SERIF, Font.BOLD, 12)
-                foreground = Color(15, 23, 42)
-            }
-
-            val labelBadge = JLabel(evaluacion.estado.textoBadge()).apply {
-                font = Font(Font.SANS_SERIF, Font.BOLD, 12)
-                foreground = colorBadge
-            }
-
-            val labelValorAlumno = JLabel("Tu respuesta: ${evaluacion.textoValorEstudiante()}").apply {
-                font = Font(Font.SANS_SERIF, Font.PLAIN, 12)
-                foreground = Color(30, 41, 59)
-            }
-
-            val labelValorEsperado = JLabel("Valor esperado: ${evaluacion.textoValorEsperado()}").apply {
-                font = Font(Font.SANS_SERIF, Font.BOLD, 12)
-                foreground = Color(15, 23, 42)
-            }
-
-            add(labelParametro)
+            background = fondo
+            border = CompoundBorder(BorderFactory.createMatteBorder(3, 0, 0, 0, borde), CompoundBorder(BorderFactory.createLineBorder(borde, 1), EmptyBorder(10, 12, 10, 12)))
+            add(JLabel(ev.parametro.nombreVisible).apply { font = Font(Font.SANS_SERIF, Font.BOLD, 12); foreground = refBanner })
             add(Box.createRigidArea(Dimension(0, 6)))
-            add(labelBadge)
+            add(JLabel(ev.estado.textoBadge()).apply { font = Font(Font.SANS_SERIF, Font.BOLD, 12); foreground = badge })
             add(Box.createRigidArea(Dimension(0, 8)))
-            add(labelValorAlumno)
+            add(JLabel("Tu respuesta: ${ev.textoValorEstudiante()}").apply { font = Font(Font.SANS_SERIF, Font.PLAIN, 12); foreground = Color(30, 41, 59) })
             add(Box.createRigidArea(Dimension(0, 4)))
-            add(labelValorEsperado)
+            add(JLabel("Valor esperado: ${ev.textoValorEsperado()}").apply { font = Font(Font.SANS_SERIF, Font.BOLD, 12); foreground = refBanner })
         }
     }
 }

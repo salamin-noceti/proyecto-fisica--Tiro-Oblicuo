@@ -1,44 +1,45 @@
 package org.example.navigation
 
 /**
- * Representa las secciones o módulos principales disponibles en el menú de navegación
- * de la aplicación desktop "Simulación Tiro: Laboratorio de Tiro Oblicuo".
- *
- * @property titulo Texto exacto que se muestra en el botón o pestaña de la interfaz.
- * @property descripcion Breve descripción del propósito de la sección.
- * @property icono Emoji o símbolo que acompaña visualmente al título en la barra.
+ * Representa las tres secciones principales de navegación dentro de la aplicación.
  */
 enum class SeccionNavegacion(
-    val titulo: String,
-    val descripcion: String,
-    val icono: String
+    titulo: String,
+    descripcion: String,
+    icono: String
 ) {
-    /**
-     * Módulo de práctica y ejercicios para el estudiante (Issue 6).
-     */
     PRACTICA(
         titulo = "Práctica",
-        descripcion = "Banco de ejercicios, selección de dificultad y carga de respuestas.",
+        descripcion = "Resolución de ejercicios y carga de parámetros del estudiante",
         icono = "🎯"
     ),
-
-    /**
-     * Módulo de animación interactiva y gráficos físicos cinemáticos (Issues 7 y 8).
-     */
     SIMULACION(
         titulo = "Simulación",
-        descripcion = "Animación en tiempo real del proyectil y gráficos cinemáticos.",
+        descripcion = "Visualización gráfica interactiva de la trayectoria parabólica",
         icono = "🚀"
     ),
-
-    /**
-     * Módulo de autocorrección, análisis paso a paso y feedback didáctico (Issue 9).
-     */
     AUTOCORRECCION(
         titulo = "Autocorrección",
-        descripcion = "Revisión paso a paso de fórmulas y retroalimentación pedagógica.",
+        descripcion = "Evaluación automática de resultados y desglose de soluciones",
         icono = "✅"
     );
 
-    override fun toString(): String = titulo
+    var titulo: String
+        private set
+
+    var descripcion: String
+        private set
+
+    var icono: String
+        private set
+
+    init {
+        this.titulo = titulo
+        this.descripcion = descripcion
+        this.icono = icono
+    }
+
+    fun etiquetaBoton(): String {
+        return titulo
+    }
 }

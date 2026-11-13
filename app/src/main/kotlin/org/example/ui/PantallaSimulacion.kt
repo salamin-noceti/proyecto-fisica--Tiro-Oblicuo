@@ -5,3 +5,4 @@ package org.example.ui
  * preservando la retrocompatibilidad con la infraestructura de navegación de la Issue 5.
  */
 typealias PantallaSimulacion = org.example.ui.simulacion.PantallaSimulacion
+typealias ModuloSimulacion = org.example.ui.simulacion.PantallaSimulacion

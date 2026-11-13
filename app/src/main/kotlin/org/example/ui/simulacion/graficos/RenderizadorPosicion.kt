@@ -7,81 +7,37 @@ import java.awt.Color
 
 /**
  * Renderizador del **Gráfico 1: Posición vs Tiempo** ($y(t)$ y $x(t)$).
- *
- * Muestra simultáneamente:
- * - El avance horizontal $x(t)$ (lineal creciente hasta el impacto).
- * - La altura vertical $y(t)$ (parábola que asciende hasta $y_{max}$ y desciende a $0$).
- *
- * Cumple con los criterios de calidad:
- * - **DUP -> 0%:** No recalcula física en la interfaz; toma las posiciones $(x, y, t)$
- *   directamente de [puntosEstela] provenientes de `CalculadorTiroOblicuo`.
- * - **SRP:** Responsable exclusivamente del mapeo de coordenadas posicionales hacia las series
- *   del componente [CartesianChartCanvas].
- *
- * @param canvas Lienzo cartesiano inyectado o instanciado por defecto.
  */
 class RenderizadorPosicion(
-    override val canvas: CartesianChartCanvas = CartesianChartCanvas(
-        titulo = "Posición vs Tiempo",
-        etiquetaEjeX = "t (s)",
-        etiquetaEjeY = "Posición (m)"
-    )
+    canvasInicial: CartesianChartCanvas = CartesianChartCanvas(titulo = "Posición vs Tiempo", etiquetaEjeX = "t (s)", etiquetaEjeY = "Posición (m)")
 ) : RenderizadorGraficoCinematico {
 
-    private val colorX = Color(37, 99, 235)  // Azul
-    private val colorY = Color(16, 185, 129) // Verde Esmeralda
+    companion object {
+        var nuevo: RenderizadorPosicion = RenderizadorPosicion()
+            private set
+            get() {
+                return RenderizadorPosicion()
+            }
+    }
+
+    override var canvas: CartesianChartCanvas = canvasInicial
+        private set
+
+    private val colorX = Color(37, 99, 235)
+    private val colorY = Color(16, 185, 129)
 
     override fun configurarLimites(datos: IngresoDatos, resultadoTeorico: ResultadoTiroOblicuo) {
         val tVuelo = resultadoTeorico.tiempoVuelo.coerceAtLeast(1.0)
-        val xMaxDominio = tVuelo * 1.05
-
-        val valorMaximoY = maxOf(
-            resultadoTeorico.distanciaHorizontal,
-            resultadoTeorico.alturaMaxima,
-            datos.alturaInicial,
-            5.0
-        )
-        val yMaxRango = valorMaximoY * 1.15
-
-        canvas.configurarLimites(
-            xMin = 0.0,
-            xMax = xMaxDominio,
-            yMin = 0.0,
-            yMax = yMaxRango
-        )
+        val valorMaximoY = maxOf(resultadoTeorico.distanciaHorizontal, resultadoTeorico.alturaMaxima, datos.alturaInicial, 5.0)
+        canvas.configurarLimites(xMin = 0.0, xMax = tVuelo * 1.05, yMin = 0.0, yMax = valorMaximoY * 1.15)
     }
 
-    override fun actualizar(
-        tiempoActual: Double,
-        puntosEstela: List<PosicionTrayectoria>,
-        resultadoTeorico: ResultadoTiroOblicuo,
-        datos: IngresoDatos
-    ) {
-        val puntosX = puntosEstela.map { PuntoGrafico(it.tiempo, it.x) }
-        val puntosY = puntosEstela.map { PuntoGrafico(it.tiempo, it.y) }
-
+    override fun actualizar(tiempoActual: Double, puntosEstela: List<PosicionTrayectoria>, resultadoTeorico: ResultadoTiroOblicuo, datos: IngresoDatos) {
+        val puntosX = puntosEstela.map { PuntoGrafico.en(it.tiempo, it.x) }
+        val puntosY = puntosEstela.map { PuntoGrafico.en(it.tiempo, it.y) }
         val ultimo = puntosEstela.lastOrNull()
-        val valorActualX = ultimo?.x ?: 0.0
-        val valorActualY = ultimo?.y ?: datos.alturaInicial
-
-        val serieX = SerieCartesiana(
-            id = "x_t",
-            nombre = "x(t)",
-            color = colorX,
-            puntos = puntosX,
-            valorActual = valorActualX,
-            unidad = "m"
-        )
-
-        val serieY = SerieCartesiana(
-            id = "y_t",
-            nombre = "y(t)",
-            color = colorY,
-            puntos = puntosY,
-            valorActual = valorActualY,
-            unidad = "m"
-        )
-
+        val serieX = canvas.construirSerie(listOf("x_t", "x(t)", "m"), colorX, puntosX, ultimo?.x ?: 0.0)
+        val serieY = canvas.construirSerie(listOf("y_t", "y(t)", "m"), colorY, puntosY, ultimo?.y ?: datos.alturaInicial)
         canvas.actualizarSeries(listOf(serieX, serieY), tiempoActual)
     }
 

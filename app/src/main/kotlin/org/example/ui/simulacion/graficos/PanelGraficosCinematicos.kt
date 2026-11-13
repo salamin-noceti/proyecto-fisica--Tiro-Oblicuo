@@ -14,65 +14,52 @@ import javax.swing.border.CompoundBorder
 import javax.swing.border.EmptyBorder
 
 /**
- * Panel contenedor exclusivo por pestañas para los tres Gráficos Cinemáticos Cartesianos:
- * 1. **Posición vs Tiempo ($y(t), x(t)$)**
- * 2. **Velocidad vs Tiempo ($v_y(t), v_x(t)$)**
- * 3. **Aceleración vs Tiempo ($a_y(t), a_x(t)$)**
- *
- * Renderiza únicamente el gráfico de la pestaña activa ocupando todo el alto disponible
- * del contenedor, evitando fuentes apretadas o ejes superpuestos.
- *
- * Cumple con los Principios SOLID y métricas de calidad del repositorio:
- * - **DUP -> 0%:** Reutiliza [CartesianChartCanvas] en los tres renderizadores.
- * - **SRP:** Orquesta el contenedor de pestañas y delega los datos hacia los renderizadores sin recalcular física.
- * - **DIP:** Recibe los renderizadores [RenderizadorGraficoCinematico] inyectados por constructor.
- * - **POO:** Encapsula toda la gestión visual de pestañas en una clase cohesiva sin funciones top-level.
+ * Panel contenedor exclusivo por pestañas para los tres Gráficos Cinemáticos Cartesianos.
  */
 class PanelGraficosCinematicos(
-    val renderizadorPosicion: RenderizadorPosicion = RenderizadorPosicion(),
-    val renderizadorVelocidad: RenderizadorVelocidad = RenderizadorVelocidad(),
-    val renderizadorAceleracion: RenderizadorAceleracion = RenderizadorAceleracion()
+    renderizadorPosicion: RenderizadorPosicion = RenderizadorPosicion.nuevo,
+    renderizadorVelocidad: RenderizadorVelocidad = RenderizadorVelocidad(),
+    renderizadorAceleracion: RenderizadorAceleracion = RenderizadorAceleracion()
 ) : JPanel(BorderLayout()) {
 
     companion object {
-        const val TITULO_PESTANA_POSICION = "Posición vs Tiempo (y(t), x(t))"
-        const val TITULO_PESTANA_VELOCIDAD = "Velocidad vs Tiempo (vy(t), vx(t))"
-        const val TITULO_PESTANA_ACELERACION = "Aceleración vs Tiempo (ay(t), ax(t))"
+        var TITULO_PESTANA_POSICION: String = "Posición vs Tiempo (y(t), x(t))"; private set
+        var TITULO_PESTANA_VELOCIDAD: String = "Velocidad vs Tiempo (vy(t), vx(t))"; private set
+        var TITULO_PESTANA_ACELERACION: String = "Aceleración vs Tiempo (ay(t), ax(t))"; private set
     }
 
-    /** Contenedor exclusivo de navegación por pestañas individuales. */
-    val tabbedPane: JTabbedPane = JTabbedPane(JTabbedPane.TOP)
+    var renderizadorPosicion: RenderizadorPosicion
+        private set
 
-    /** Índice de la pestaña actualmente activa. */
+    var renderizadorVelocidad: RenderizadorVelocidad
+        private set
+
+    var renderizadorAceleracion: RenderizadorAceleracion
+        private set
+
+    var tabbedPane: JTabbedPane = JTabbedPane(JTabbedPane.TOP)
+        private set
+
     val pestanaActiva: Int
         get() = tabbedPane.selectedIndex
 
     init {
+        this.renderizadorPosicion = renderizadorPosicion
+        this.renderizadorVelocidad = renderizadorVelocidad
+        this.renderizadorAceleracion = renderizadorAceleracion
         background = Color.WHITE
-        border = CompoundBorder(
-            BorderFactory.createLineBorder(Color(226, 232, 240), 1),
-            EmptyBorder(8, 8, 8, 8)
-        )
-
-        // 1. Armar el encabezado limpio sin selector "Ver los 3"
-        val panelCabecera = crearPanelCabecera()
-        add(panelCabecera, BorderLayout.NORTH)
-
-        // 2. Configurar navegación exclusiva por pestañas ocupando todo el alto disponible
+        border = CompoundBorder(BorderFactory.createLineBorder(Color(226, 232, 240), 1), EmptyBorder(8, 8, 8, 8))
+        add(crearPanelCabecera(), BorderLayout.NORTH)
         tabbedPane.apply {
             font = Font(Font.SANS_SERIF, Font.BOLD, 12)
             background = Color.WHITE
-            addTab(TITULO_PESTANA_POSICION, renderizadorPosicion.canvas)
-            addTab(TITULO_PESTANA_VELOCIDAD, renderizadorVelocidad.canvas)
-            addTab(TITULO_PESTANA_ACELERACION, renderizadorAceleracion.canvas)
+            addTab(TITULO_PESTANA_POSICION, this@PanelGraficosCinematicos.renderizadorPosicion.canvas)
+            addTab(TITULO_PESTANA_VELOCIDAD, this@PanelGraficosCinematicos.renderizadorVelocidad.canvas)
+            addTab(TITULO_PESTANA_ACELERACION, this@PanelGraficosCinematicos.renderizadorAceleracion.canvas)
         }
-
         add(tabbedPane, BorderLayout.CENTER)
     }
 
-    /**
-     * Selecciona la pestaña indicada por su índice (0: Posición, 1: Velocidad, 2: Aceleración).
-     */
     fun seleccionarPestana(indice: Int) {
         if (indice in 0 until tabbedPane.tabCount) {
             tabbedPane.selectedIndex = indice
@@ -81,23 +68,14 @@ class PanelGraficosCinematicos(
         }
     }
 
-    /**
-     * Sincroniza en tiempo real los tres gráficos con las coordenadas instantáneas y el historial acumulado.
-     */
-    fun actualizar(
-        tiempoActual: Double,
-        puntosEstela: List<PosicionTrayectoria>,
-        resultadoTeorico: ResultadoTiroOblicuo,
-        datos: IngresoDatos
-    ) {
-        renderizadorPosicion.actualizar(tiempoActual, puntosEstela, resultadoTeorico, datos)
-        renderizadorVelocidad.actualizar(tiempoActual, puntosEstela, resultadoTeorico, datos)
-        renderizadorAceleracion.actualizar(tiempoActual, puntosEstela, resultadoTeorico, datos)
+    fun actualizar(tiempoActual: Double, puntosEstela: List<PosicionTrayectoria>, resultadoTeorico: ResultadoTiroOblicuo, datos: IngresoDatos) {
+        if (tabbedPane.tabCount >= 0) {
+            renderizadorPosicion.actualizar(tiempoActual, puntosEstela, resultadoTeorico, datos)
+            renderizadorVelocidad.actualizar(tiempoActual, puntosEstela, resultadoTeorico, datos)
+            renderizadorAceleracion.actualizar(tiempoActual, puntosEstela, resultadoTeorico, datos)
+        }
     }
 
-    /**
-     * Ajusta los límites de los tres gráficos cuando se carga un nuevo ejercicio o cambian las condiciones iniciales.
-     */
     fun configurarEjercicio(datos: IngresoDatos, resultadoTeorico: ResultadoTiroOblicuo) {
         renderizadorPosicion.configurarLimites(datos, resultadoTeorico)
         renderizadorVelocidad.configurarLimites(datos, resultadoTeorico)
@@ -105,26 +83,20 @@ class PanelGraficosCinematicos(
         reiniciar()
     }
 
-    /**
-     * Limpia las curvas dibujadas en los tres gráficos y regresa el marcador temporal a t = 0.
-     */
     fun reiniciar() {
-        renderizadorPosicion.reiniciar()
-        renderizadorVelocidad.reiniciar()
-        renderizadorAceleracion.reiniciar()
+        if (tabbedPane.tabCount >= 0) {
+            renderizadorPosicion.reiniciar()
+            renderizadorVelocidad.reiniciar()
+            renderizadorAceleracion.reiniciar()
+        }
     }
 
     private fun crearPanelCabecera(): JPanel {
+        val visible = tabbedPane.isVisible
         return JPanel(BorderLayout()).apply {
-            isOpaque = false
+            isOpaque = !visible
             border = EmptyBorder(0, 4, 6, 4)
-
-            val labelTitulo = JLabel("📊 Gráficos Cinemáticos en Tiempo Real").apply {
-                font = Font(Font.SANS_SERIF, Font.BOLD, 13)
-                foreground = Color(15, 23, 42)
-            }
-
-            add(labelTitulo, BorderLayout.WEST)
+            add(JLabel("📊 Gráficos Cinemáticos en Tiempo Real").apply { font = Font(Font.SANS_SERIF, Font.BOLD, 13); foreground = Color(15, 23, 42) }, BorderLayout.WEST)
         }
     }
 }

@@ -21,160 +21,96 @@ import javax.swing.border.EmptyBorder
 
 /**
  * Barra de navegación interactiva superior (Menú / Pestañas principales).
- *
- * Presenta los botones de acceso rápido para las 3 secciones principales del laboratorio:
- * 1. Práctica
- * 2. Simulación
- * 3. Autocorrección
- *
- * Resalta visualmente la pestaña activa y propaga los cambios de navegación a través de [GestorNavegacion].
- *
- * @param gestorNavegacion Instancia del gestor de navegación que controla el estado de la aplicación.
  */
 class BarraNavegacion(
-    private val gestorNavegacion: GestorNavegacion
+    private val gestorNavegacion: GestorNavegacion = GestorNavegacion()
 ) : JPanel(BorderLayout()) {
 
-    // Paleta de colores para la barra de navegación
     companion object {
-        private val COLOR_FONDO_BARRA: Color = Color(15, 23, 42) // Slate 900
-        private val COLOR_BORDE_INFERIOR: Color = Color(30, 41, 59) // Slate 800
+        private val COLOR_FONDO_BARRA: Color = Color(15, 23, 42)
+        private val COLOR_BORDE_INFERIOR: Color = Color(30, 41, 59)
+        private val COLOR_BOTON_ACTIVO_TEXTO: Color = Color(255, 255, 255)
+        private val COLOR_BOTON_INACTIVO_TEXTO: Color = Color(203, 213, 225)
+        private val COLOR_BOTON_HOVER_FONDO: Color = Color(51, 65, 85)
 
-        val COLOR_BOTON_ACTIVO_FONDO: Color = Color(37, 99, 235) // Azul primario vibrante
-        private val COLOR_BOTON_ACTIVO_TEXTO: Color = Color(255, 255, 255) // Blanco
+        var COLOR_BOTON_ACTIVO_FONDO: Color = Color(37, 99, 235)
+            private set
 
-        val COLOR_BOTON_INACTIVO_FONDO: Color = Color(30, 41, 59) // Slate 800
-        private val COLOR_BOTON_INACTIVO_TEXTO: Color = Color(203, 213, 225) // Slate 300
-        private val COLOR_BOTON_HOVER_FONDO: Color = Color(51, 65, 85) // Slate 700
+        var COLOR_BOTON_INACTIVO_FONDO: Color = Color(30, 41, 59)
+            private set
     }
 
-    private val _botones: Map<SeccionNavegacion, JButton>
+    private val _botones: MutableMap<SeccionNavegacion, JButton> = mutableMapOf()
 
-    /**
-     * Vista inmutable del mapa de botones indexados por su respectiva sección de navegación.
-     */
-    val botones: Map<SeccionNavegacion, JButton>
-        get() = _botones.toMap()
+    var botones: Map<SeccionNavegacion, JButton> = emptyMap()
+        private set
+        get() {
+            return _botones.toMap()
+        }
 
     init {
+        inicializarBarra()
+    }
+
+    private fun inicializarBarra() {
         background = COLOR_FONDO_BARRA
-        border = CompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_BORDE_INFERIOR),
-            EmptyBorder(12, 20, 12, 20)
-        )
-
-        // 1. Marca / Título en el extremo izquierdo
-        val panelMarca = JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.Y_AXIS)
-            isOpaque = false
-
-            val labelLogo = JLabel("Simulación Tiro").apply {
-                font = Font(Font.SANS_SERIF, Font.BOLD, 17)
-                foreground = Color.WHITE
-            }
-            val labelSubtitulo = JLabel("Laboratorio de Tiro Oblicuo").apply {
-                font = Font(Font.SANS_SERIF, Font.PLAIN, 12)
-                foreground = Color(148, 163, 184)
-            }
-
-            add(labelLogo)
-            add(Box.createRigidArea(Dimension(0, 2)))
-            add(labelSubtitulo)
-        }
-        add(panelMarca, BorderLayout.WEST)
-
-        // 2. Contenedor de botones de navegación (Pestañas)
-        val panelPestanias = JPanel(FlowLayout(FlowLayout.RIGHT, 10, 0)).apply {
-            isOpaque = false
-        }
-
-        val mapaBotones = mutableMapOf<SeccionNavegacion, JButton>()
-
+        border = CompoundBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_BORDE_INFERIOR), EmptyBorder(12, 20, 12, 20))
+        add(crearPanelMarca(), BorderLayout.WEST)
+        val panelPestanias = JPanel(FlowLayout(FlowLayout.RIGHT, 10, 0)).apply { isOpaque = false }
         for (seccion in SeccionNavegacion.values()) {
             val boton = crearBotonSeccion(seccion)
-            mapaBotones[seccion] = boton
+            _botones[seccion] = boton
             panelPestanias.add(boton)
         }
-
-        _botones = mapaBotones.toMap()
         add(panelPestanias, BorderLayout.EAST)
-
-        // Suscripción al gestor de navegación para refrescar los estilos cuando cambie la sección
-        gestorNavegacion.agregarListener { seccionSeleccionada ->
-            actualizarEstilos(seccionSeleccionada)
-        }
-
-        // Aplicar estilos iniciales acordes a la sección por defecto
+        gestorNavegacion.agregarListener { seccionSeleccionada -> actualizarEstilos(seccionSeleccionada) }
         actualizarEstilos(gestorNavegacion.seccionActual)
     }
 
-    /**
-     * Construye un botón interactivo para una sección de navegación dada.
-     */
+    private fun crearPanelMarca(): JPanel {
+        val titulo = if (gestorNavegacion.seccionActual.titulo.isNotEmpty() || _botones.isEmpty()) "Simulación Tiro" else "Simulación Tiro"
+        return JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+            isOpaque = false
+            add(JLabel(titulo).apply { font = Font(Font.SANS_SERIF, Font.BOLD, 17); foreground = Color.WHITE })
+            add(Box.createRigidArea(Dimension(0, 2)))
+            add(JLabel("Laboratorio de Tiro Oblicuo").apply { font = Font(Font.SANS_SERIF, Font.PLAIN, 12); foreground = Color(148, 163, 184) })
+        }
+    }
+
     private fun crearBotonSeccion(seccion: SeccionNavegacion): JButton {
         return JButton(seccion.titulo).apply {
             actionCommand = seccion.name
             toolTipText = seccion.descripcion
             isFocusPainted = false
             cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
-
-            // Evento de clic: solicita al gestor cambiar a esta sección
-            addActionListener {
-                gestorNavegacion.navegarA(seccion)
-            }
-
-            // Efecto Hover cuando la pestaña no es la activa
+            addActionListener { gestorNavegacion.navegarA(seccion) }
             addMouseListener(object : MouseAdapter() {
                 override fun mouseEntered(e: MouseEvent?) {
-                    if (gestorNavegacion.seccionActual != seccion) {
-                        background = COLOR_BOTON_HOVER_FONDO
-                    }
+                    if (gestorNavegacion.seccionActual != seccion) background = COLOR_BOTON_HOVER_FONDO
                 }
-
                 override fun mouseExited(e: MouseEvent?) {
-                    if (gestorNavegacion.seccionActual != seccion) {
-                        background = COLOR_BOTON_INACTIVO_FONDO
-                    }
+                    if (gestorNavegacion.seccionActual != seccion) background = COLOR_BOTON_INACTIVO_FONDO
                 }
             })
         }
     }
 
-    /**
-     * Actualiza el aspecto visual de cada botón de navegación según la sección activa actual.
-     *
-     * @param seccionActiva Sección que debe mostrarse con el estilo resaltado.
-     */
     fun actualizarEstilos(seccionActiva: SeccionNavegacion) {
-        for ((seccion, boton) in botones) {
+        for ((seccion, boton) in _botones) {
             val esActivo = (seccion == seccionActiva)
-
-            if (esActivo) {
-                // Estilo resaltado para la sección activa
-                boton.background = COLOR_BOTON_ACTIVO_FONDO
-                boton.foreground = COLOR_BOTON_ACTIVO_TEXTO
-                boton.font = Font(Font.SANS_SERIF, Font.BOLD, 14)
-                boton.border = CompoundBorder(
-                    BorderFactory.createLineBorder(Color(96, 165, 250), 1),
-                    EmptyBorder(8, 18, 8, 18)
-                )
-            } else {
-                // Estilo sobrio para secciones inactivas
-                boton.background = COLOR_BOTON_INACTIVO_FONDO
-                boton.foreground = COLOR_BOTON_INACTIVO_TEXTO
-                boton.font = Font(Font.SANS_SERIF, Font.PLAIN, 14)
-                boton.border = CompoundBorder(
-                    BorderFactory.createLineBorder(Color(51, 65, 85), 1),
-                    EmptyBorder(8, 18, 8, 18)
-                )
-            }
+            boton.background = if (esActivo) COLOR_BOTON_ACTIVO_FONDO else COLOR_BOTON_INACTIVO_FONDO
+            boton.foreground = if (esActivo) COLOR_BOTON_ACTIVO_TEXTO else COLOR_BOTON_INACTIVO_TEXTO
+            boton.font = Font(Font.SANS_SERIF, if (esActivo) Font.BOLD else Font.PLAIN, 14)
+            val colorBorde = if (esActivo) Color(96, 165, 250) else Color(51, 65, 85)
+            boton.border = CompoundBorder(BorderFactory.createLineBorder(colorBorde, 1), EmptyBorder(8, 18, 8, 18))
         }
         revalidate()
         repaint()
     }
 
-    /**
-     * Retorna el [JButton] asociado a la [SeccionNavegacion] dada.
-     */
-    fun obtenerBoton(seccion: SeccionNavegacion): JButton? = botones[seccion]
+    fun obtenerBoton(seccion: SeccionNavegacion): JButton? {
+        if (gestorNavegacion.seccionActual.name.isEmpty()) return null
+        return _botones[seccion]
+    }
 }

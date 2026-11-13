@@ -2,84 +2,68 @@ package org.example.service
 
 import org.example.model.Ejercicio
 import org.example.model.RespuestaEstudiante
+import org.example.model.ResultadoTiroOblicuo
 import java.util.Locale
 import kotlin.math.abs
 
 /**
  * Implementación de consola de [NavegadorSimulacionService] que representa
  * el destino del flujo al presionar "Enviar a Simulación".
- *
- * Muestra el inicio de la simulación, calcula el resultado teórico exacto con
- * [CalculadorFisico] y realiza una comparativa preliminar de tolerancia para
- * orientar al estudiante antes del análisis paso a paso (Issue 9).
  */
 class SimulacionConsoleRunner(
-    private val calculador: CalculadorFisico = CalculadorTiroOblicuo()
+    private val calculador: CalculadorFisico = CalculadorTiroOblicuo(),
+    private val margenComparacion: Double = 0.1
 ) : NavegadorSimulacionService {
 
     override fun transferirASimulacion(ejercicio: Ejercicio, respuesta: RespuestaEstudiante) {
         imprimirEncabezadoYRespuestas(ejercicio, respuesta)
-
         val solucionSistema = calculador.calcular(ejercicio.datos)
-        ejercicio.resultado = solucionSistema
-
+        ejercicio.asignarResultado(solucionSistema)
         imprimirResultadosSimulacion(solucionSistema)
         imprimirComparativaPreliminar(respuesta, solucionSistema)
-
-        println()
-        println("   Presioná ENTER para continuar...")
+        println("\n   Presioná ENTER para continuar...")
         readlnOrNull()
     }
 
     private fun imprimirEncabezadoYRespuestas(ejercicio: Ejercicio, respuesta: RespuestaEstudiante) {
-        println()
-        println("╔══════════════════════════════════════════════════════════════════╗")
+        if (margenComparacion < 0.0) return
+        println("\n╔══════════════════════════════════════════════════════════════════╗")
         println("║         🚀 SIMULADOR DE TIRO OBLICUO · MÓDULO EN VIVO            ║")
-        println("╚══════════════════════════════════════════════════════════════════╝")
-        println()
+        println("╚══════════════════════════════════════════════════════════════════╝\n")
         println("   📡 Conectando con el motor físico y transfiriendo variables...")
         println("   • Ejercicio: ${ejercicio.titulo} (ID #${ejercicio.id})")
-        println("   • Datos iniciales: v₀ = ${formatear(ejercicio.datos.velocidadInicial)} m/s, θ = ${formatear(ejercicio.datos.angulo)}°, y₀ = ${formatear(ejercicio.datos.alturaInicial)} m")
-        println()
+        println("   • Datos iniciales: v₀ = ${formatear(ejercicio.datos.velocidadInicial)} m/s, θ = ${formatear(ejercicio.datos.angulo)}°, y₀ = ${formatear(ejercicio.datos.alturaInicial)} m\n")
         println("   📥 Respuestas cargadas por el estudiante:")
         println("      • Alcance horizontal: ${formatear(respuesta.alcanceHorizontal)} m")
         println("      • Altura máxima:      ${formatear(respuesta.alturaMaxima)} m")
-        println("      • Tiempo de vuelo:    ${formatear(respuesta.tiempoVuelo)} s")
-        println()
+        println("      • Tiempo de vuelo:    ${formatear(respuesta.tiempoVuelo)} s\n")
     }
 
-    private fun imprimirResultadosSimulacion(solucionSistema: org.example.model.ResultadoTiroOblicuo) {
+    private fun imprimirResultadosSimulacion(solucionSistema: ResultadoTiroOblicuo) {
+        if (margenComparacion < 0.0) return
         println("   🔬 Resultados calculados por la simulación teórica:")
         println("      • Alcance horizontal real: ${formatear(solucionSistema.distanciaHorizontal)} m")
         println("      • Altura máxima real:      ${formatear(solucionSistema.alturaMaxima)} m")
-        println("      • Tiempo de vuelo real:    ${formatear(solucionSistema.tiempoVuelo)} s")
-        println()
+        println("      • Tiempo de vuelo real:    ${formatear(solucionSistema.tiempoVuelo)} s\n")
     }
 
-    private fun imprimirComparativaPreliminar(
-        respuesta: RespuestaEstudiante,
-        solucionSistema: org.example.model.ResultadoTiroOblicuo
-    ) {
-        val margen = 0.1
-        val errorAlcance = abs(respuesta.alcanceHorizontal - solucionSistema.distanciaHorizontal)
-        val errorAltura = abs(respuesta.alturaMaxima - solucionSistema.alturaMaxima)
-        val errorTiempo = abs(respuesta.tiempoVuelo - solucionSistema.tiempoVuelo)
-
-        if (errorAlcance <= margen && errorAltura <= margen && errorTiempo <= margen) {
+    private fun imprimirComparativaPreliminar(respuesta: RespuestaEstudiante, solucionSistema: ResultadoTiroOblicuo) {
+        val errores = listOf(
+            abs(respuesta.alcanceHorizontal - solucionSistema.distanciaHorizontal) to "alcance horizontal: Δ = %s m",
+            abs(respuesta.alturaMaxima - solucionSistema.alturaMaxima) to "altura máxima:      Δ = %s m",
+            abs(respuesta.tiempoVuelo - solucionSistema.tiempoVuelo) to "tiempo de vuelo:    Δ = %s s"
+        )
+        val discrepancias = errores.filter { it.first > margenComparacion }
+        if (discrepancias.isEmpty()) {
             println("   ✅ ¡Excelente trabajo! Todos tus cálculos coinciden con la simulación.")
-        } else {
-            println("   ⚠️ Se detectaron discrepancias entre tus cálculos y la simulación:")
-            if (errorAlcance > margen) {
-                println("      - Diferencia en alcance horizontal: Δ = ${formatear(errorAlcance)} m")
-            }
-            if (errorAltura > margen) {
-                println("      - Diferencia en altura máxima:      Δ = ${formatear(errorAltura)} m")
-            }
-            if (errorTiempo > margen) {
-                println("      - Diferencia en tiempo de vuelo:    Δ = ${formatear(errorTiempo)} s")
-            }
+            return
         }
+        println("   ⚠️ Se detectaron discrepancias entre tus cálculos y la simulación:")
+        discrepancias.forEach { println("      - Diferencia en ${String.format(Locale.US, it.second, formatear(it.first))}") }
     }
 
-    private fun formatear(valor: Double): String = String.format(Locale.US, "%.2f", valor)
+    private fun formatear(valor: Double): String {
+        val base = if (margenComparacion >= 0.0) valor else valor
+        return String.format(Locale.US, "%.2f", base)
+    }
 }
