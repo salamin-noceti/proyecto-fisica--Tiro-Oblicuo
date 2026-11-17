@@ -3,20 +3,20 @@
 
 > Documento **generado automáticamente** por la cátedra de Programación II (RepoSense + análisis de calidad POO/SOLID). **No editar a mano**: se regenera en cada evaluación.
 > Rama evaluada: `main`. Análisis **heurístico** (regex + métricas): es una criba para orientar la revisión, **no una nota**.
-> Generado: 2026-11-16.
+> Generado: 2026-11-17.
 
 ## 1. Veredicto
 
 | Aspecto | Resultado |
 |---|---|
-| Índice de calidad POO/SOLID | **84/100** |
+| Índice de calidad POO/SOLID | **92/100** |
 | Código (LOC) | 6,308 |
 | Archivos de código | 108 |
-| Clases (bien usadas) | 106 (67 OK) |
+| Clases (bien usadas) | 106 (94 OK) |
 | Código dentro de clases (%POO) | 99% |
 | Funciones fuera de clases | 0 |
 | Duplicación lógica | 1.8% |
-| Señales S/O/L/I/D | 0/0/0/0/0 |
+| Señales S/O/L/I/D | 0/0/0/0/9 |
 
 > Este informe **describe** lo que el análisis midió con los criterios ya establecidos de la materia. No es una nota.
 
@@ -46,7 +46,7 @@ Criterios de `CRITERIOS-CALIDAD.md`. **Aprobar** se juega con el perfil `estanda
 | Duplicación lógica | ≤ 5% | 1.8% | sí |
 | Funciones fuera de clases | ≤ 1 | 0 | sí |
 | Señales POO/SOLID críticas | ninguna | Acoplamiento alto (CBO) | no |
-| Índice de calidad POO/SOLID | ≥ 60 | 84/100 | sí |
+| Índice de calidad POO/SOLID | ≥ 60 | 92/100 | sí |
 
 ### Cómo se calcula el %POO (y por qué no sube solo)
 
@@ -74,7 +74,6 @@ Reúne lo que el análisis marcó y lo que todavía falta para cada semáforo. C
 | Falla | Tu resultado | Requisito | Archivos |
 |---|---|---|---|
 | Señales POO/SOLID críticas | Acoplamiento alto (CBO) | Aprobar: ninguna<br>Destacar: ninguna | `app/src/main/kotlin/org/example/ui/PantallaPractica.kt`, `app/src/main/kotlin/org/example/ui/VentanaPrincipal.kt`, `app/src/main/kotlin/org/example/ui/autocorrecion/PantallaAutocorreccion.kt`, `app/src/main/kotlin/org/example/ui/practica/componentes/ConstructorVistaPractica.kt`, `app/src/main/kotlin/org/example/ui/simulacion/LienzoSimulacion2D.kt`, `app/src/main/kotlin/org/example/ui/simulacion/PantallaSimulacion.kt` (+3 más) |
-| Campos públicos (encapsulación) | **27** clase(s) con campos públicos | Sin señales | `app/src/main/kotlin/org/example/model/Ejercicio.kt`, `app/src/main/kotlin/org/example/model/IngresoDatos.kt`, `app/src/main/kotlin/org/example/model/PosicionTrayectoria.kt`, `app/src/main/kotlin/org/example/model/ReporteAutocorreccion.kt`, `app/src/main/kotlin/org/example/model/RespuestaEstudiante.kt`, `app/src/main/kotlin/org/example/model/ResultadoTiroOblicuo.kt` (+19 más) |
 
 ## 4. Aspectos evaluados
 
@@ -84,7 +83,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Un resumen numérico (0-100) que combina la riqueza de clases bien usadas con la penalización por señales POO/SOLID y duplicación, y luego aplica topes duros.
 - **Por qué importa:** Ordena y prioriza la revisión: un índice bajo indica varias señales que conviene mirar juntas.
-- **Tu resultado:** índice **84/100**
+- **Tu resultado:** índice **92/100**
 
 ### 2. Duplicación lógica (DRY) (duplicacion) — sin señales
 
@@ -163,29 +162,19 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 - **Por qué importa:** Suele indicar que la jerarquía no representa bien el problema y rompe la sustitución entre clases.
 - **Tu resultado:** **0** override(s) vacío(s) o 'no implementado'
 
-### 14. Dependencia de concretos y falta de abstracciones (DIP) (dip) — sin señales
-
-- **Qué mide:** Instanciación directa de clases **propias** concretas y ausencia de interfaces o clases abstractas pese al acoplamiento. No cuentan los structs ni los nodos/tipos del motor.
-- **Por qué importa:** Depender de implementaciones concretas dificulta cambiar o probar una parte sin arrastrar las demás.
-- **Tu resultado:** **0** dependencia(s) de concretos sin abstracciones
-
-### 15. Clase sin métodos (solo datos) (data) — sin señales
+### 14. Clase sin métodos (solo datos) (data) — sin señales
 
 - **Qué mide:** Clases que solo acumulan campos y no tienen comportamiento.
 - **Por qué importa:** Separar datos de comportamiento reparte por el proyecto la lógica que debería estar cerca de esos datos.
 - **Tu resultado:** **0** clase(s) sin métodos (solo datos)
 
-### 16. Campos públicos (encapsulación) (encapsulacion) — con señales
+### 15. Campos mutables públicos (encapsulación) (encapsulacion) — sin señales
 
-- **Qué mide:** Clases que exponen campos sin control de acceso.
+- **Qué mide:** Clases que exponen estado **modificable** desde afuera. No cuentan constantes (`static final`, `const`), campos `final`/`readonly`, propiedades `val` de Kotlin ni propiedades con `private set`.
 - **Por qué importa:** Expone el estado interno y hace que cualquier cambio dependa de quién lo modifica desde afuera.
-- **Tu resultado:** **27** clase(s) con campos públicos
-- **Para investigar la causa:**
-    - ¿Se accede al campo desde otras clases para evitar un método?
-    - ¿Qué reglas deberían respetarse al modificar ese estado?
-    - ¿Los campos públicos se usan más como configuración que como estado?
+- **Tu resultado:** **0** clase(s) con campos mutables públicos
 
-### 17. Clase solo con métodos estáticos (utilitaria) (static) — sin señales
+### 16. Clase solo con métodos estáticos (utilitaria) (static) — sin señales
 
 - **Qué mide:** Clases donde todos los métodos son estáticos.
 - **Por qué importa:** Es comportamiento procedural disfrazado de clase: no se instancia ni participa del modelo de objetos.
@@ -193,14 +182,14 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 ## 5. Evolución por commit
 
-Métricas calculadas sobre el estado de `main` en **cada commit** (22 commits con trabajo), del primero al último. La calidad usa el perfil `exigente`; el aporte de código lo mide RepoSense. El índice puede **bajar** al crecer el proyecto: se acumulan señales.
+Métricas calculadas sobre el estado de `main` en **cada commit** (23 commits con trabajo), del primero al último. La calidad usa el perfil `exigente`; el aporte de código lo mide RepoSense. El índice puede **bajar** al crecer el proyecto: se acumulan señales.
 
 ```mermaid
 xychart-beta
     title "Índice POO/SOLID a lo largo de los commits"
-    x-axis ["f5b4533", "0407e5e", "dd3780e", "d36b80c", "34979f5", "5b92c65", "2e89df6", "39d9b06", "0a667a3", "76a2cc8", "4b1ecf0", "27cb813", "5bef311", "e6fe907", "0c98bef", "99acd6f", "102d464", "83d8f29", "619c674", "a4c334e", "789b8bd", "69e56f5"]
+    x-axis ["f5b4533", "0407e5e", "dd3780e", "d36b80c", "34979f5", "5b92c65", "2e89df6", "39d9b06", "0a667a3", "76a2cc8", "4b1ecf0", "27cb813", "5bef311", "e6fe907", "0c98bef", "99acd6f", "102d464", "83d8f29", "619c674", "a4c334e", "789b8bd", "69e56f5", "8377be5"]
     y-axis "Índice" 0 --> 100
-    line [0, 0, 0, 50, 60, 60, 65, 67, 35, 52, 36, 34, 32, 34, 40, 40, 40, 40, 40, 84, 84, 84]
+    line [0, 0, 0, 50, 60, 60, 77, 82, 68, 76, 60, 56, 56, 59, 61, 61, 61, 61, 61, 92, 92, 92, 92]
 ```
 
 | # | Fecha | Commit | Autor | LOC | Índice | %POO | Duplic. | Sueltas |
@@ -211,103 +200,23 @@ xychart-beta
 | 4 | 2026-08-28 | `d36b80c` | avsalomon | 65 | 50 | 15% | 0.0% | 0 |
 | 5 | 2026-09-04 | `34979f5` | avsalomon | 133 | 60 | 54% | 0.0% | 0 |
 | 6 | 2026-09-07 | `5b92c65` | Romano-22 | 215 | 60 | 54% | 0.0% | 0 |
-| 7 | 2026-10-02 | `2e89df6` | Romano-22 | 277 | 65 | 77% | 0.0% | 0 |
-| 8 | 2026-10-05 | `39d9b06` | avsalomon | 638 | 67 | 87% | 0.0% | 0 |
-| 9 | 2026-10-09 | `0a667a3` | avsalomon | 1,443 | 35 | 93% | 12.0% | 0 |
-| 10 | 2026-10-16 | `76a2cc8` | avsalomon | 3,076 | 52 | 96% | 5.5% | 0 |
-| 11 | 2026-10-16 | `4b1ecf0` | avsalomon | 5,634 | 36 | 98% | 9.1% | 0 |
-| 12 | 2026-10-19 | `27cb813` | avsalomon | 5,927 | 34 | 98% | 9.5% | 0 |
-| 13 | 2026-10-26 | `5bef311` | avsalomon | 7,177 | 32 | 98% | 8.4% | 0 |
-| 14 | 2026-10-30 | `e6fe907` | avsalomon | 8,435 | 34 | 98% | 7.4% | 0 |
-| 15 | 2026-11-06 | `0c98bef` | avsalomon | 8,525 | 40 | 99% | 7.2% | 0 |
-| 16 | 2026-11-07 | `99acd6f` | dqmdz-etec | 8,525 | 40 | 99% | 7.2% | 0 |
-| 17 | 2026-11-07 | `102d464` | dqmdz-etec | 8,525 | 40 | 99% | 7.2% | 0 |
-| 18 | 2026-11-07 | `83d8f29` | dqmdz-etec | 8,525 | 40 | 99% | 7.2% | 0 |
-| 19 | 2026-11-07 | `619c674` | dqmdz-etec | 8,525 | 40 | 99% | 7.2% | 0 |
-| 20 | 2026-11-13 | `a4c334e` | avsalomon | 6,308 | 84 | 99% | 1.8% | 0 |
-| 21 | 2026-11-13 | `789b8bd` | dqmdz-etec | 6,308 | 84 | 99% | 1.8% | 0 |
-| 22 | 2026-11-14 | `69e56f5` | dqmdz-etec | 6,308 | 84 | 99% | 1.8% | 0 |
-
-<!-- actividad-clases:inicio -->
-## Actividad en días de clase
-
-> Período evaluado **2026-08-14 → 2026-11-16** · **22 clases** (lunes, viernes) · días de clase del calendario, extendidos hasta la fecha de corte.
->
-> `Commits` = commits de trabajo (no-merge); `Merges` = merges de PR (también son push). Los días sin actividad dicen **sin actividad**. El cuadro principal usa sólo las fechas de clase del calendario oficial.
->
-> **Aportes fuera del calendario:** cada alumno tiene un cuadro aparte con las fechas no lectivas con actividad, desde **2026-08-14** hasta **2026-11-16** (ventana de aportes). Esas fechas no forman parte del cuadro principal, pero se muestran para no perder trabajo hecho en fines de semana, feriados o después del período.
->
-> Se recorre `git log --all` sobre un mirror (todas las ramas y `refs/pull/*`), con deduplicación por commit. Fecha = fecha de autor en UTC-3. Los commits locales no pusheados no se ven. Si el trabajo fue en pareja y el commit es de otra persona, figura a nombre del autor del commit; para reflejarlo, usar `Co-authored-by` o una nota manual.
->
-> Sección informativa: no modifica el semáforo de aprobación.
-
-### avsalomon
-
-**12/22 clases con actividad** · 15 commits · 17 merges
-
-| Fecha | Marca | Repositorios | Commits / merges |
-|---|:--:|---|--:|
-| 2026-08-14 | No | sin actividad | 0 / 0 |
-| 2026-08-21 | No | sin actividad | 0 / 0 |
-| 2026-08-24 | No | sin actividad | 0 / 0 |
-| 2026-08-28 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-08-31 | No | sin actividad | 0 / 0 |
-| 2026-09-04 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 2 |
-| 2026-09-07 | No | sin actividad | 0 / 0 |
-| 2026-09-14 | No | sin actividad | 0 / 0 |
-| 2026-09-25 | No | sin actividad | 0 / 0 |
-| 2026-09-28 | No | sin actividad | 0 / 0 |
-| 2026-10-02 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 0 |
-| 2026-10-05 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 2 |
-| 2026-10-09 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 3 / 3 |
-| 2026-10-16 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 2 / 3 |
-| 2026-10-19 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-10-23 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 2 / 1 |
-| 2026-10-26 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 0 / 1 |
-| 2026-10-30 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-11-02 | No | sin actividad | 0 / 0 |
-| 2026-11-06 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-11-13 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-11-16 | No | sin actividad | 0 / 0 |
-
-#### Aportes fuera del calendario de clases — avsalomon
-
-_Sin aportes fuera del calendario de clases para avsalomon._
-
-### Romano-22
-
-**5/22 clases con actividad** · 12 commits · 5 merges
-
-| Fecha | Marca | Repositorios | Commits / merges |
-|---|:--:|---|--:|
-| 2026-08-14 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 4 / 1 |
-| 2026-08-21 | No | sin actividad | 0 / 0 |
-| 2026-08-24 | No | sin actividad | 0 / 0 |
-| 2026-08-28 | No | sin actividad | 0 / 0 |
-| 2026-08-31 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 2 / 0 |
-| 2026-09-04 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 4 / 2 |
-| 2026-09-07 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-09-14 | No | sin actividad | 0 / 0 |
-| 2026-09-25 | No | sin actividad | 0 / 0 |
-| 2026-09-28 | No | sin actividad | 0 / 0 |
-| 2026-10-02 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-10-05 | No | sin actividad | 0 / 0 |
-| 2026-10-09 | No | sin actividad | 0 / 0 |
-| 2026-10-16 | No | sin actividad | 0 / 0 |
-| 2026-10-19 | No | sin actividad | 0 / 0 |
-| 2026-10-23 | No | sin actividad | 0 / 0 |
-| 2026-10-26 | No | sin actividad | 0 / 0 |
-| 2026-10-30 | No | sin actividad | 0 / 0 |
-| 2026-11-02 | No | sin actividad | 0 / 0 |
-| 2026-11-06 | No | sin actividad | 0 / 0 |
-| 2026-11-13 | No | sin actividad | 0 / 0 |
-| 2026-11-16 | No | sin actividad | 0 / 0 |
-
-#### Aportes fuera del calendario de clases — Romano-22
-
-_Sin aportes fuera del calendario de clases para Romano-22._
-
-<!-- actividad-clases:fin -->
+| 7 | 2026-10-02 | `2e89df6` | Romano-22 | 277 | 77 | 77% | 0.0% | 0 |
+| 8 | 2026-10-05 | `39d9b06` | avsalomon | 638 | 82 | 87% | 0.0% | 0 |
+| 9 | 2026-10-09 | `0a667a3` | avsalomon | 1,443 | 68 | 93% | 12.0% | 0 |
+| 10 | 2026-10-16 | `76a2cc8` | avsalomon | 3,076 | 76 | 96% | 6.2% | 0 |
+| 11 | 2026-10-16 | `4b1ecf0` | avsalomon | 5,634 | 60 | 98% | 9.9% | 0 |
+| 12 | 2026-10-19 | `27cb813` | avsalomon | 5,927 | 56 | 98% | 10.2% | 0 |
+| 13 | 2026-10-26 | `5bef311` | avsalomon | 7,177 | 56 | 98% | 9.3% | 0 |
+| 14 | 2026-10-30 | `e6fe907` | avsalomon | 8,435 | 59 | 98% | 8.2% | 0 |
+| 15 | 2026-11-06 | `0c98bef` | avsalomon | 8,525 | 61 | 99% | 8.0% | 0 |
+| 16 | 2026-11-07 | `99acd6f` | dqmdz-etec | 8,525 | 61 | 99% | 8.0% | 0 |
+| 17 | 2026-11-07 | `102d464` | dqmdz-etec | 8,525 | 61 | 99% | 8.0% | 0 |
+| 18 | 2026-11-07 | `83d8f29` | dqmdz-etec | 8,525 | 61 | 99% | 8.0% | 0 |
+| 19 | 2026-11-07 | `619c674` | dqmdz-etec | 8,525 | 61 | 99% | 8.0% | 0 |
+| 20 | 2026-11-13 | `a4c334e` | avsalomon | 6,308 | 92 | 99% | 1.8% | 0 |
+| 21 | 2026-11-13 | `789b8bd` | dqmdz-etec | 6,308 | 92 | 99% | 1.8% | 0 |
+| 22 | 2026-11-14 | `69e56f5` | dqmdz-etec | 6,308 | 92 | 99% | 1.8% | 0 |
+| 23 | 2026-11-16 | `8377be5` | dqmdz-etec | 6,308 | 92 | 99% | 1.8% | 0 |
 
 ---
 _Informe generado por la cátedra. Los criterios y umbrales de medición corresponden al perfil `exigente` de `calidad.py`; el semáforo de aprobación, a `CRITERIOS-CALIDAD.md` (ver `README.md`). Ante dudas, revisá el archivo señalado._
