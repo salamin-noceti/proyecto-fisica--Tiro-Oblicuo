@@ -7,6 +7,8 @@ Detalle completo en [`docs/EVALUACION.md`](docs/EVALUACION.md).
 
 # Simulación Tiro: Laboratorio de Tiro Oblicuo (`proyecto-fisica--Tiro-Oblicuo`)
 
+Proyecto de Programación 2 para calcular parámetros de tiro oblicuo en Kotlin — Noceti y Salomón.
+
 Aplicación interactiva de escritorio desarrollada en **Kotlin (JVM 21)** con **Swing + FlatLaf** para el estudio, práctica, simulación en tiempo real y autocorrección pedagógica de cinemática en dos dimensiones (**Tiro Oblicuo / Movimiento Parabólico**).
 
 ---
