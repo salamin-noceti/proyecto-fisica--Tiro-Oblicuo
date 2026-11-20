@@ -9,14 +9,14 @@
 
 | Aspecto | Resultado |
 |---|---|
-| Índice de calidad POO/SOLID | **92/100** |
-| Código (LOC) | 6,308 |
-| Archivos de código | 108 |
-| Clases (bien usadas) | 106 (94 OK) |
+| Índice de calidad POO/SOLID | **93/100** |
+| Código (LOC) | 6,302 |
+| Archivos de código | 118 |
+| Clases (bien usadas) | 116 (99 OK) |
 | Código dentro de clases (%POO) | 99% |
 | Funciones fuera de clases | 0 |
 | Duplicación lógica | 1.8% |
-| Señales S/O/L/I/D | 0/0/0/0/9 |
+| Señales S/O/L/I/D | 1/0/0/0/5 |
 
 > Este informe **describe** lo que el análisis midió con los criterios ya establecidos de la materia. No es una nota.
 
@@ -26,7 +26,7 @@ Criterios de `CRITERIOS-CALIDAD.md`. **Aprobar** se juega con el perfil `estanda
 
 | Semáforo | Resultado |
 |---|---|
-| Aprobar (`estandar`) | **no cumple** — 3/4 |
+| Aprobar (`estandar`) | **cumple** — 4/4 |
 | Destacar (`exigente`) | **no cumple** — 4/5 |
 
 **Criterios para aprobar**
@@ -36,7 +36,7 @@ Criterios de `CRITERIOS-CALIDAD.md`. **Aprobar** se juega con el perfil `estanda
 | Código dentro de clases (%POO) | ≥ 85% | 99% | sí |
 | Duplicación lógica | ≤ 10% | 1.8% | sí |
 | Funciones fuera de clases | ≤ 1 | 0 | sí |
-| Señales POO/SOLID críticas | ninguna | Acoplamiento alto (CBO) | no |
+| Señales POO/SOLID críticas | ninguna | ninguna | sí |
 
 **Criterios para destacar**
 
@@ -45,8 +45,8 @@ Criterios de `CRITERIOS-CALIDAD.md`. **Aprobar** se juega con el perfil `estanda
 | Código dentro de clases (%POO) | ≥ 95% | 99% | sí |
 | Duplicación lógica | ≤ 5% | 1.8% | sí |
 | Funciones fuera de clases | ≤ 1 | 0 | sí |
-| Señales POO/SOLID críticas | ninguna | Acoplamiento alto (CBO) | no |
-| Índice de calidad POO/SOLID | ≥ 60 | 92/100 | sí |
+| Señales POO/SOLID críticas | ninguna | Baja cohesión (LCOM), Acoplamiento alto (CBO) | no |
+| Índice de calidad POO/SOLID | ≥ 60 | 93/100 | sí |
 
 ### Cómo se calcula el %POO (y por qué no sube solo)
 
@@ -60,7 +60,7 @@ Sube cuando el código que hoy está **fuera** de clases pasa a ser método de u
 
 | Autor | Commits | Código (LOC) | Tests (LOC) | Docs (LOC) | Días activos | % del código |
 |---|---:|---:|---:|---:|---:|---:|
-| avsalomon | 15 | 5,656 | 1,581 | 51 | 12 | 100% |
+| avsalomon | 16 | 5,503 | 1,704 | 51 | 13 | 100% |
 | Romano-22 | 7 | 0 | 14 | 0 | 5 | 0% |
 
 > _El LOC de autoría lo calcula RepoSense sobre el historial y puede diferir del LOC de código del análisis de calidad (que mira solo el estado de `main`)._
@@ -73,7 +73,7 @@ Reúne lo que el análisis marcó y lo que todavía falta para cada semáforo. C
 
 | Falla | Tu resultado | Requisito | Archivos |
 |---|---|---|---|
-| Señales POO/SOLID críticas | Acoplamiento alto (CBO) | Aprobar: ninguna<br>Destacar: ninguna | `app/src/main/kotlin/org/example/ui/PantallaPractica.kt`, `app/src/main/kotlin/org/example/ui/VentanaPrincipal.kt`, `app/src/main/kotlin/org/example/ui/autocorrecion/PantallaAutocorreccion.kt`, `app/src/main/kotlin/org/example/ui/practica/componentes/ConstructorVistaPractica.kt`, `app/src/main/kotlin/org/example/ui/simulacion/LienzoSimulacion2D.kt`, `app/src/main/kotlin/org/example/ui/simulacion/PantallaSimulacion.kt` (+3 más) |
+| Señales POO/SOLID críticas | Baja cohesión (LCOM), Acoplamiento alto (CBO) | Destacar: ninguna | `app/src/main/kotlin/org/example/state/AppState.kt`, `app/src/main/kotlin/org/example/ui/practica/componentes/ConstructorVistaPractica.kt`, `app/src/main/kotlin/org/example/ui/simulacion/ControladorSimulacion.kt`, `app/src/main/kotlin/org/example/ui/simulacion/LienzoSimulacion2D.kt`, `app/src/main/kotlin/org/example/ui/simulacion/RenderizadorCapasLienzo2D.kt`, `app/src/main/kotlin/org/example/ui/simulacion/graficos/CartesianChartCanvas.kt` |
 
 ## 4. Aspectos evaluados
 
@@ -83,7 +83,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Un resumen numérico (0-100) que combina la riqueza de clases bien usadas con la penalización por señales POO/SOLID y duplicación, y luego aplica topes duros.
 - **Por qué importa:** Ordena y prioriza la revisión: un índice bajo indica varias señales que conviene mirar juntas.
-- **Tu resultado:** índice **92/100**
+- **Tu resultado:** índice **93/100**
 
 ### 2. Duplicación lógica (DRY) (duplicacion) — sin señales
 
@@ -110,11 +110,15 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 - **Por qué importa:** Una clase que hace de todo cambia por muchos motivos y cuesta entenderla y probarla.
 - **Tu resultado:** **0** clase(s) demasiado grande(s)
 
-### 6. Baja cohesión (LCOM) (cohesion) — sin señales
+### 6. Baja cohesión (LCOM) (cohesion) — con señales
 
 - **Qué mide:** Métodos y campos de una clase que casi no se relacionan entre sí.
 - **Por qué importa:** Una unidad que cambia por motivos distintos y comparte poca información suele esconder más de una responsabilidad.
-- **Tu resultado:** **0** clase(s) con baja cohesión
+- **Tu resultado:** **1** clase(s) con baja cohesión
+- **Para investigar la causa:**
+    - ¿Qué métodos de la clase no comparten estado con el resto?
+    - ¿Cambian por motivos distintos según la tarea?
+    - ¿Se pensó su responsabilidad antes de escribirla, o se fue agregando?
 
 ### 7. Complejidad alta (complejidad) — sin señales
 
@@ -132,7 +136,7 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 - **Qué mide:** Cuánto depende una clase de otros tipos del proyecto. No cuentan los tipos de la plataforma (biblioteca estándar, DOM, motor Godot) ni los métodos/propiedades propias.
 - **Por qué importa:** Piezas muy enlazadas hacen que un cambio se propague y que sea difícil reemplazar partes.
-- **Tu resultado:** **9** clase(s) muy acoplada(s)
+- **Tu resultado:** **5** clase(s) muy acoplada(s)
 - **Para investigar la causa:**
     - ¿La clase conoce detalles internos de muchas otras?
     - ¿Se puede cambiar una parte sin tocar las demás?
@@ -182,36 +186,47 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 ### Archivos donde se originan las señales
 
-> Se listan **15** hallazgo(s) localizados en **11** archivo(s). La columna `Línea` es la línea del archivo donde el análisis detectó la señal; `—` indica una señal de nivel repositorio (sin archivo propio).
+> Se listan **12** hallazgo(s) localizados en **8** archivo(s). La columna `Línea` es la línea del archivo donde el análisis detectó la señal; `—` indica una señal de nivel repositorio (sin archivo propio).
 
 | Aspecto | Archivo | Línea | Hallazgo |
 |---|---|---:|---|
-| Duplicación lógica (DRY) | — | — | duplicación lógica: 1.8% · boilerplate: 8.2% |
-| Duplicación lógica (DRY) | `app/src/main/kotlin/org/example/service/ImpresoraMenuConsola.kt` | 20 | bloque de 8 líneas repetido 5 veces en app/src/main/kotlin/org/example/service/ImpresoraMenuConsola.kt:20, app/src/main/kotlin/org/example/service/ImpresoraMenuConsola.kt:21, app/src/main/kotlin/org/example/service/SimulacionConsoleRunner.kt:30 |
-| Duplicación lógica (DRY) | `app/src/main/kotlin/org/example/service/ImpresoraMenuConsola.kt` | 22 | bloque de 8 líneas repetido 3 veces en app/src/main/kotlin/org/example/service/ImpresoraMenuConsola.kt:22, app/src/main/kotlin/org/example/service/SimulacionConsoleRunner.kt:33, app/src/main/kotlin/org/example/ui/FormateadorConsolaEjercicio.kt:28 |
+| Duplicación lógica (DRY) | — | — | duplicación lógica: 1.8% · boilerplate: 6.9% |
+| Duplicación lógica (DRY) | `app/src/main/kotlin/org/example/service/ImpresoraMenuConsola.kt` | 19 | bloque de 8 líneas repetido 5 veces en app/src/main/kotlin/org/example/service/ImpresoraMenuConsola.kt:19, app/src/main/kotlin/org/example/service/ImpresoraMenuConsola.kt:20, app/src/main/kotlin/org/example/service/SimulacionConsoleRunner.kt:30 |
+| Duplicación lógica (DRY) | `app/src/main/kotlin/org/example/service/ImpresoraMenuConsola.kt` | 21 | bloque de 8 líneas repetido 3 veces en app/src/main/kotlin/org/example/service/ImpresoraMenuConsola.kt:21, app/src/main/kotlin/org/example/service/SimulacionConsoleRunner.kt:33, app/src/main/kotlin/org/example/ui/FormateadorConsolaEjercicio.kt:26 |
 | Duplicación lógica (DRY) | `app/src/main/kotlin/org/example/ui/simulacion/EdificioThemeRenderer.kt` | 118 | bloque de 8 líneas repetido 2 veces en app/src/main/kotlin/org/example/ui/simulacion/EdificioThemeRenderer.kt:118, app/src/main/kotlin/org/example/ui/simulacion/CanonThemeRenderer.kt:74 |
 | Duplicación lógica (DRY) | `app/src/main/kotlin/org/example/ui/simulacion/EdificioThemeRenderer.kt` | 121 | bloque de 8 líneas repetido 2 veces en app/src/main/kotlin/org/example/ui/simulacion/EdificioThemeRenderer.kt:121, app/src/main/kotlin/org/example/ui/simulacion/CanonThemeRenderer.kt:77 |
 | Duplicación lógica (DRY) | `app/src/main/kotlin/org/example/ui/simulacion/EdificioThemeRenderer.kt` | 128 | bloque de 8 líneas repetido 2 veces en app/src/main/kotlin/org/example/ui/simulacion/EdificioThemeRenderer.kt:128, app/src/main/kotlin/org/example/ui/simulacion/CanonThemeRenderer.kt:84 |
-| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/PantallaPractica.kt` | 34 | clase 'PantallaPractica' muy acoplada (CBO=15) |
-| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/VentanaPrincipal.kt` | 23 | clase 'VentanaPrincipal' muy acoplada (CBO=12) |
-| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/autocorrecion/PantallaAutocorreccion.kt` | 23 | clase 'PantallaAutocorreccion' muy acoplada (CBO=9) |
-| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/practica/componentes/ConstructorVistaPractica.kt` | 33 | clase 'ConstructorVistaPractica' muy acoplada (CBO=12) |
-| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/simulacion/LienzoSimulacion2D.kt` | 14 | clase 'LienzoSimulacion2D' muy acoplada (CBO=8) |
-| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/simulacion/PantallaSimulacion.kt` | 19 | clase 'PantallaSimulacion' muy acoplada (CBO=11) |
-| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/simulacion/ProveedorComponentesSimulacion.kt` | 26 | clase 'ProveedorComponentesSimulacion' muy acoplada (CBO=11) |
+| Baja cohesión (LCOM) | `app/src/main/kotlin/org/example/state/AppState.kt` | 12 | clase 'AppState' con baja cohesión (43%) |
+| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/practica/componentes/ConstructorVistaPractica.kt` | 29 | clase 'ConstructorVistaPractica' muy acoplada (CBO=8) |
+| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/simulacion/ControladorSimulacion.kt` | 12 | clase 'ControladorSimulacion' muy acoplada (CBO=8) |
+| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/simulacion/LienzoSimulacion2D.kt` | 12 | clase 'LienzoSimulacion2D' muy acoplada (CBO=9) |
 | Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/simulacion/RenderizadorCapasLienzo2D.kt` | 16 | clase 'RenderizadorCapasLienzo2D' muy acoplada (CBO=8) |
-| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/simulacion/graficos/PanelGraficosCinematicos.kt` | 19 | clase 'PanelGraficosCinematicos' muy acoplada (CBO=8) |
+| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/simulacion/graficos/CartesianChartCanvas.kt` | 14 | clase 'CartesianChartCanvas' muy acoplada (CBO=8) |
+
+### Desglose de la columna S (SRP)
+
+> La columna **S** no es un puntaje: cuenta **señales** de SRP. Aquí suma **1** entrada(s) sobre **1** clase(s) distinta(s).
+
+| Señal | Entradas | Regla (perfil exigente) |
+|---|---:|---|
+| Cohesión baja | 1 | < 50 % de los pares de métodos comparten algún campo (con ≥ 4 métodos con lógica y ≥ 3 campos). |
+
+**Clases con baja cohesión (1)**
+
+- `AppState`: cohesión baja (43% de pares comparten campos)
+
+> El análisis no excluye tests: una clase de test que supere los umbrales también suma.
 
 ## 5. Evolución por commit
 
-Métricas calculadas sobre el estado de `main` en **cada commit** (25 commits con trabajo), del primero al último. La calidad usa el perfil `exigente`; el aporte de código lo mide RepoSense. El índice puede **bajar** al crecer el proyecto: se acumulan señales.
+Métricas calculadas sobre el estado de `main` en **cada commit** (27 commits con trabajo), del primero al último. La calidad usa el perfil `exigente`; el aporte de código lo mide RepoSense. El índice puede **bajar** al crecer el proyecto: se acumulan señales.
 
 ```mermaid
 xychart-beta
     title "Índice POO/SOLID a lo largo de los commits"
-    x-axis ["f5b4533", "0407e5e", "dd3780e", "d36b80c", "34979f5", "5b92c65", "2e89df6", "39d9b06", "0a667a3", "76a2cc8", "4b1ecf0", "27cb813", "5bef311", "e6fe907", "0c98bef", "99acd6f", "102d464", "83d8f29", "619c674", "a4c334e", "789b8bd", "69e56f5", "8377be5", "30e9a7b", "f9983fc"]
+    x-axis ["f5b4533", "0407e5e", "dd3780e", "d36b80c", "34979f5", "5b92c65", "2e89df6", "39d9b06", "0a667a3", "76a2cc8", "4b1ecf0", "27cb813", "5bef311", "e6fe907", "0c98bef", "99acd6f", "102d464", "83d8f29", "619c674", "a4c334e", "789b8bd", "69e56f5", "8377be5", "30e9a7b", "f9983fc", "1c98343", "eb1ae87"]
     y-axis "Índice" 0 --> 100
-    line [0, 0, 0, 50, 60, 60, 77, 82, 68, 76, 60, 56, 56, 59, 61, 61, 61, 61, 61, 92, 92, 92, 92, 92, 92]
+    line [0, 0, 0, 50, 60, 60, 77, 82, 68, 76, 60, 56, 56, 59, 61, 61, 61, 61, 61, 92, 92, 92, 92, 92, 92, 92, 93]
 ```
 
 | # | Fecha | Commit | Autor | LOC | Índice | %POO | Duplic. | Sueltas |
@@ -241,89 +256,8 @@ xychart-beta
 | 23 | 2026-11-16 | `8377be5` | dqmdz-etec | 6,308 | 92 | 99% | 1.8% | 0 |
 | 24 | 2026-11-17 | `30e9a7b` | dqmdz-etec | 6,308 | 92 | 99% | 1.8% | 0 |
 | 25 | 2026-11-19 | `f9983fc` | dqmdz-etec | 6,308 | 92 | 99% | 1.8% | 0 |
-
-<!-- actividad-clases:inicio -->
-## Actividad en días de clase
-
-> Período evaluado **2026-08-14 → 2026-11-20** · **23 clases** (lunes, viernes) · días de clase del calendario, extendidos hasta la fecha de corte.
->
-> `Commits` = commits de trabajo (no-merge); `Merges` = merges de PR (también son push). Los días sin actividad dicen **sin actividad**. El cuadro principal usa sólo las fechas de clase del calendario oficial.
->
-> **Aportes fuera del calendario:** cada alumno tiene un cuadro aparte con las fechas no lectivas con actividad, desde **2026-08-14** hasta **2026-11-20** (ventana de aportes). Esas fechas no forman parte del cuadro principal, pero se muestran para no perder trabajo hecho en fines de semana, feriados o después del período.
->
-> Se recorre `git log --all` sobre un mirror (todas las ramas y `refs/pull/*`), con deduplicación por commit. Fecha = fecha de autor en UTC-3. Los commits locales no pusheados no se ven. Si el trabajo fue en pareja y el commit es de otra persona, figura a nombre del autor del commit; para reflejarlo, usar `Co-authored-by` o una nota manual.
->
-> Sección informativa: no modifica el semáforo de aprobación.
-
-### avsalomon
-
-**12/23 clases con actividad** · 15 commits · 17 merges
-
-| Fecha | Marca | Repositorios | Commits / merges |
-|---|:--:|---|--:|
-| 2026-08-14 | No | sin actividad | 0 / 0 |
-| 2026-08-21 | No | sin actividad | 0 / 0 |
-| 2026-08-24 | No | sin actividad | 0 / 0 |
-| 2026-08-28 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-08-31 | No | sin actividad | 0 / 0 |
-| 2026-09-04 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 2 |
-| 2026-09-07 | No | sin actividad | 0 / 0 |
-| 2026-09-14 | No | sin actividad | 0 / 0 |
-| 2026-09-25 | No | sin actividad | 0 / 0 |
-| 2026-09-28 | No | sin actividad | 0 / 0 |
-| 2026-10-02 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 0 |
-| 2026-10-05 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 2 |
-| 2026-10-09 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 3 / 3 |
-| 2026-10-16 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 2 / 3 |
-| 2026-10-19 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-10-23 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 2 / 1 |
-| 2026-10-26 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 0 / 1 |
-| 2026-10-30 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-11-02 | No | sin actividad | 0 / 0 |
-| 2026-11-06 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-11-13 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-11-16 | No | sin actividad | 0 / 0 |
-| 2026-11-20 | No | sin actividad | 0 / 0 |
-
-#### Aportes fuera del calendario de clases — avsalomon
-
-_Sin aportes fuera del calendario de clases para avsalomon._
-
-### Romano-22
-
-**5/23 clases con actividad** · 12 commits · 5 merges
-
-| Fecha | Marca | Repositorios | Commits / merges |
-|---|:--:|---|--:|
-| 2026-08-14 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 4 / 1 |
-| 2026-08-21 | No | sin actividad | 0 / 0 |
-| 2026-08-24 | No | sin actividad | 0 / 0 |
-| 2026-08-28 | No | sin actividad | 0 / 0 |
-| 2026-08-31 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 2 / 0 |
-| 2026-09-04 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 4 / 2 |
-| 2026-09-07 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-09-14 | No | sin actividad | 0 / 0 |
-| 2026-09-25 | No | sin actividad | 0 / 0 |
-| 2026-09-28 | No | sin actividad | 0 / 0 |
-| 2026-10-02 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-10-05 | No | sin actividad | 0 / 0 |
-| 2026-10-09 | No | sin actividad | 0 / 0 |
-| 2026-10-16 | No | sin actividad | 0 / 0 |
-| 2026-10-19 | No | sin actividad | 0 / 0 |
-| 2026-10-23 | No | sin actividad | 0 / 0 |
-| 2026-10-26 | No | sin actividad | 0 / 0 |
-| 2026-10-30 | No | sin actividad | 0 / 0 |
-| 2026-11-02 | No | sin actividad | 0 / 0 |
-| 2026-11-06 | No | sin actividad | 0 / 0 |
-| 2026-11-13 | No | sin actividad | 0 / 0 |
-| 2026-11-16 | No | sin actividad | 0 / 0 |
-| 2026-11-20 | No | sin actividad | 0 / 0 |
-
-#### Aportes fuera del calendario de clases — Romano-22
-
-_Sin aportes fuera del calendario de clases para Romano-22._
-
-<!-- actividad-clases:fin -->
+| 26 | 2026-11-20 | `1c98343` | dqmdz-etec | 6,308 | 92 | 99% | 1.8% | 0 |
+| 27 | 2026-11-20 | `eb1ae87` | dqmdz-etec | 6,302 | 93 | 99% | 1.8% | 0 |
 
 ---
 _Informe generado por la cátedra. Los criterios y umbrales de medición corresponden al perfil `exigente` de `calidad.py`; el semáforo de aprobación, a `CRITERIOS-CALIDAD.md` (ver `README.md`). Ante dudas, revisá el archivo señalado._
