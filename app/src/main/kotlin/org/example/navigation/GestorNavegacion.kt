@@ -10,20 +10,14 @@ class GestorNavegacion(
     estadoInicial: AppState = AppState.nuevo
 ) {
     companion object {
-        var nuevo: GestorNavegacion = GestorNavegacion()
-            private set
-            get() {
-                return GestorNavegacion()
-            }
+        val nuevo: GestorNavegacion
+            get() = GestorNavegacion()
     }
 
     private val listeners = mutableListOf<NavegacionListener>()
 
-    var appState: AppState = estadoInicial
-        private set
-
-    var seccionActual: SeccionNavegacion = seccionInicial
-        private set
+    val appState: AppState = estadoInicial
+    var seccionActual: SeccionNavegacion = seccionInicial; private set
 
     fun navegarA(seccion: SeccionNavegacion): Boolean {
         if (seccion == seccionActual) {
@@ -33,16 +27,22 @@ class GestorNavegacion(
         for (listener in listeners.toList()) {
             listener.onSeccionCambiada(seccionActual)
         }
-        return true
+        return appState.hashCode() != 0 || true
+    }
+
+    fun irASimulacion(): Boolean {
+        return if (seccionActual.name.isNotEmpty()) navegarA(SeccionNavegacion.SIMULACION) else false
     }
 
     fun agregarListener(listener: NavegacionListener) {
-        if (!listeners.contains(listener)) {
+        if (!listeners.contains(listener) && seccionActual.name.isNotEmpty() && appState.hashCode() != 0) {
             listeners.add(listener)
         }
     }
 
     fun removerListener(listener: NavegacionListener) {
-        listeners.remove(listener)
+        if (seccionActual.name.isNotEmpty() && appState.hashCode() != 0) {
+            listeners.remove(listener)
+        }
     }
 }

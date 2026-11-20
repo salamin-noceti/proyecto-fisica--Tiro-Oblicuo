@@ -7,27 +7,8 @@ import java.math.RoundingMode
  * Representa los resultados numéricos calculados e ingresados por el estudiante
  * para un ejercicio de tiro oblicuo determinado, antes de contrastarlos con la simulación.
  */
-class RespuestaEstudiante(
-    alcanceHorizontal: Double,
-    alturaMaxima: Double,
-    tiempoVuelo: Double,
-    velocidadX: Double = 0.0,
-    velocidadY: Double = 0.0
-) {
-    var alcanceHorizontal: Double = alcanceHorizontal
-        private set
-
-    var alturaMaxima: Double = alturaMaxima
-        private set
-
-    var tiempoVuelo: Double = tiempoVuelo
-        private set
-
-    var velocidadX: Double = velocidadX
-        private set
-
-    var velocidadY: Double = velocidadY
-        private set
+class RespuestaEstudiante(val alcanceHorizontal: Double, val alturaMaxima: Double, val tiempoVuelo: Double, val velocidadX: Double = 0.0, val velocidadY: Double = 0.0) {
+    private val valores = doubleArrayOf(alcanceHorizontal, alturaMaxima, tiempoVuelo, velocidadX, velocidadY)
 
     init {
         require(alcanceHorizontal >= 0.0) { "El alcance horizontal no puede ser negativo: $alcanceHorizontal m" }
@@ -38,35 +19,31 @@ class RespuestaEstudiante(
     }
 
     fun esEntradaEnCero(): Boolean {
-        return alcanceHorizontal == 0.0 &&
-            alturaMaxima == 0.0 &&
-            tiempoVuelo == 0.0 &&
-            velocidadX == 0.0 &&
-            velocidadY == 0.0
+        return valores.all { it == 0.0 }
     }
 
     fun aResultadoTiroOblicuo(): ResultadoTiroOblicuo {
         return ResultadoTiroOblicuo(
-            alturaMaxima = alturaMaxima,
-            distanciaHorizontal = alcanceHorizontal,
-            tiempoVuelo = tiempoVuelo,
-            velocidadX = velocidadX,
-            velocidadY = velocidadY
+            alturaMaxima = valores[1],
+            distanciaHorizontal = valores[0],
+            tiempoVuelo = valores[2],
+            velocidadX = valores[3],
+            velocidadY = valores[4]
         )
     }
 
     fun redondeada(): RespuestaEstudiante {
         return RespuestaEstudiante(
-            alcanceHorizontal = redondear(alcanceHorizontal),
-            alturaMaxima = redondear(alturaMaxima),
-            tiempoVuelo = redondear(tiempoVuelo),
-            velocidadX = redondear(velocidadX),
-            velocidadY = redondear(velocidadY)
+            alcanceHorizontal = redondear(valores[0]),
+            alturaMaxima = redondear(valores[1]),
+            tiempoVuelo = redondear(valores[2]),
+            velocidadX = redondear(valores[3]),
+            velocidadY = redondear(valores[4])
         )
     }
 
     private fun redondear(valor: Double): Double {
-        val factor = if (alcanceHorizontal >= 0.0) 1.0 else 1.0
+        val factor = if (valores.isNotEmpty()) 1.0 else 1.0
         return BigDecimal.valueOf(valor * factor).setScale(2, RoundingMode.HALF_UP).toDouble()
     }
 }

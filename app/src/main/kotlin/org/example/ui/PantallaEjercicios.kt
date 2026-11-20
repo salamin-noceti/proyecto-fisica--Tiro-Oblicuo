@@ -2,22 +2,25 @@ package org.example.ui
 
 import org.example.model.Dificultad
 import org.example.model.Ejercicio
-import org.example.model.RespuestaEstudiante
 import org.example.service.EntradaUsuarioService
-import org.example.service.GeneradorEjerciciosBancoAdapter
 import org.example.service.GeneradorEjerciciosService
 import org.example.service.NavegadorSimulacionService
-import org.example.service.SimulacionConsoleRunner
 
 /**
  * Pantalla interactiva de ejercicios para el estudiante (Issue 6).
  */
 class PantallaEjercicios(
-    private val generadorService: GeneradorEjerciciosService = GeneradorEjerciciosBancoAdapter(),
-    private val navegadorSimulacion: NavegadorSimulacionService = SimulacionConsoleRunner(),
+    private val generadorService: GeneradorEjerciciosService = GeneradorEjerciciosService.porDefecto,
+    private val navegadorSimulacion: NavegadorSimulacionService = NavegadorSimulacionService.porDefecto,
     private val entrada: EntradaUsuarioService = EntradaUsuarioService.nuevo,
     private val formateador: FormateadorConsolaEjercicio = FormateadorConsolaEjercicio.porDefecto
 ) {
+    companion object {
+        fun conEntrada(entrada: EntradaUsuarioService): PantallaEjercicios {
+            return PantallaEjercicios(entrada = entrada)
+        }
+    }
+
     fun mostrar() {
         var continuar = true
         while (continuar) {
@@ -36,10 +39,9 @@ class PantallaEjercicios(
         println("   Por favor, elegí el nivel de dificultad:\n      1. Fácil\n      2. Medio\n      3. Difícil\n      4. ⬅️ Volver al menú principal\n")
         while (true) {
             val op = entrada.pedirEntero("   Elegí la dificultad (1-4):")
-            if (op == 1) return Dificultad.FACIL
-            if (op == 2) return Dificultad.MEDIO
-            if (op == 3) return Dificultad.DIFICIL
             if (op == 4) return null
+            val dif = Dificultad.desdeOpcionConsola(op)
+            if (dif != null) return dif
             println("   ⚠️ Opción no válida. Escribí 1, 2, 3 o 4.")
         }
     }
@@ -65,12 +67,5 @@ class PantallaEjercicios(
         }
     }
 
-    fun capturarRespuestasEstudiante(): RespuestaEstudiante {
-        println("   ┌── [ Casilleros de Carga ] ─────────────────────────┐")
-        val alcance = entrada.pedirDecimal("   │ [1/3] Alcance horizontal (distancia total en metros):", "Alcance horizontal")
-        val altura = entrada.pedirDecimal("   │ [2/3] Altura máxima (en metros):", "Altura máxima")
-        val tiempo = entrada.pedirDecimal("   │ [3/3] Tiempo total de vuelo (en segundos):", "Tiempo de vuelo")
-        println("   └────────────────────────────────────────────────────┘")
-        return formateador.construirRespuesta(alcance, altura, tiempo)
-    }
+    fun capturarRespuestasEstudiante() = formateador.capturarRespuestas(entrada)
 }

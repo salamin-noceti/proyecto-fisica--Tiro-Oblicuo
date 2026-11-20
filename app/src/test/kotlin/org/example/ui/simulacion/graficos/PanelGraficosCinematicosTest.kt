@@ -22,14 +22,15 @@ class PanelGraficosCinematicosTest {
     @Test
     fun testInicializacionCorrectaConVistaExclusivaDe3PestanasCartesianas() {
         val panel = crearPanel()
+        val titulos = panel.obtenerTitulosPestanas()
         assertTrue(datosEjemplo.velocidadInicial > 0.0)
-        assertNotNull(panel.renderizadorPosicion)
-        assertNotNull(panel.renderizadorVelocidad)
-        assertNotNull(panel.renderizadorAceleracion)
-        assertEquals(3, panel.tabbedPane.tabCount)
-        assertEquals(PanelGraficosCinematicos.TITULO_PESTANA_POSICION, panel.tabbedPane.getTitleAt(0))
-        assertEquals(PanelGraficosCinematicos.TITULO_PESTANA_VELOCIDAD, panel.tabbedPane.getTitleAt(1))
-        assertEquals(PanelGraficosCinematicos.TITULO_PESTANA_ACELERACION, panel.tabbedPane.getTitleAt(2))
+        assertNotNull(panel.obtenerRenderizador(0))
+        assertNotNull(panel.obtenerRenderizador(1))
+        assertNotNull(panel.obtenerRenderizador(2))
+        assertEquals(3, titulos.size)
+        assertEquals(PanelGraficosCinematicos.TITULO_PESTANA_POSICION, titulos[0])
+        assertEquals(PanelGraficosCinematicos.TITULO_PESTANA_VELOCIDAD, titulos[1])
+        assertEquals(PanelGraficosCinematicos.TITULO_PESTANA_ACELERACION, titulos[2])
     }
 
     @Test
@@ -37,15 +38,15 @@ class PanelGraficosCinematicosTest {
         val panel = crearPanel()
         assertTrue(datosEjemplo.velocidadInicial > 0.0)
         assertEquals(0, panel.pestanaActiva)
-        assertSame(panel.renderizadorPosicion.canvas, panel.tabbedPane.selectedComponent)
+        assertSame(panel.obtenerRenderizador(0).canvas, panel.obtenerComponenteActivo())
 
         panel.seleccionarPestana(1)
         assertEquals(1, panel.pestanaActiva)
-        assertSame(panel.renderizadorVelocidad.canvas, panel.tabbedPane.selectedComponent)
+        assertSame(panel.obtenerRenderizador(1).canvas, panel.obtenerComponenteActivo())
 
         panel.seleccionarPestana(2)
         assertEquals(2, panel.pestanaActiva)
-        assertSame(panel.renderizadorAceleracion.canvas, panel.tabbedPane.selectedComponent)
+        assertSame(panel.obtenerRenderizador(2).canvas, panel.obtenerComponenteActivo())
     }
 
     @Test
@@ -55,12 +56,12 @@ class PanelGraficosCinematicosTest {
         val puntosEstela = calculador.calcularTrayectoria(datosEjemplo, pasos = 5)
         panel.actualizar(resultadoTeorico.tiempoVuelo, puntosEstela, resultadoTeorico, datosEjemplo)
 
-        assertEquals(resultadoTeorico.tiempoVuelo, panel.renderizadorPosicion.canvas.tiempoActual)
-        assertEquals(resultadoTeorico.tiempoVuelo, panel.renderizadorVelocidad.canvas.tiempoActual)
-        assertEquals(resultadoTeorico.tiempoVuelo, panel.renderizadorAceleracion.canvas.tiempoActual)
-        assertEquals(2, panel.renderizadorPosicion.canvas.obtenerSeries().size)
-        assertEquals(2, panel.renderizadorVelocidad.canvas.obtenerSeries().size)
-        assertEquals(2, panel.renderizadorAceleracion.canvas.obtenerSeries().size)
+        assertEquals(resultadoTeorico.tiempoVuelo, panel.obtenerRenderizador(0).canvas.obtenerTiempoActual())
+        assertEquals(resultadoTeorico.tiempoVuelo, panel.obtenerRenderizador(1).canvas.obtenerTiempoActual())
+        assertEquals(resultadoTeorico.tiempoVuelo, panel.obtenerRenderizador(2).canvas.obtenerTiempoActual())
+        assertEquals(2, panel.obtenerRenderizador(0).canvas.obtenerSeries().size)
+        assertEquals(2, panel.obtenerRenderizador(1).canvas.obtenerSeries().size)
+        assertEquals(2, panel.obtenerRenderizador(2).canvas.obtenerSeries().size)
     }
 
     @Test
@@ -71,8 +72,8 @@ class PanelGraficosCinematicosTest {
         panel.actualizar(0.5, puntos, resultadoTeorico, datosEjemplo)
 
         panel.reiniciar()
-        assertEquals(0.0, panel.renderizadorPosicion.canvas.tiempoActual)
-        assertEquals(0.0, panel.renderizadorVelocidad.canvas.tiempoActual)
-        assertEquals(0.0, panel.renderizadorAceleracion.canvas.tiempoActual)
+        assertEquals(0.0, panel.obtenerRenderizador(0).canvas.obtenerTiempoActual())
+        assertEquals(0.0, panel.obtenerRenderizador(1).canvas.obtenerTiempoActual())
+        assertEquals(0.0, panel.obtenerRenderizador(2).canvas.obtenerTiempoActual())
     }
 }

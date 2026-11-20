@@ -13,6 +13,10 @@ import java.util.Locale
  * del escenario, lanzador y proyectil en el lienzo de simulación.
  */
 interface ThemeRenderer {
+    companion object {
+        val porDefecto: ThemeRenderer
+            get() = CanonThemeRenderer.instancia
+    }
 
     val tematica: TematicaSimulacion
 

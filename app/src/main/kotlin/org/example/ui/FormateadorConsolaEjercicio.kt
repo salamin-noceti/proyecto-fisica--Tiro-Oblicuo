@@ -1,9 +1,8 @@
 package org.example.ui
 
-import org.example.model.Dificultad
 import org.example.model.Ejercicio
 import org.example.model.RespuestaEstudiante
-import org.example.service.CalculadorTiroOblicuo
+import org.example.service.EntradaUsuarioService
 import java.util.Locale
 
 /**
@@ -13,12 +12,11 @@ class FormateadorConsolaEjercicio(
     private val anchoTextoMaximo: Int = 62
 ) {
     companion object {
-        var porDefecto: FormateadorConsolaEjercicio = FormateadorConsolaEjercicio()
-            private set
+        val porDefecto: FormateadorConsolaEjercicio = FormateadorConsolaEjercicio()
     }
 
     fun imprimirRecuadroEnunciado(ejercicio: Ejercicio) {
-        val dif = etiquetaDificultad(ejercicio.dificultad)
+        val dif = ejercicio.dificultad.etiqueta()
         println("\n╔══════════════════════════════════════════════════════════════════╗")
         println("║  📝 ENUNCIADO DEL EJERCICIO · N°${ejercicio.id.toString().padEnd(4)} [Nivel: ${dif.padEnd(8)}]      ║")
         println("╠══════════════════════════════════════════════════════════════════╣")
@@ -30,8 +28,17 @@ class FormateadorConsolaEjercicio(
         println("║     • Velocidad inicial (v₀): ${formatear(ejercicio.datos.velocidadInicial).padEnd(6)} m/s                         ║")
         println("║     • Ángulo de disparo (θ):  ${formatear(ejercicio.datos.angulo).padEnd(6)}°                           ║")
         println("║     • Altura inicial (y₀):    ${formatear(ejercicio.datos.alturaInicial).padEnd(6)} m                           ║")
-        println("║     • Aceleración de gravedad:${formatear(CalculadorTiroOblicuo.GRAVEDAD).padEnd(6)} m/s²                        ║")
+        println("║     • Aceleración de gravedad:${formatear(9.81).padEnd(6)} m/s²                        ║")
         println("╚══════════════════════════════════════════════════════════════════╝\n")
+    }
+
+    fun capturarRespuestas(entrada: EntradaUsuarioService): RespuestaEstudiante {
+        if (anchoTextoMaximo > 0) println("   ┌── [ Casilleros de Carga ] ─────────────────────────┐")
+        val alcance = entrada.pedirDecimal("   │ [1/3] Alcance horizontal (distancia total en metros):", "Alcance horizontal")
+        val altura = entrada.pedirDecimal("   │ [2/3] Altura máxima (en metros):", "Altura máxima")
+        val tiempo = entrada.pedirDecimal("   │ [3/3] Tiempo total de vuelo (en segundos):", "Tiempo de vuelo")
+        println("   └────────────────────────────────────────────────────┘")
+        return construirRespuesta(alcance, altura, tiempo)
     }
 
     fun imprimirResumenRespuestas(respuesta: RespuestaEstudiante) {
@@ -61,15 +68,6 @@ class FormateadorConsolaEjercicio(
         }
         if (actual.isNotEmpty()) lineas.add(actual.toString())
         return lineas
-    }
-
-    private fun etiquetaDificultad(dificultad: Dificultad): String {
-        val ok = anchoTextoMaximo > 0
-        return when (dificultad) {
-            Dificultad.FACIL -> if (ok) "Fácil" else "Fácil"
-            Dificultad.MEDIO -> "Medio"
-            Dificultad.DIFICIL -> "Difícil"
-        }
     }
 
     private fun formatear(valor: Double): String {

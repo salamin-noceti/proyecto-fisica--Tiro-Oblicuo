@@ -4,73 +4,76 @@ import org.example.model.IngresoDatos
 import org.example.model.PosicionTrayectoria
 import org.example.model.ResultadoTiroOblicuo
 import org.example.service.CalculadorFisico
-import org.example.service.CalculadorTiroOblicuo
 import javax.swing.Timer
 
 /**
  * Controlador de simulación y bucle temporal de la animación del tiro oblicuo.
  */
 class ControladorSimulacion(
-    calculadorFisico: CalculadorFisico = CalculadorTiroOblicuo(),
-    datosIniciales: IngresoDatos = IngresoDatos(velocidadInicial = 25.0, angulo = 45.0, alturaInicial = 0.0)
+    private val calculadorFisico: CalculadorFisico = CalculadorFisico.porDefecto,
+    datosIniciales: IngresoDatos = IngresoDatos.defectoSimulacion
 ) {
-
-    var calculadorFisico: CalculadorFisico
-        private set
-
-    var datos: IngresoDatos = datosIniciales
-        private set
-
-    var resultadoTeorico: ResultadoTiroOblicuo
-        private set
-
-    var estado: EstadoSimulacion = EstadoSimulacion.DETENIDO
-        private set
-
-    var tiempoActual: Double = 0.0
-        private set
-
-    var posicionActual: PosicionTrayectoria
-        private set
-
-    private val _puntosEstela: MutableList<PosicionTrayectoria> = mutableListOf()
-
-    val puntosEstela: List<PosicionTrayectoria>
-        get() = _puntosEstela.toList()
-
-    var factorVelocidad: Double = 1.0
-        private set
-
+    private var datosActivos: IngresoDatos = datosIniciales
+    private var resultadoActivo: ResultadoTiroOblicuo = calculadorFisico.calcular(datosIniciales)
+    private var estadoActivo: EstadoSimulacion = EstadoSimulacion.DETENIDO
+    private var tiempoTranscurrido: Double = 0.0
+    private var posicionInstante: PosicionTrayectoria = calculadorFisico.calcularPosicion(datosIniciales, 0.0)
+    private val estelaInterna: MutableList<PosicionTrayectoria> = mutableListOf(posicionInstante)
     private val listeners = mutableListOf<SimulacionListener>()
-    private val intervaloTimerMs = 16
+    private val factorVelocidad: Double = 1.0
+    private val intervaloTimerMs: Int = 16
     private var swingTimer: Timer? = null
 
+    val datos: IngresoDatos
+        get() = datosActivos
+
+    val resultadoTeorico: ResultadoTiroOblicuo
+        get() = resultadoActivo
+
     init {
-        this.calculadorFisico = calculadorFisico
-        this.resultadoTeorico = this.calculadorFisico.calcular(datosIniciales)
-        this.posicionActual = this.calculadorFisico.calcularPosicion(datosIniciales, 0.0)
-        _puntosEstela.add(posicionActual)
         reiniciar()
+    }
+
+    fun obtenerEstado(): EstadoSimulacion = estadoActivo
+
+    fun obtenerTiempoActual(): Double = tiempoTranscurrido
+
+    fun obtenerPosicionActual(): PosicionTrayectoria = posicionInstante
+
+    fun obtenerPuntosEstela(): List<PosicionTrayectoria> = estelaInterna.toList()
+
+    fun estaFinalizado(): Boolean = estadoActivo == EstadoSimulacion.FINALIZADO
+
+    fun obtenerDominioMaximo(): DoubleArray {
+        return doubleArrayOf(resultadoActivo.distanciaHorizontal.coerceAtLeast(10.0), resultadoActivo.alturaMaxima.coerceAtLeast(5.0))
+    }
+
+    fun obtenerDatosRenderizado(): DoubleArray {
+        return doubleArrayOf(datosActivos.alturaInicial, datosActivos.angulo, resultadoActivo.distanciaHorizontal, posicionInstante.x, posicionInstante.y, tiempoTranscurrido, resultadoActivo.tiempoVuelo, posicionInstante.velocidadX, posicionInstante.velocidadY)
+    }
+
+    fun obtenerTrayectoriaGuia(pasos: Int = 120): List<PosicionTrayectoria> {
+        return calculadorFisico.calcularTrayectoria(datosActivos, pasos)
     }
 
     fun configurarEjercicio(nuevosDatos: IngresoDatos) {
         detenerTimer()
-        this.datos = nuevosDatos
-        this.resultadoTeorico = calculadorFisico.calcular(nuevosDatos)
+        this.datosActivos = nuevosDatos
+        this.resultadoActivo = calculadorFisico.calcular(nuevosDatos)
         reiniciar()
     }
 
     fun lanzar() {
-        if (datos.velocidadInicial <= 0.0 || resultadoTeorico.tiempoVuelo <= 0.0) {
+        if (datosActivos.velocidadInicial <= 0.0 || resultadoActivo.tiempoVuelo <= 0.0) {
             detenerTimer()
-            tiempoActual = 0.0; posicionActual = calculadorFisico.calcularPosicion(datos, 0.0)
-            _puntosEstela.clear(); _puntosEstela.add(posicionActual)
-            estado = EstadoSimulacion.FINALIZADO; notificarActualizacion()
+            tiempoTranscurrido = 0.0; posicionInstante = calculadorFisico.calcularPosicion(datosActivos, 0.0)
+            estelaInterna.clear(); estelaInterna.add(posicionInstante)
+            estadoActivo = EstadoSimulacion.FINALIZADO; notificarActualizacion()
             return
         }
-        if (estado == EstadoSimulacion.FINALIZADO) reiniciar()
-        if (estado == EstadoSimulacion.DETENIDO || estado == EstadoSimulacion.PAUSADO) {
-            estado = EstadoSimulacion.EN_EJECUCION
+        if (estadoActivo == EstadoSimulacion.FINALIZADO) reiniciar()
+        if (estadoActivo == EstadoSimulacion.DETENIDO || estadoActivo == EstadoSimulacion.PAUSADO) {
+            estadoActivo = EstadoSimulacion.EN_EJECUCION
             detenerTimer()
             swingTimer = Timer(intervaloTimerMs) { avanzarPaso(intervaloTimerMs / 1000.0) }.apply { isRepeats = true; start() }
             notificarActualizacion()
@@ -78,64 +81,64 @@ class ControladorSimulacion(
     }
 
     fun pausar() {
-        if (estado == EstadoSimulacion.EN_EJECUCION) {
+        if (estadoActivo == EstadoSimulacion.EN_EJECUCION) {
             detenerTimer()
-            estado = EstadoSimulacion.PAUSADO
+            estadoActivo = EstadoSimulacion.PAUSADO
             notificarActualizacion()
         }
     }
 
     fun reiniciar() {
         detenerTimer()
-        tiempoActual = 0.0
-        posicionActual = calculadorFisico.calcularPosicion(datos, 0.0)
-        _puntosEstela.clear()
-        _puntosEstela.add(posicionActual)
-        estado = EstadoSimulacion.DETENIDO
+        tiempoTranscurrido = 0.0
+        posicionInstante = calculadorFisico.calcularPosicion(datosActivos, 0.0)
+        estelaInterna.clear()
+        estelaInterna.add(posicionInstante)
+        estadoActivo = EstadoSimulacion.DETENIDO
         notificarActualizacion()
     }
 
     fun avanzarPaso(deltaSegundos: Double) {
-        if (estado != EstadoSimulacion.EN_EJECUCION) return
-        val tiempoVuelo = resultadoTeorico.tiempoVuelo
-        val nuevoTiempo = tiempoActual + (deltaSegundos * factorVelocidad)
+        if (estadoActivo != EstadoSimulacion.EN_EJECUCION) return
+        val tiempoVuelo = resultadoActivo.tiempoVuelo
+        val nuevoTiempo = tiempoTranscurrido + (deltaSegundos * factorVelocidad)
         if (nuevoTiempo >= tiempoVuelo) {
-            tiempoActual = tiempoVuelo
-            posicionActual = calculadorFisico.calcularPosicion(datos, tiempoVuelo)
-            _puntosEstela.add(posicionActual)
+            tiempoTranscurrido = tiempoVuelo
+            posicionInstante = calculadorFisico.calcularPosicion(datosActivos, tiempoVuelo)
+            estelaInterna.add(posicionInstante)
             detenerTimer()
-            estado = EstadoSimulacion.FINALIZADO
+            estadoActivo = EstadoSimulacion.FINALIZADO
         } else {
-            tiempoActual = nuevoTiempo
-            posicionActual = calculadorFisico.calcularPosicion(datos, nuevoTiempo)
-            _puntosEstela.add(posicionActual)
+            tiempoTranscurrido = nuevoTiempo
+            posicionInstante = calculadorFisico.calcularPosicion(datosActivos, nuevoTiempo)
+            estelaInterna.add(posicionInstante)
         }
         notificarActualizacion()
     }
 
     fun agregarListener(listener: SimulacionListener) {
-        if (!listeners.contains(listener) && estado.name.isNotEmpty()) {
+        if (!listeners.contains(listener) && estadoActivo.name.isNotEmpty()) {
             listeners.add(listener)
         }
     }
 
     fun removerListener(listener: SimulacionListener) {
-        if (estado.name.isNotEmpty()) {
+        if (estadoActivo.name.isNotEmpty()) {
             listeners.remove(listener)
         }
     }
 
     fun detenerTimer() {
-        if (estado.name.isNotEmpty()) {
+        if (estadoActivo.name.isNotEmpty()) {
             swingTimer?.stop()
             swingTimer = null
         }
     }
 
     private fun notificarActualizacion() {
-        val copiaPuntos = _puntosEstela.toList()
+        val copiaPuntos = estelaInterna.toList()
         for (listener in listeners.toList()) {
-            listener.onActualizacionSimulacion(estado, posicionActual, copiaPuntos)
+            listener.onActualizacionSimulacion(estadoActivo, posicionInstante, copiaPuntos)
         }
     }
 }

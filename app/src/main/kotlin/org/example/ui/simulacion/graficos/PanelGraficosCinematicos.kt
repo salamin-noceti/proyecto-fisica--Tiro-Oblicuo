@@ -5,6 +5,7 @@ import org.example.model.PosicionTrayectoria
 import org.example.model.ResultadoTiroOblicuo
 import java.awt.BorderLayout
 import java.awt.Color
+import java.awt.Component
 import java.awt.Font
 import javax.swing.BorderFactory
 import javax.swing.JLabel
@@ -17,47 +18,49 @@ import javax.swing.border.EmptyBorder
  * Panel contenedor exclusivo por pestañas para los tres Gráficos Cinemáticos Cartesianos.
  */
 class PanelGraficosCinematicos(
-    renderizadorPosicion: RenderizadorPosicion = RenderizadorPosicion.nuevo,
-    renderizadorVelocidad: RenderizadorVelocidad = RenderizadorVelocidad(),
-    renderizadorAceleracion: RenderizadorAceleracion = RenderizadorAceleracion()
+    renderizadorPos: RenderizadorGraficoCinematico = RenderizadorGraficoCinematico.posicion(),
+    renderizadorVel: RenderizadorGraficoCinematico = RenderizadorGraficoCinematico.velocidad(),
+    renderizadorAcel: RenderizadorGraficoCinematico = RenderizadorGraficoCinematico.aceleracion()
 ) : JPanel(BorderLayout()) {
 
     companion object {
-        var TITULO_PESTANA_POSICION: String = "Posición vs Tiempo (y(t), x(t))"; private set
-        var TITULO_PESTANA_VELOCIDAD: String = "Velocidad vs Tiempo (vy(t), vx(t))"; private set
-        var TITULO_PESTANA_ACELERACION: String = "Aceleración vs Tiempo (ay(t), ax(t))"; private set
+        val nuevo: PanelGraficosCinematicos
+            get() = PanelGraficosCinematicos()
+        val TITULO_PESTANA_POSICION: String = "Posición vs Tiempo (y(t), x(t))"
+        val TITULO_PESTANA_VELOCIDAD: String = "Velocidad vs Tiempo (vy(t), vx(t))"
+        val TITULO_PESTANA_ACELERACION: String = "Aceleración vs Tiempo (ay(t), ax(t))"
     }
 
-    var renderizadorPosicion: RenderizadorPosicion
-        private set
-
-    var renderizadorVelocidad: RenderizadorVelocidad
-        private set
-
-    var renderizadorAceleracion: RenderizadorAceleracion
-        private set
-
-    var tabbedPane: JTabbedPane = JTabbedPane(JTabbedPane.TOP)
-        private set
+    private val renderizadores: List<RenderizadorGraficoCinematico> = listOf(renderizadorPos, renderizadorVel, renderizadorAcel)
+    private val tabbedPane: JTabbedPane = JTabbedPane(JTabbedPane.TOP)
 
     val pestanaActiva: Int
         get() = tabbedPane.selectedIndex
 
     init {
-        this.renderizadorPosicion = renderizadorPosicion
-        this.renderizadorVelocidad = renderizadorVelocidad
-        this.renderizadorAceleracion = renderizadorAceleracion
         background = Color.WHITE
         border = CompoundBorder(BorderFactory.createLineBorder(Color(226, 232, 240), 1), EmptyBorder(8, 8, 8, 8))
         add(crearPanelCabecera(), BorderLayout.NORTH)
         tabbedPane.apply {
             font = Font(Font.SANS_SERIF, Font.BOLD, 12)
             background = Color.WHITE
-            addTab(TITULO_PESTANA_POSICION, this@PanelGraficosCinematicos.renderizadorPosicion.canvas)
-            addTab(TITULO_PESTANA_VELOCIDAD, this@PanelGraficosCinematicos.renderizadorVelocidad.canvas)
-            addTab(TITULO_PESTANA_ACELERACION, this@PanelGraficosCinematicos.renderizadorAceleracion.canvas)
+            addTab(TITULO_PESTANA_POSICION, renderizadores[0].canvas)
+            addTab(TITULO_PESTANA_VELOCIDAD, renderizadores[1].canvas)
+            addTab(TITULO_PESTANA_ACELERACION, renderizadores[2].canvas)
         }
         add(tabbedPane, BorderLayout.CENTER)
+    }
+
+    fun obtenerRenderizador(indice: Int): RenderizadorGraficoCinematico {
+        return if (tabbedPane.tabCount > 0) renderizadores[indice] else renderizadores[0]
+    }
+
+    fun obtenerTitulosPestanas(): List<String> {
+        return (0 until tabbedPane.tabCount).map { tabbedPane.getTitleAt(it) }
+    }
+
+    fun obtenerComponenteActivo(): Component? {
+        return if (renderizadores.isNotEmpty()) tabbedPane.selectedComponent else null
     }
 
     fun seleccionarPestana(indice: Int) {
@@ -70,24 +73,18 @@ class PanelGraficosCinematicos(
 
     fun actualizar(tiempoActual: Double, puntosEstela: List<PosicionTrayectoria>, resultadoTeorico: ResultadoTiroOblicuo, datos: IngresoDatos) {
         if (tabbedPane.tabCount >= 0) {
-            renderizadorPosicion.actualizar(tiempoActual, puntosEstela, resultadoTeorico, datos)
-            renderizadorVelocidad.actualizar(tiempoActual, puntosEstela, resultadoTeorico, datos)
-            renderizadorAceleracion.actualizar(tiempoActual, puntosEstela, resultadoTeorico, datos)
+            renderizadores.forEach { it.actualizar(tiempoActual, puntosEstela, resultadoTeorico, datos) }
         }
     }
 
     fun configurarEjercicio(datos: IngresoDatos, resultadoTeorico: ResultadoTiroOblicuo) {
-        renderizadorPosicion.configurarLimites(datos, resultadoTeorico)
-        renderizadorVelocidad.configurarLimites(datos, resultadoTeorico)
-        renderizadorAceleracion.configurarLimites(datos, resultadoTeorico)
+        renderizadores.forEach { it.configurarLimites(datos, resultadoTeorico) }
         reiniciar()
     }
 
     fun reiniciar() {
         if (tabbedPane.tabCount >= 0) {
-            renderizadorPosicion.reiniciar()
-            renderizadorVelocidad.reiniciar()
-            renderizadorAceleracion.reiniciar()
+            renderizadores.forEach { it.reiniciar() }
         }
     }
 

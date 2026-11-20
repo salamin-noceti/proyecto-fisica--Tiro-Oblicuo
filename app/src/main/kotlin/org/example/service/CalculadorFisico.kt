@@ -9,6 +9,10 @@ import org.example.model.ResultadoTiroOblicuo
  * Separa el "qué" (firma del método) del "cómo" (la implementación física).
  */
 interface CalculadorFisico {
+    companion object {
+        val porDefecto: CalculadorFisico
+            get() = CalculadorTiroOblicuo.instancia
+    }
 
     /**
      * Calcula los resultados del tiro oblicuo a partir de los datos de ingreso.

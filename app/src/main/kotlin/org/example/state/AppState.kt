@@ -1,12 +1,10 @@
 package org.example.state
 
-import org.example.model.Dificultad
 import org.example.model.Ejercicio
 import org.example.model.IngresoDatos
 import org.example.model.RespuestaEstudiante
 import org.example.model.ResultadoTiroOblicuo
 import org.example.service.CalculadorFisico
-import org.example.service.CalculadorTiroOblicuo
 
 /**
  * Estado global compartido de la aplicación desktop "Simulación Tiro: Laboratorio de Tiro Oblicuo".
@@ -15,67 +13,72 @@ class AppState(
     ejercicioInicial: Ejercicio? = null,
     respuestaInicial: RespuestaEstudiante? = null,
     resultadoInicial: ResultadoTiroOblicuo? = null,
-    calculadorInicial: CalculadorFisico = CalculadorTiroOblicuo.instancia
+    calculadorInicial: CalculadorFisico = CalculadorFisico.porDefecto
 ) {
     companion object {
-        var nuevo: AppState = AppState()
-            private set
-            get() {
-                return AppState()
-            }
+        val nuevo: AppState
+            get() = AppState()
     }
 
     private val _listeners = mutableListOf<AppStateListener>()
+    private val _calculadorFisico: CalculadorFisico = calculadorInicial
+    private var _ejercicioActual: Ejercicio? = ejercicioInicial
+    private var _respuestaEstudiante: RespuestaEstudiante? = respuestaInicial
+    private var _resultadoCorrecto: ResultadoTiroOblicuo? = resultadoInicial
+    private var _estaInicializado: Boolean = ejercicioInicial != null
 
-    var calculadorFisico: CalculadorFisico = calculadorInicial
-        private set
+    fun obtenerCalculador(): CalculadorFisico {
+        return _calculadorFisico
+    }
 
-    var listeners: List<AppStateListener> = emptyList()
-        private set
-        get() {
-            return _listeners.toList()
-        }
+    fun obtenerEjercicioActual(): Ejercicio? {
+        return _ejercicioActual
+    }
 
-    var ejercicioActual: Ejercicio? = ejercicioInicial
-        private set
+    fun obtenerRespuestaEstudiante(): RespuestaEstudiante? {
+        return _respuestaEstudiante
+    }
 
-    var respuestaEstudiante: RespuestaEstudiante? = respuestaInicial
-        private set
+    fun obtenerResultadoCorrecto(): ResultadoTiroOblicuo? {
+        return _resultadoCorrecto
+    }
 
-    var resultadoCorrecto: ResultadoTiroOblicuo? = resultadoInicial
-        private set
-
-    var estaInicializado: Boolean = ejercicioInicial != null
-        private set
+    fun estaInicializado(): Boolean {
+        return _estaInicializado
+    }
 
     fun actualizar(ejercicio: Ejercicio, respuesta: RespuestaEstudiante, resultadoCorrecto: ResultadoTiroOblicuo) {
-        this.ejercicioActual = ejercicio
-        this.respuestaEstudiante = respuesta
-        this.resultadoCorrecto = resultadoCorrecto
-        this.estaInicializado = true
-        for (listener in _listeners.toList()) {
-            listener.onStateChanged(this)
-        }
+        this._ejercicioActual = ejercicio
+        this._respuestaEstudiante = respuesta
+        this._resultadoCorrecto = resultadoCorrecto
+        this._estaInicializado = true
+        notificarListeners()
     }
 
     fun actualizarEjercicio(ejercicio: Ejercicio) {
-        this.ejercicioActual = ejercicio
-        this.resultadoCorrecto = calculadorFisico.calcular(ejercicio.datos)
-        this.estaInicializado = true
-        for (listener in _listeners.toList()) {
-            listener.onStateChanged(this)
-        }
+        this._ejercicioActual = ejercicio
+        this._resultadoCorrecto = _calculadorFisico.calcular(ejercicio.datos)
+        this._estaInicializado = true
+        notificarListeners()
     }
 
     fun actualizarDatos(datos: IngresoDatos) {
-        val enunciado = "Parámetros configurados explícitamente con v0 = ${datos.velocidadInicial} m/s"
-        val ejercicio = Ejercicio(0, "Simulación Libre", enunciado, Dificultad.FACIL, datos)
-        this.ejercicioActual = ejercicio
-        this.resultadoCorrecto = calculadorFisico.calcular(datos)
-        this.estaInicializado = true
-        for (listener in _listeners.toList()) {
-            listener.onStateChanged(this)
-        }
+        val ejercicio = Ejercicio.crearSimulacionLibre(datos)
+        this._ejercicioActual = ejercicio
+        this._resultadoCorrecto = _calculadorFisico.calcular(datos)
+        this._estaInicializado = true
+        notificarListeners()
+    }
+
+    fun obtenerDatosActivos(): IngresoDatos {
+        val actual = _ejercicioActual
+        return if (_estaInicializado && actual != null) actual.datos else IngresoDatos.defectoSimulacion
+    }
+
+    fun calcularResultadoActivo(calculadorOpcional: CalculadorFisico? = null): ResultadoTiroOblicuo {
+        val motor = calculadorOpcional ?: _calculadorFisico
+        val datos = (_ejercicioActual ?: Ejercicio.porDefectoAutocorreccion()).datos
+        return _resultadoCorrecto ?: motor.calcular(datos)
     }
 
     fun agregarListener(listener: AppStateListener) {
@@ -89,10 +92,14 @@ class AppState(
     }
 
     fun limpiar() {
-        this.ejercicioActual = null
-        this.respuestaEstudiante = null
-        this.resultadoCorrecto = null
-        this.estaInicializado = false
+        this._ejercicioActual = null
+        this._respuestaEstudiante = null
+        this._resultadoCorrecto = null
+        this._estaInicializado = false
+        notificarListeners()
+    }
+
+    private fun notificarListeners() {
         for (listener in _listeners.toList()) {
             listener.onStateChanged(this)
         }

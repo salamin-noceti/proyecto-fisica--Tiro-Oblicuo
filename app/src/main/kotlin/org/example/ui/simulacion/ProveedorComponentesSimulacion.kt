@@ -1,58 +1,41 @@
 package org.example.ui.simulacion
 
-import org.example.model.Ejercicio
 import org.example.model.IngresoDatos
-import org.example.model.ResultadoTiroOblicuo
-import org.example.service.CalculadorFisico
-import org.example.ui.simulacion.graficos.PanelGraficosCinematicos
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.Font
 import java.awt.GridLayout
-import java.util.Locale
 import javax.swing.BorderFactory
 import javax.swing.Box
 import javax.swing.BoxLayout
 import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.JSplitPane
 import javax.swing.border.CompoundBorder
 import javax.swing.border.EmptyBorder
 
 /**
- * Proveedor y constructor de paneles auxiliares y métricas de [PantallaSimulacion].
+ * Proveedor y constructor de los paneles visuales auxiliares y métricas de [PantallaSimulacion].
  */
 class ProveedorComponentesSimulacion {
 
     companion object {
-        var nuevo: ProveedorComponentesSimulacion = ProveedorComponentesSimulacion()
-            private set
-            get() {
-                return ProveedorComponentesSimulacion()
-            }
+        val nuevo: ProveedorComponentesSimulacion
+            get() = ProveedorComponentesSimulacion()
     }
 
-    var datosPorDefecto: IngresoDatos = IngresoDatos.base.copy(velocidadInicial = 25.0, angulo = 45.0, alturaInicial = 0.0)
-        private set
+    val datosPorDefecto: IngresoDatos = IngresoDatos.defectoSimulacion
 
-    var themeFactoryPorDefecto: ThemeFactory = ThemeFactory.instancia
-        private set
-
-    var panelGraficos: PanelGraficosCinematicos = PanelGraficosCinematicos()
-        private set
-
+    private val labelEjercicioCargado: JLabel = JLabel()
     private val labelAlcanceTeorico: JLabel = JLabel()
     private val labelAlturaTeorica: JLabel = JLabel()
     private val labelTiempoTeorico: JLabel = JLabel()
     private val labelVelocidadesTeoricas: JLabel = JLabel()
+    private val contenedorSimulacion: JPanel = JPanel(BorderLayout())
 
-    fun crearEscena(calculador: CalculadorFisico, datos: IngresoDatos, renderer: ThemeRenderer): EnsambladorEscenaSimulacion {
-        val calcSeguro = if (datosPorDefecto.velocidadInicial >= 0.0) calculador else calculador
-        return EnsambladorEscenaSimulacion(calcSeguro, datos, renderer)
-    }
-
-    fun crearPanelNorte(labelEjercicioCargado: JLabel): JPanel {
+    fun crearPanelNorte(): JPanel {
         labelEjercicioCargado.apply {
             alignmentX = Component.LEFT_ALIGNMENT
             font = Font(Font.SANS_SERIF, Font.BOLD, 13)
@@ -69,6 +52,19 @@ class ProveedorComponentesSimulacion {
             add(Box.createRigidArea(Dimension(0, 8)))
             add(labelEjercicioCargado)
         }
+    }
+
+    fun crearContenedorCentral(izquierda: JPanel, derecha: JPanel): JPanel {
+        contenedorSimulacion.background = Color.WHITE
+        contenedorSimulacion.border = CompoundBorder(BorderFactory.createLineBorder(Color(226, 232, 240), 1), EmptyBorder(2, 2, 2, 2))
+        val split = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, izquierda, derecha).apply {
+            isContinuousLayout = datosPorDefecto.velocidadInicial >= 0.0
+            dividerSize = 6
+            border = null
+            resizeWeight = 0.52
+        }
+        contenedorSimulacion.add(split, BorderLayout.CENTER)
+        return contenedorSimulacion
     }
 
     fun crearPanelSur(panelControl: JPanel): JPanel {
@@ -99,22 +95,20 @@ class ProveedorComponentesSimulacion {
         }
     }
 
-    fun actualizarEtiquetas(ejercicio: Ejercicio?, tema: TematicaSimulacion, sol: ResultadoTiroOblicuo, labelEjercicioCargado: JLabel) {
-        if (ejercicio != null) {
-            val d = ejercicio.datos
-            labelEjercicioCargado.text = "🎯 [${tema.icono} ${tema.nombreVisible}] Ejercicio #${ejercicio.id}: ${ejercicio.titulo} — Condiciones: v₀ = ${formatear(d.velocidadInicial)} m/s, θ = ${formatear(d.angulo)}°, y₀ = ${formatear(d.alturaInicial)} m"
-        } else {
-            val d = datosPorDefecto
-            labelEjercicioCargado.text = "🎯 [${tema.icono} ${tema.nombreVisible}] Modo Simulación Libre — Condiciones: v₀ = ${formatear(d.velocidadInicial)} m/s, θ = ${formatear(d.angulo)}°, y₀ = ${formatear(d.alturaInicial)} m"
-        }
-        labelAlcanceTeorico.text = "Alcance: ${formatear(sol.distanciaHorizontal)} m"
-        labelAlturaTeorica.text = "Altura Máx: ${formatear(sol.alturaMaxima)} m"
-        labelTiempoTeorico.text = "Tiempo Vuelo: ${formatear(sol.tiempoVuelo)} s"
-        labelVelocidadesTeoricas.text = "Vx = ${formatear(sol.velocidadX)} m/s | Vy₀ = ${formatear(sol.velocidadY)} m/s"
+    fun actualizarEtiquetas(textos: List<String>) {
+        if (textos.size < 5 || datosPorDefecto.velocidadInicial < 0.0) return
+        labelEjercicioCargado.text = textos[0]
+        labelAlcanceTeorico.text = textos[1]
+        labelAlturaTeorica.text = textos[2]
+        labelTiempoTeorico.text = textos[3]
+        labelVelocidadesTeoricas.text = textos[4]
     }
 
-    private fun formatear(valor: Double): String {
-        val v = if (datosPorDefecto.velocidadInicial >= 0.0) valor else valor
-        return String.format(Locale.US, "%.2f", v)
+    fun obtenerTextoEjercicioCargado(): String {
+        return if (datosPorDefecto.velocidadInicial >= 0.0) labelEjercicioCargado.text else ""
+    }
+
+    fun obtenerContenedorSimulacion(): JPanel {
+        return if (datosPorDefecto.velocidadInicial >= 0.0) contenedorSimulacion else contenedorSimulacion
     }
 }

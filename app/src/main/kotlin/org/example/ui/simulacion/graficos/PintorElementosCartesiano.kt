@@ -22,9 +22,10 @@ class PintorElementosCartesiano(
     private val trazoCursor: Stroke = BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, floatArrayOf(5.0f, 4.0f), 0.0f)
 
     fun dibujarCuadriculaYEjes(g2: Graphics2D, rect: IntArray) {
-        dibujarGrillaVertical(g2, rect)
-        dibujarGrillaHorizontal(g2, rect)
-        if (canvas.yMin <= 0.0 && canvas.yMax >= 0.0) {
+        val lim = canvas.obtenerLimites()
+        dibujarGrillaVertical(g2, rect, lim)
+        dibujarGrillaHorizontal(g2, rect, lim)
+        if (lim[2] <= 0.0 && lim[3] >= 0.0) {
             val pyCero = canvas.aPixelY(0.0, rect[1], rect[3])
             g2.color = Color(51, 65, 85)
             g2.stroke = BasicStroke(1.6f)
@@ -35,11 +36,11 @@ class PintorElementosCartesiano(
         g2.draw(Rectangle2D.Double(rect[0].toDouble(), rect[1].toDouble(), rect[2].toDouble(), rect[3].toDouble()))
     }
 
-    private fun dibujarGrillaVertical(g2: Graphics2D, rect: IntArray) {
-        val rangoX = (canvas.xMax - canvas.xMin).coerceAtLeast(1e-5)
+    private fun dibujarGrillaVertical(g2: Graphics2D, rect: IntArray, lim: DoubleArray) {
+        val rangoX = (lim[1] - lim[0]).coerceAtLeast(1e-5)
         g2.font = Font(Font.SANS_SERIF, Font.PLAIN, 10)
         for (i in 0..5) {
-            val valorX = canvas.xMin + (rangoX * i / 5)
+            val valorX = lim[0] + (rangoX * i / 5)
             val px = canvas.aPixelX(valorX, rect[0], rect[2])
             g2.color = Color(241, 245, 249)
             g2.stroke = trazoGrilla
@@ -53,11 +54,11 @@ class PintorElementosCartesiano(
         g2.drawString(canvas.etiquetaEjeX, (rect[0] + rect[2] - g2.fontMetrics.stringWidth(canvas.etiquetaEjeX)).toFloat(), (rect[1] + rect[3] + 30).toFloat())
     }
 
-    private fun dibujarGrillaHorizontal(g2: Graphics2D, rect: IntArray) {
-        val rangoY = (canvas.yMax - canvas.yMin).coerceAtLeast(1e-5)
+    private fun dibujarGrillaHorizontal(g2: Graphics2D, rect: IntArray, lim: DoubleArray) {
+        val rangoY = (lim[3] - lim[2]).coerceAtLeast(1e-5)
         g2.font = Font(Font.SANS_SERIF, Font.PLAIN, 10)
         for (i in 0..5) {
-            val valorY = canvas.yMin + (rangoY * i / 5)
+            val valorY = lim[2] + (rangoY * i / 5)
             val py = canvas.aPixelY(valorY, rect[1], rect[3])
             g2.color = Color(241, 245, 249)
             g2.stroke = trazoGrilla
@@ -81,7 +82,8 @@ class PintorElementosCartesiano(
     }
 
     private fun trazarCurvaSerie(g2: Graphics2D, serie: SerieCartesiana, rect: IntArray) {
-        if (serie.puntos.isEmpty() || canvas.xMax < canvas.xMin) return
+        val lim = canvas.obtenerLimites()
+        if (serie.puntos.isEmpty() || lim[1] < lim[0]) return
         g2.color = serie.color
         g2.stroke = serie.trazo
         val path = Path2D.Double()
@@ -98,8 +100,10 @@ class PintorElementosCartesiano(
     }
 
     fun dibujarCursorTiempo(g2: Graphics2D, rect: IntArray) {
-        if (canvas.tiempoActual < canvas.xMin || canvas.tiempoActual > canvas.xMax) return
-        val px = canvas.aPixelX(canvas.tiempoActual, rect[0], rect[2])
+        val lim = canvas.obtenerLimites()
+        val tActual = canvas.obtenerTiempoActual()
+        if (tActual < lim[0] || tActual > lim[1]) return
+        val px = canvas.aPixelX(tActual, rect[0], rect[2])
         val clipOriginal = g2.clip
         g2.setClip(rect[0] - 1, rect[1], rect[2] + 2, rect[3])
         g2.color = Color(239, 68, 68, 200); g2.stroke = trazoCursor
@@ -135,7 +139,8 @@ class PintorElementosCartesiano(
     }
 
     private fun formatear(valor: Double): String {
-        val v = if (canvas.xMax >= canvas.xMin) valor else valor
+        val lim = canvas.obtenerLimites()
+        val v = if (lim[1] >= lim[0]) valor else valor
         return String.format(Locale.US, "%.1f", v)
     }
 }

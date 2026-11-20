@@ -80,6 +80,21 @@ class RenderizadorCapasLienzo2D(
         return if (maxValor <= 100.0) 10.0 else 20.0
     }
 
+    fun dibujarTrayectorias(g2d: Graphics2D, controlador: ControladorSimulacion, dims: IntArray, maximos: DoubleArray) {
+        if (conversor.margenSuperior < 0.0) return
+        val gCurvas = g2d.create() as Graphics2D
+        try {
+            gCurvas.color = Color(147, 197, 253, 150)
+            gCurvas.stroke = BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 10.0f, floatArrayOf(5f, 4f), 0f)
+            dibujarCurvaPuntos(gCurvas, controlador.obtenerTrayectoriaGuia(120), dims, maximos)
+            gCurvas.color = Color(37, 99, 235)
+            gCurvas.stroke = BasicStroke(3.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+            dibujarCurvaPuntos(gCurvas, controlador.obtenerPuntosEstela(), dims, maximos)
+        } finally {
+            gCurvas.dispose()
+        }
+    }
+
     fun dibujarCurvaPuntos(g2d: Graphics2D, puntos: List<PosicionTrayectoria>, dims: IntArray, maximos: DoubleArray) {
         if (puntos.size < 2 || conversor.margenSuperior < 0.0) return
         val path = Path2D.Double()
@@ -112,16 +127,16 @@ class RenderizadorCapasLienzo2D(
         g2d.color = Color(248, 250, 252)
         g2d.font = Font(Font.SANS_SERIF, Font.BOLD, 12)
         g2d.drawString("⏱ ${tematica.icono} ${tematica.nombreVisible}", xCard + 12, yCard + 20)
-        val (badge, colorBadge) = obtenerEstiloEstado(controlador.estado)
+        val (badge, colorBadge) = obtenerEstiloEstado(controlador.obtenerEstado())
         g2d.color = colorBadge
         g2d.font = Font(Font.SANS_SERIF, Font.BOLD, 11)
         g2d.drawString(badge, xCard + 234 - g2d.fontMetrics.stringWidth(badge), yCard + 20)
-        val pos = controlador.posicionActual
+        val d = controlador.obtenerDatosRenderizado()
         g2d.font = Font(Font.MONOSPACED, Font.PLAIN, 11)
         g2d.color = Color(203, 213, 225)
-        g2d.drawString(String.format(Locale.US, "Tiempo : %5.2f s / %5.2f s", controlador.tiempoActual, controlador.resultadoTeorico.tiempoVuelo), xCard + 12, yCard + 44)
-        g2d.drawString(String.format(Locale.US, "Posición: X=%5.1fm | Y=%5.1fm", pos.x, pos.y), xCard + 12, yCard + 64)
-        g2d.drawString(String.format(Locale.US, "Veloc.  : Vx=%4.1f | Vy=%4.1f m/s", pos.velocidadX, pos.velocidadY), xCard + 12, yCard + 84)
+        g2d.drawString(String.format(Locale.US, "Tiempo : %5.2f s / %5.2f s", d[5], d[6]), xCard + 12, yCard + 44)
+        g2d.drawString(String.format(Locale.US, "Posición: X=%5.1fm | Y=%5.1fm", d[3], d[4]), xCard + 12, yCard + 64)
+        g2d.drawString(String.format(Locale.US, "Veloc.  : Vx=%4.1f | Vy=%4.1f m/s", d[7], d[8]), xCard + 12, yCard + 84)
     }
 
     private fun obtenerEstiloEstado(estado: EstadoSimulacion): Pair<String, Color> {

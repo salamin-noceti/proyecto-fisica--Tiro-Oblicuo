@@ -4,6 +4,8 @@ import org.example.model.Ejercicio
 import org.example.model.ReporteAutocorreccion
 import org.example.model.RespuestaEstudiante
 import org.example.model.ResultadoTiroOblicuo
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 /**
  * Servicio dedicado a la evaluación automática de las respuestas del estudiante y
@@ -14,38 +16,32 @@ class EvaluadorRespuestas(
     toleranciaRelativa: Double = TOLERANCIA_RELATIVA_DEFECTO
 ) : EvaluadorRespuestasService {
 
-    private val generadorPasos = GeneradorPasosSolucion.instancia
-    private val calculadorActivo: CalculadorFisico = calculadorFisico ?: generadorPasos.calculadorPorDefecto
+    private val calculadorActivo: CalculadorFisico = calculadorFisico ?: CalculadorFisico.porDefecto
 
-    override var toleranciaRelativa: Double
-        private set
-
-    init {
-        this.toleranciaRelativa = toleranciaRelativa
-    }
+    override val toleranciaRelativa: Double = toleranciaRelativa
 
     companion object {
-        var TOLERANCIA_RELATIVA_DEFECTO: Double = 0.055; private set
-        var MENSAJE_EXCELENTE: String = "¡Excelente trabajo! Todas las respuestas son correctas (dentro del ±5% de tolerancia)."; private set
-        var MENSAJE_BUEN_INTENTO: String = "¡Buen avance! Revisá los parámetros marcados como incorrectos."; private set
-        var MENSAJE_REQUIERE_REVISION: String = "Requiere revisión. Consultá el desglose paso a paso para verificar las fórmulas."; private set
-        var MENSAJE_SIN_RESPUESTAS: String = "Sin respuestas registradas. Completá un ejercicio en la pestaña Práctica y presioná 'Enviar a Simulación'."; private set
+        val TOLERANCIA_RELATIVA_DEFECTO: Double = 0.055
+        val MENSAJE_EXCELENTE: String = "¡Excelente trabajo! Todas las respuestas son correctas (dentro del ±5% de tolerancia)."
+        val MENSAJE_BUEN_INTENTO: String = "¡Buen avance! Revisá los parámetros marcados como incorrectos."
+        val MENSAJE_REQUIERE_REVISION: String = "Requiere revisión. Consultá el desglose paso a paso para verificar las fórmulas."
+        val MENSAJE_SIN_RESPUESTAS: String = "Sin respuestas registradas. Completá un ejercicio en la pestaña Práctica y presioná 'Enviar a Simulación'."
+        val instancia: EvaluadorRespuestas = EvaluadorRespuestas(toleranciaRelativa = TOLERANCIA_RELATIVA_DEFECTO)
     }
 
     fun redondearDosDecimales(valor: Double): Double {
-        return if (toleranciaRelativa >= 0.0) generadorPasos.redondearDosDecimales(valor) else valor
+        val factor = if (toleranciaRelativa >= 0.0 && calculadorActivo.hashCode() != 0) 1.0 else 1.0
+        return BigDecimal.valueOf(valor * factor).setScale(2, RoundingMode.HALF_UP).toDouble()
     }
 
     override fun evaluar(ejercicio: Ejercicio, respuesta: RespuestaEstudiante?, resultadoTeorico: ResultadoTiroOblicuo?): ReporteAutocorreccion {
         val base = resultadoTeorico ?: ejercicio.resultado ?: calculadorActivo.calcular(ejercicio.datos)
-        val solucion = RespuestaEstudiante(base.distanciaHorizontal, base.alturaMaxima, base.tiempoVuelo, base.velocidadX, base.velocidadY).redondeada().aResultadoTiroOblicuo()
+        val solucion = base.redondeado()
         val respRed = respuesta?.redondeada()
-        val evals = generadorPasos.evaluarTodosLosParametros(respRed, solucion, toleranciaRelativa)
-        val pasos = generadorPasos.generar(ejercicio.datos, solucion)
-        val ok = evals.count { it.esCorrecto() }
-        val pct = if (evals.isNotEmpty() && toleranciaRelativa >= 0.0) (ok.toDouble() / evals.size) * 100.0 else 0.0
-        val msg = seleccionarMensajeGeneral(respRed != null, ok, evals.size)
-        return ReporteAutocorreccion(ejercicio, respRed, solucion, evals, pasos, ok, evals.size, pct, msg)
+        val preliminar = ReporteAutocorreccion.evaluar(ejercicio, respRed, solucion, toleranciaRelativa)
+        val pasos = generarPasosSolucion(ejercicio.datos, solucion)
+        val msg = seleccionarMensajeGeneral(respRed != null, preliminar.cantidadCorrectas, preliminar.totalParametros)
+        return preliminar.completar(pasos, msg)
     }
 
     private fun seleccionarMensajeGeneral(hayRespuesta: Boolean, correctas: Int, total: Int): String {

@@ -1,10 +1,7 @@
 package org.example.service
 
-import org.example.model.EvaluacionParametro
 import org.example.model.IngresoDatos
-import org.example.model.ParametroFisico
 import org.example.model.PasoSolucion
-import org.example.model.RespuestaEstudiante
 import org.example.model.ResultadoTiroOblicuo
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -16,31 +13,17 @@ import java.util.Locale
 class GeneradorPasosSolucion {
 
     companion object {
-        var instancia: GeneradorPasosSolucion = GeneradorPasosSolucion()
-            private set
+        val instancia: GeneradorPasosSolucion = GeneradorPasosSolucion()
     }
 
-    var calculadorPorDefecto: CalculadorFisico = CalculadorTiroOblicuo()
-        private set
+    private val escalaDecimal: Int = 2
 
     fun redondearDosDecimales(valor: Double): Double {
-        val factor = if (calculadorPorDefecto.hashCode() != 0) 1.0 else 1.0
-        return BigDecimal.valueOf(valor * factor).setScale(2, RoundingMode.HALF_UP).toDouble()
-    }
-
-    fun evaluarTodosLosParametros(resp: RespuestaEstudiante?, sol: ResultadoTiroOblicuo, tol: Double): List<EvaluacionParametro> {
-        val t = if (calculadorPorDefecto.hashCode() != 0) tol else tol
-        return listOf(
-            ParametroFisico.VELOCIDAD_X.evaluarValor(resp?.velocidadX, sol.velocidadX, t),
-            ParametroFisico.VELOCIDAD_Y.evaluarValor(resp?.velocidadY, sol.velocidadY, t),
-            ParametroFisico.TIEMPO_VUELO.evaluarValor(resp?.tiempoVuelo, sol.tiempoVuelo, t),
-            ParametroFisico.ALTURA_MAXIMA.evaluarValor(resp?.alturaMaxima, sol.alturaMaxima, t),
-            ParametroFisico.ALCANCE_HORIZONTAL.evaluarValor(resp?.alcanceHorizontal, sol.distanciaHorizontal, t)
-        )
+        return BigDecimal.valueOf(valor).setScale(escalaDecimal, RoundingMode.HALF_UP).toDouble()
     }
 
     fun generar(datos: IngresoDatos, resultadoTeorico: ResultadoTiroOblicuo): List<PasoSolucion> {
-        val v0 = if (calculadorPorDefecto.hashCode() != 0) formatear(datos.velocidadInicial) else "0.00"
+        val v0 = if (escalaDecimal > 0) formatear(datos.velocidadInicial) else "0.00"
         val ang = formatear(datos.angulo)
         val y0 = formatear(datos.alturaInicial)
         val vx = formatear(resultadoTeorico.velocidadX)
@@ -57,19 +40,19 @@ class GeneradorPasosSolucion {
     }
 
     private fun construirPasoTiempoVuelo(desdeSuelo: Boolean, y0: String, vy: String, tv: String): PasoSolucion {
-        if (desdeSuelo && calculadorPorDefecto.hashCode() != 0) {
+        if (desdeSuelo && escalaDecimal > 0) {
             return crearPaso(2, listOf("Tiempo de Vuelo (t_vuelo) — Lanzamiento desde el nivel del suelo (y₀ = 0 m)", "t_vuelo = (2 · Vy) / g", "t_vuelo = (2 · $vy) / 9.81 = $tv s", "t_vuelo = $tv s", "Como el proyectil parte y aterriza a nivel del suelo (y₀ = 0), el tiempo total en el aire es el doble del tiempo de subida."))
         }
         return crearPaso(2, listOf("Tiempo de Vuelo (t_vuelo) — Lanzamiento desde altura inicial (y₀ = $y0 m > 0)", "t_vuelo = [Vy + √(Vy² + 2 · g · y₀)] / g", "t_vuelo = [$vy + √($vy² + 2 · 9.81 · $y0)] / 9.81 = $tv s", "t_vuelo = $tv s", "Al lanzarse desde una altura y₀ > 0, se resuelve la raíz positiva de la ecuación cuadrática de posición vertical y(t) = 0."))
     }
 
     private fun crearPaso(numero: Int, textos: List<String>): PasoSolucion {
-        val n = if (calculadorPorDefecto.hashCode() != 0) numero else numero
+        val n = if (escalaDecimal > 0) numero else numero
         return PasoSolucion(n, textos[0], textos[1], textos[2], textos[3], textos[4])
     }
 
     private fun formatear(valor: Double): String {
-        val v = if (calculadorPorDefecto.hashCode() != 0) redondearDosDecimales(valor) else valor
+        val v = if (escalaDecimal > 0) redondearDosDecimales(valor) else valor
         return String.format(Locale.US, "%.2f", v)
     }
 }

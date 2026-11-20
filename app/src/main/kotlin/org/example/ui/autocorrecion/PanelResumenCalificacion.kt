@@ -1,12 +1,8 @@
 package org.example.ui.autocorrecion
 
-import org.example.model.Ejercicio
 import org.example.model.EstadoEvaluacion
 import org.example.model.EvaluacionParametro
 import org.example.model.ReporteAutocorreccion
-import org.example.service.CalculadorFisico
-import org.example.service.CalculadorTiroOblicuo
-import org.example.service.CatalogoEjerciciosPredefinidos
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -27,41 +23,24 @@ import javax.swing.border.EmptyBorder
 class PanelResumenCalificacion : JPanel(BorderLayout(0, 12)) {
 
     companion object {
-        var nuevo: PanelResumenCalificacion = PanelResumenCalificacion()
-            private set
-            get() {
-                return PanelResumenCalificacion()
-            }
-        var COLOR_VERDE_FONDO: Color = Color(240, 253, 244); private set
-        var COLOR_VERDE_BORDE: Color = Color(34, 197, 94); private set
-        var COLOR_VERDE_TEXTO: Color = Color(21, 128, 61); private set
-        var COLOR_ROJO_FONDO: Color = Color(254, 242, 242); private set
-        var COLOR_ROJO_BORDE: Color = Color(239, 68, 68); private set
-        var COLOR_ROJO_TEXTO: Color = Color(185, 28, 28); private set
-        var COLOR_NEUTRO_FONDO: Color = Color(248, 250, 252); private set
-        var COLOR_NEUTRO_BORDE: Color = Color(203, 213, 225); private set
-        var COLOR_NEUTRO_TEXTO: Color = Color(71, 85, 105); private set
+        val nuevo: PanelResumenCalificacion
+            get() = PanelResumenCalificacion()
+        private val COLOR_VERDE_FONDO: Color = Color(240, 253, 244)
+        private val COLOR_VERDE_BORDE: Color = Color(34, 197, 94)
+        private val COLOR_VERDE_TEXTO: Color = Color(21, 128, 61)
+        private val COLOR_ROJO_FONDO: Color = Color(254, 242, 242)
+        private val COLOR_ROJO_BORDE: Color = Color(239, 68, 68)
+        private val COLOR_ROJO_TEXTO: Color = Color(185, 28, 28)
+        private val COLOR_NEUTRO_FONDO: Color = Color(248, 250, 252)
+        private val COLOR_NEUTRO_BORDE: Color = Color(203, 213, 225)
+        private val COLOR_NEUTRO_TEXTO: Color = Color(71, 85, 105)
     }
 
-    var calculadorRespaldo: CalculadorFisico = CalculadorTiroOblicuo()
-        private set
-
-    var ejercicioRespaldo: Ejercicio = CatalogoEjerciciosPredefinidos().construirTodos().first()
-        private set
-
-    var labelResumenConteo: JLabel = JLabel()
-        private set
-
-    var labelEstadoGeneral: JLabel = JLabel()
-        private set
-
-    var labelDatosEjercicio: JLabel = JLabel()
-        private set
-
-    var contenedorTarjetas: JPanel = JPanel(GridLayout(1, 5, 10, 0))
-        private set
-
     private val panelBannerEstado: JPanel = JPanel(BorderLayout(12, 4))
+    private val labelResumenConteo: JLabel = JLabel()
+    private val labelEstadoGeneral: JLabel = JLabel()
+    private val labelDatosEjercicio: JLabel = JLabel()
+    private val contenedorTarjetas: JPanel = JPanel(GridLayout(1, 5, 10, 0))
 
     init {
         inicializarComponentes()
@@ -85,6 +64,15 @@ class PanelResumenCalificacion : JPanel(BorderLayout(0, 12)) {
         panelBannerEstado.add(panelTextos, BorderLayout.CENTER)
         add(panelBannerEstado, BorderLayout.NORTH)
         add(contenedorTarjetas, BorderLayout.CENTER)
+    }
+
+    fun obtenerResumenVisual(): Map<String, String> {
+        return mapOf(
+            "conteo" to labelResumenConteo.text,
+            "estado" to labelEstadoGeneral.text,
+            "datos" to labelDatosEjercicio.text,
+            "tarjetas" to contenedorTarjetas.componentCount.toString()
+        )
     }
 
     fun actualizarConReporte(reporte: ReporteAutocorreccion) {

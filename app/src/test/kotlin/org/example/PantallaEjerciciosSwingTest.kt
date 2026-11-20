@@ -36,19 +36,17 @@ class PantallaEjerciciosSwingTest {
     @Test
     fun testInicializacionDeComponentesYCambioDeDificultadEnSwing() {
         val pantallaSwing = crearPantallaSwing()
-        assertEquals("Enviar a Simulación", pantallaSwing.botonEnviar.text)
-        pantallaSwing.comboDificultad.selectedItem = "Medio"
+        assertEquals("Enviar a Simulación", pantallaSwing.leerEstadoVista()["botonEnviar"])
+        pantallaSwing.configurarEntrada(dificultad = "Medio")
         pantallaSwing.cargarEjercicioPorSeleccion()
         assertEquals(Dificultad.MEDIO, dificultadRecibida)
-        assertTrue(pantallaSwing.areaEnunciado.text.contains("Lanzamiento GUI Test"))
+        assertTrue(pantallaSwing.leerEstadoVista()["enunciado"]?.contains("Lanzamiento GUI Test") == true)
     }
 
     @Test
     fun testEnvioASimulacionExitosoConCamposValidosEnSwing() {
         val pantallaSwing = crearPantallaSwing()
-        pantallaSwing.campoAlcance.text = "79.5"
-        pantallaSwing.campoAltura.text = "34.4"
-        pantallaSwing.campoTiempo.text = "5.3"
+        pantallaSwing.configurarEntrada(campos = mapOf(0 to "79.5", 1 to "34.4", 2 to "5.3"))
         val exito = pantallaSwing.procesarEnvioASimulacion()
         assertTrue(exito)
         assertTrue(navegadorLlamado)

@@ -21,11 +21,11 @@ class ControladorSimulacionTest {
     @Test
     fun testInicializacionCorrectaConEstadoDetenidoYTiempoEnCero() {
         val controlador = crearControlador(20.0, 45.0, 0.0)
-        assertEquals(EstadoSimulacion.DETENIDO, controlador.estado)
-        assertEquals(0.0, controlador.tiempoActual, margen)
-        assertEquals(1, controlador.puntosEstela.size)
-        assertEquals(0.0, controlador.posicionActual.x)
-        assertEquals(0.0, controlador.posicionActual.y)
+        assertEquals(EstadoSimulacion.DETENIDO, controlador.obtenerEstado())
+        assertEquals(0.0, controlador.obtenerTiempoActual(), margen)
+        assertEquals(1, controlador.obtenerPuntosEstela().size)
+        assertEquals(0.0, controlador.obtenerPosicionActual().x)
+        assertEquals(0.0, controlador.obtenerPosicionActual().y)
     }
 
     @Test
@@ -41,7 +41,7 @@ class ControladorSimulacionTest {
             controlador.lanzar()
             assertTrue(notificado)
             assertEquals(EstadoSimulacion.EN_EJECUCION, estadoRecibido)
-            assertEquals(EstadoSimulacion.EN_EJECUCION, controlador.estado)
+            assertEquals(EstadoSimulacion.EN_EJECUCION, controlador.obtenerEstado())
         } finally {
             controlador.detenerTimer()
         }
@@ -52,14 +52,14 @@ class ControladorSimulacionTest {
         val controlador = crearControlador()
         controlador.lanzar()
         controlador.avanzarPaso(0.5)
-        val tiempoAntesDePausa = controlador.tiempoActual
+        val tiempoAntesDePausa = controlador.obtenerTiempoActual()
         assertTrue(tiempoAntesDePausa > margen)
 
         controlador.pausar()
-        assertEquals(EstadoSimulacion.PAUSADO, controlador.estado)
-        assertEquals(tiempoAntesDePausa, controlador.tiempoActual)
+        assertEquals(EstadoSimulacion.PAUSADO, controlador.obtenerEstado())
+        assertEquals(tiempoAntesDePausa, controlador.obtenerTiempoActual())
         controlador.avanzarPaso(0.5)
-        assertEquals(tiempoAntesDePausa, controlador.tiempoActual)
+        assertEquals(tiempoAntesDePausa, controlador.obtenerTiempoActual())
     }
 
     @Test
@@ -67,14 +67,14 @@ class ControladorSimulacionTest {
         val controlador = crearControlador()
         controlador.lanzar()
         controlador.avanzarPaso(1.0)
-        assertTrue(controlador.puntosEstela.size > 1 && margen > 0.0)
+        assertTrue(controlador.obtenerPuntosEstela().size > 1 && margen > 0.0)
 
         controlador.reiniciar()
-        assertEquals(EstadoSimulacion.DETENIDO, controlador.estado)
-        assertEquals(0.0, controlador.tiempoActual)
-        assertEquals(1, controlador.puntosEstela.size)
-        assertEquals(0.0, controlador.posicionActual.x)
-        assertEquals(0.0, controlador.posicionActual.y)
+        assertEquals(EstadoSimulacion.DETENIDO, controlador.obtenerEstado())
+        assertEquals(0.0, controlador.obtenerTiempoActual())
+        assertEquals(1, controlador.obtenerPuntosEstela().size)
+        assertEquals(0.0, controlador.obtenerPosicionActual().x)
+        assertEquals(0.0, controlador.obtenerPosicionActual().y)
     }
 
     @Test
@@ -85,10 +85,10 @@ class ControladorSimulacionTest {
 
         controlador.lanzar()
         controlador.avanzarPaso(tiempoVuelo + 2.0)
-        assertEquals(EstadoSimulacion.FINALIZADO, controlador.estado)
-        assertEquals(tiempoVuelo, controlador.tiempoActual)
-        assertEquals(0.0, controlador.posicionActual.y)
-        assertTrue(abs(controlador.posicionActual.x - resultado.distanciaHorizontal) < margen)
+        assertEquals(EstadoSimulacion.FINALIZADO, controlador.obtenerEstado())
+        assertEquals(tiempoVuelo, controlador.obtenerTiempoActual())
+        assertEquals(0.0, controlador.obtenerPosicionActual().y)
+        assertTrue(abs(controlador.obtenerPosicionActual().x - resultado.distanciaHorizontal) < margen)
     }
 
     @Test
@@ -99,10 +99,10 @@ class ControladorSimulacionTest {
         val nuevosDatos = crearControlador(30.0, 60.0, 5.0).datos
         controlador.configurarEjercicio(nuevosDatos)
 
-        assertEquals(EstadoSimulacion.DETENIDO, controlador.estado)
-        assertEquals(0.0, controlador.tiempoActual, margen)
+        assertEquals(EstadoSimulacion.DETENIDO, controlador.obtenerEstado())
+        assertEquals(0.0, controlador.obtenerTiempoActual(), margen)
         assertEquals(nuevosDatos, controlador.datos)
-        assertEquals(5.0, controlador.posicionActual.y)
+        assertEquals(5.0, controlador.obtenerPosicionActual().y)
     }
 
     @Test
@@ -110,11 +110,11 @@ class ControladorSimulacionTest {
         val controlador = crearControlador(0.0, 30.0, 4.0)
         try {
             controlador.lanzar()
-            assertEquals(EstadoSimulacion.FINALIZADO, controlador.estado)
-            assertEquals(0.0, controlador.tiempoActual, margen)
-            assertEquals(0.0, controlador.posicionActual.x)
-            assertEquals(4.0, controlador.posicionActual.y)
-            assertEquals(1, controlador.puntosEstela.size)
+            assertEquals(EstadoSimulacion.FINALIZADO, controlador.obtenerEstado())
+            assertEquals(0.0, controlador.obtenerTiempoActual(), margen)
+            assertEquals(0.0, controlador.obtenerPosicionActual().x)
+            assertEquals(4.0, controlador.obtenerPosicionActual().y)
+            assertEquals(1, controlador.obtenerPuntosEstela().size)
         } finally {
             controlador.detenerTimer()
         }

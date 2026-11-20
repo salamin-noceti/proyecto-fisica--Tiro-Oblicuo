@@ -3,31 +3,14 @@ package org.example.service
 /**
  * Resultado encapsulado de la validación individual de un campo numérico.
  */
-class ResultadoValidacion(
-    esValido: Boolean,
-    valorNumerico: Double? = null,
-    mensajeError: String? = null
-) {
-    var esValido: Boolean
-        private set
-
-    var valorNumerico: Double?
-        private set
-
-    var mensajeError: String?
-        private set
-
-    init {
-        this.esValido = esValido
-        this.valorNumerico = valorNumerico
-        this.mensajeError = mensajeError
-    }
+class ResultadoValidacion(val esValido: Boolean, val valorNumerico: Double? = null, val mensajeError: String? = null) {
+    private val _mensajeError: String? = mensajeError
 
     fun procesar(onValido: (Double) -> Unit, onInvalido: (String) -> Unit) {
         if (esValido && valorNumerico != null) {
-            onValido(valorNumerico ?: 0.0)
+            onValido(valorNumerico)
         } else {
-            onInvalido(mensajeError ?: "Error de validación")
+            onInvalido(_mensajeError ?: "Error de validación")
         }
     }
 }

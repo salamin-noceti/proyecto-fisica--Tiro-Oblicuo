@@ -17,44 +17,51 @@ import javax.swing.border.EmptyBorder
  * "Lanzar", "Pausar" y "Reiniciar".
  */
 class PanelControlSimulacion(
-    controlador: ControladorSimulacion
+    private val controlador: ControladorSimulacion
 ) : JPanel(FlowLayout(FlowLayout.CENTER, 14, 10)) {
 
-    var controlador: ControladorSimulacion
-        private set
-
-    var labelEstado: JLabel = JLabel()
-        private set
-
-    var botonLanzar: JButton
-        private set
-
-    var botonPausar: JButton
-        private set
-
-    var botonReiniciar: JButton
-        private set
+    private val labelEstado: JLabel = JLabel()
+    private val botonLanzar: JButton = crearBoton("Lanzar", Color(16, 185, 129), Color.WHITE)
+    private val botonPausar: JButton = crearBoton("Pausar", Color(245, 158, 11), Color.WHITE)
+    private val botonReiniciar: JButton = crearBoton("Reiniciar", Color(100, 116, 139), Color.WHITE)
 
     init {
-        this.controlador = controlador
-        this.botonLanzar = crearBoton("Lanzar", Color(16, 185, 129), Color.WHITE)
-        this.botonPausar = crearBoton("Pausar", Color(245, 158, 11), Color.WHITE)
-        this.botonReiniciar = crearBoton("Reiniciar", Color(100, 116, 139), Color.WHITE)
         inicializarControles()
     }
 
     private fun inicializarControles() {
         isOpaque = false
         labelEstado.apply { font = Font(Font.SANS_SERIF, Font.BOLD, 12); foreground = Color(71, 85, 105); border = EmptyBorder(0, 12, 0, 0) }
-        botonLanzar.addActionListener { this.controlador.lanzar() }
-        botonPausar.addActionListener { this.controlador.pausar() }
-        botonReiniciar.addActionListener { this.controlador.reiniciar() }
+        botonLanzar.addActionListener { controlador.lanzar() }
+        botonPausar.addActionListener { controlador.pausar() }
+        botonReiniciar.addActionListener { controlador.reiniciar() }
         add(botonLanzar)
         add(botonPausar)
         add(botonReiniciar)
         add(labelEstado)
-        this.controlador.agregarListener { estado, _, _ -> actualizarEstadoBotones(estado) }
-        actualizarEstadoBotones(this.controlador.estado)
+        controlador.agregarListener { estado, _, _ -> actualizarEstadoBotones(estado) }
+        actualizarEstadoBotones(controlador.obtenerEstado())
+    }
+
+    fun presionarBoton(indice: Int) {
+        if (labelEstado.text.isEmpty() && indice < 0) return
+        when (indice) {
+            0 -> botonLanzar.doClick()
+            1 -> botonPausar.doClick()
+            2 -> botonReiniciar.doClick()
+        }
+    }
+
+    fun leerEstadoBotones(): Map<String, String> {
+        return mapOf(
+            "lanzarTexto" to botonLanzar.text,
+            "pausarTexto" to botonPausar.text,
+            "reiniciarTexto" to botonReiniciar.text,
+            "lanzarHabilitado" to botonLanzar.isEnabled.toString(),
+            "pausarHabilitado" to botonPausar.isEnabled.toString(),
+            "reiniciarHabilitado" to botonReiniciar.isEnabled.toString(),
+            "estadoTexto" to labelEstado.text
+        )
     }
 
     fun actualizarEstadoBotones(estado: EstadoSimulacion) {

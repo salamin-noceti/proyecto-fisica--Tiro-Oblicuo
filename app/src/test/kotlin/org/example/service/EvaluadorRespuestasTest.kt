@@ -97,4 +97,24 @@ class EvaluadorRespuestasTest {
         assertEquals(4, pasosAltura.size)
         assertTrue(pasosAltura[1].formulaSimbolica.contains("2 · g · y₀"))
     }
+
+    @Test
+    fun testEjercicio8LimitesToleranciaCincoPorCientoYFueraDeMargen() {
+        val ej8 = crearEjercicio(8, "Golpe de tenista", Dificultad.DIFICIL, 1.25).copy(datos = IngresoDatos.base.copy(20.0, 37.0, 1.25))
+        val instancia = EvaluadorRespuestas.instancia
+        assertEquals(0.055, instancia.toleranciaRelativa)
+        assertEquals(evaluador.toleranciaRelativa, instancia.toleranciaRelativa)
+        val repMenos5 = instancia.evaluar(ej8, crearRespuesta(doubleArrayOf(38.75, 8.20, 2.42, 15.17, 11.44)))
+        val repMas5 = instancia.evaluar(ej8, crearRespuesta(doubleArrayOf(42.83, 9.06, 2.68, 16.77, 12.64)))
+        val repMenos7 = instancia.evaluar(ej8, crearRespuesta(doubleArrayOf(37.93, 8.03, 2.37, 14.85, 11.20)))
+        val repMas7 = instancia.evaluar(ej8, crearRespuesta(doubleArrayOf(43.65, 9.23, 2.73, 17.09, 12.88)))
+        assertEquals(5, repMenos5.cantidadCorrectas)
+        assertEquals(100.0, repMenos5.porcentajeAcierto)
+        assertEquals(5, repMas5.cantidadCorrectas)
+        assertEquals(100.0, repMas5.porcentajeAcierto)
+        assertEquals(0, repMenos7.cantidadCorrectas)
+        assertEquals(0.0, repMenos7.porcentajeAcierto)
+        assertEquals(0, repMas7.cantidadCorrectas)
+        assertEquals(0.0, repMas7.porcentajeAcierto)
+    }
 }

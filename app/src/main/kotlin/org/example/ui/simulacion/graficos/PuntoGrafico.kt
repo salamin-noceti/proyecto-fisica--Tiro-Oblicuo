@@ -3,28 +3,16 @@ package org.example.ui.simulacion.graficos
 /**
  * Coordenada numérica de un punto en el plano cartesiano físico.
  */
-class PuntoGrafico(
-    x: Double,
-    y: Double
-) {
+class PuntoGrafico(val x: Double, val y: Double) {
     companion object {
         fun en(x: Double, y: Double): PuntoGrafico {
             return PuntoGrafico(x, y)
         }
     }
 
-    var x: Double
-        private set
-
-    var y: Double
-        private set
-
-    init {
-        this.x = x
-        this.y = y
-    }
+    private val coords: DoubleArray = doubleArrayOf(x, y)
 
     fun comoPar(): Pair<Double, Double> {
-        return x to y
+        return coords[0] to coords[1]
     }
 }

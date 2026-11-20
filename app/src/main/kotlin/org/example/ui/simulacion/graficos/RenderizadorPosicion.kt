@@ -13,15 +13,11 @@ class RenderizadorPosicion(
 ) : RenderizadorGraficoCinematico {
 
     companion object {
-        var nuevo: RenderizadorPosicion = RenderizadorPosicion()
-            private set
-            get() {
-                return RenderizadorPosicion()
-            }
+        val nuevo: RenderizadorPosicion
+            get() = RenderizadorPosicion()
     }
 
-    override var canvas: CartesianChartCanvas = canvasInicial
-        private set
+    override val canvas: CartesianChartCanvas = canvasInicial
 
     private val colorX = Color(37, 99, 235)
     private val colorY = Color(16, 185, 129)
@@ -33,11 +29,9 @@ class RenderizadorPosicion(
     }
 
     override fun actualizar(tiempoActual: Double, puntosEstela: List<PosicionTrayectoria>, resultadoTeorico: ResultadoTiroOblicuo, datos: IngresoDatos) {
-        val puntosX = puntosEstela.map { PuntoGrafico.en(it.tiempo, it.x) }
-        val puntosY = puntosEstela.map { PuntoGrafico.en(it.tiempo, it.y) }
         val ultimo = puntosEstela.lastOrNull()
-        val serieX = canvas.construirSerie(listOf("x_t", "x(t)", "m"), colorX, puntosX, ultimo?.x ?: 0.0)
-        val serieY = canvas.construirSerie(listOf("y_t", "y(t)", "m"), colorY, puntosY, ultimo?.y ?: datos.alturaInicial)
+        val serieX = canvas.construirSerieTrayectoria(listOf("x_t", "x(t)", "m"), colorX, puntosEstela, { it.x }, ultimo?.x ?: 0.0)
+        val serieY = canvas.construirSerieTrayectoria(listOf("y_t", "y(t)", "m"), colorY, puntosEstela, { it.y }, ultimo?.y ?: datos.alturaInicial)
         canvas.actualizarSeries(listOf(serieX, serieY), tiempoActual)
     }
 

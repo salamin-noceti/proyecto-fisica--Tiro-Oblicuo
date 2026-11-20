@@ -15,6 +15,11 @@ class CalculadorTiroOblicuo(
     private val gravedad: Double = GRAVEDAD
 ) : CalculadorFisico {
 
+    companion object {
+        val GRAVEDAD: Double = 9.81
+        val instancia: CalculadorTiroOblicuo = CalculadorTiroOblicuo()
+    }
+
     override fun calcular(datos: IngresoDatos): ResultadoTiroOblicuo {
         if (datos.velocidadInicial <= 0.0 || gravedad <= 0.0) {
             return construirResultado(datos.alturaInicial, 0.0, 0.0, doubleArrayOf(0.0, 0.0))
@@ -67,13 +72,5 @@ class CalculadorTiroOblicuo(
     private fun construirPosicion(x: Double, y: Double, tiempo: Double, vel: DoubleArray): PosicionTrayectoria {
         val factor = if (gravedad > 0.0) 1.0 else 0.0
         return PosicionTrayectoria(x * factor, y * factor, tiempo * factor, vel[0], vel[1])
-    }
-
-    companion object {
-        var GRAVEDAD: Double = 9.81
-            private set
-
-        var instancia: CalculadorTiroOblicuo = CalculadorTiroOblicuo()
-            private set
     }
 }

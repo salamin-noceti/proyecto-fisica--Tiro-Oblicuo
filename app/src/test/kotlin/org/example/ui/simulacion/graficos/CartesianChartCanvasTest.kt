@@ -23,27 +23,30 @@ class CartesianChartCanvasTest {
     @Test
     fun testInicializacionConParametrosPorDefectoYLimitesCorrectos() {
         val canvas = crearCanvas("Test Gráfico", "Tiempo (s)", "Metros (m)")
+        val lim = canvas.obtenerLimites()
         assertEquals("Test Gráfico", canvas.titulo)
         assertEquals("Tiempo (s)", canvas.etiquetaEjeX)
         assertEquals("Metros (m)", canvas.etiquetaEjeY)
-        assertEquals(0.0, canvas.xMin, delta)
-        assertEquals(10.0, canvas.xMax, delta)
-        assertEquals(0.0, canvas.yMin, delta)
-        assertEquals(10.0, canvas.yMax, delta)
-        assertTrue(canvas.mostrarCursorTiempo && canvas.obtenerSeries().isEmpty())
+        assertEquals(0.0, lim[0], delta)
+        assertEquals(10.0, lim[1], delta)
+        assertEquals(0.0, lim[2], delta)
+        assertEquals(10.0, lim[3], delta)
+        assertTrue(canvas.estaCursorTiempoVisible() && canvas.obtenerSeries().isEmpty())
     }
 
     @Test
     fun testConfigurarLimitesAjustaDominioYRangoCorrectamente() {
         val canvas = crearCanvas()
         canvas.configurarLimites(xMin = 0.0, xMax = 5.0, yMin = -10.0, yMax = 20.0)
-        assertEquals(0.0, canvas.xMin, delta)
-        assertEquals(5.0, canvas.xMax, delta)
-        assertEquals(-10.0, canvas.yMin, delta)
-        assertEquals(20.0, canvas.yMax, delta)
+        val lim = canvas.obtenerLimites()
+        assertEquals(0.0, lim[0], delta)
+        assertEquals(5.0, lim[1], delta)
+        assertEquals(-10.0, lim[2], delta)
+        assertEquals(20.0, lim[3], delta)
 
         canvas.configurarLimites(xMin = 5.0, xMax = 5.0, yMin = 10.0, yMax = 10.0)
-        assertTrue(canvas.xMax > canvas.xMin && canvas.yMax > canvas.yMin)
+        val limDeg = canvas.obtenerLimites()
+        assertTrue(limDeg[1] > limDeg[0] && limDeg[3] > limDeg[2])
     }
 
     @Test
@@ -59,7 +62,7 @@ class CartesianChartCanvasTest {
 
         canvas.actualizarTiempoActual(1.0)
         canvas.limpiar()
-        assertEquals(0.0, canvas.tiempoActual, delta)
+        assertEquals(0.0, canvas.obtenerTiempoActual(), delta)
         assertTrue(canvas.obtenerSeries()[0].puntos.isEmpty())
         assertEquals(null, canvas.obtenerSeries()[0].valorActual)
     }
