@@ -3,7 +3,7 @@
 
 > Documento **generado automáticamente** por la cátedra de Programación II (RepoSense + análisis de calidad POO/SOLID). **No editar a mano**: se regenera en cada evaluación.
 > Rama evaluada: `main`. Análisis **heurístico** (regex + métricas): es una criba para orientar la revisión, **no una nota**.
-> Generado: 2026-11-17.
+> Generado: 2026-11-20.
 
 ## 1. Veredicto
 
@@ -61,7 +61,7 @@ Sube cuando el código que hoy está **fuera** de clases pasa a ser método de u
 | Autor | Commits | Código (LOC) | Tests (LOC) | Docs (LOC) | Días activos | % del código |
 |---|---:|---:|---:|---:|---:|---:|
 | avsalomon | 15 | 5,656 | 1,581 | 51 | 12 | 100% |
-| Romano-22 | 6 | 0 | 14 | 0 | 5 | 0% |
+| Romano-22 | 7 | 0 | 14 | 0 | 5 | 0% |
 
 > _El LOC de autoría lo calcula RepoSense sobre el historial y puede diferir del LOC de código del análisis de calidad (que mira solo el estado de `main`)._
 
@@ -180,16 +180,38 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 - **Por qué importa:** Es comportamiento procedural disfrazado de clase: no se instancia ni participa del modelo de objetos.
 - **Tu resultado:** **0** clase(s) solo con métodos estáticos
 
+### Archivos donde se originan las señales
+
+> Se listan **15** hallazgo(s) localizados en **11** archivo(s). La columna `Línea` es la línea del archivo donde el análisis detectó la señal; `—` indica una señal de nivel repositorio (sin archivo propio).
+
+| Aspecto | Archivo | Línea | Hallazgo |
+|---|---|---:|---|
+| Duplicación lógica (DRY) | — | — | duplicación lógica: 1.8% · boilerplate: 8.2% |
+| Duplicación lógica (DRY) | `app/src/main/kotlin/org/example/service/ImpresoraMenuConsola.kt` | 20 | bloque de 8 líneas repetido 5 veces en app/src/main/kotlin/org/example/service/ImpresoraMenuConsola.kt:20, app/src/main/kotlin/org/example/service/ImpresoraMenuConsola.kt:21, app/src/main/kotlin/org/example/service/SimulacionConsoleRunner.kt:30 |
+| Duplicación lógica (DRY) | `app/src/main/kotlin/org/example/service/ImpresoraMenuConsola.kt` | 22 | bloque de 8 líneas repetido 3 veces en app/src/main/kotlin/org/example/service/ImpresoraMenuConsola.kt:22, app/src/main/kotlin/org/example/service/SimulacionConsoleRunner.kt:33, app/src/main/kotlin/org/example/ui/FormateadorConsolaEjercicio.kt:28 |
+| Duplicación lógica (DRY) | `app/src/main/kotlin/org/example/ui/simulacion/EdificioThemeRenderer.kt` | 118 | bloque de 8 líneas repetido 2 veces en app/src/main/kotlin/org/example/ui/simulacion/EdificioThemeRenderer.kt:118, app/src/main/kotlin/org/example/ui/simulacion/CanonThemeRenderer.kt:74 |
+| Duplicación lógica (DRY) | `app/src/main/kotlin/org/example/ui/simulacion/EdificioThemeRenderer.kt` | 121 | bloque de 8 líneas repetido 2 veces en app/src/main/kotlin/org/example/ui/simulacion/EdificioThemeRenderer.kt:121, app/src/main/kotlin/org/example/ui/simulacion/CanonThemeRenderer.kt:77 |
+| Duplicación lógica (DRY) | `app/src/main/kotlin/org/example/ui/simulacion/EdificioThemeRenderer.kt` | 128 | bloque de 8 líneas repetido 2 veces en app/src/main/kotlin/org/example/ui/simulacion/EdificioThemeRenderer.kt:128, app/src/main/kotlin/org/example/ui/simulacion/CanonThemeRenderer.kt:84 |
+| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/PantallaPractica.kt` | 34 | clase 'PantallaPractica' muy acoplada (CBO=15) |
+| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/VentanaPrincipal.kt` | 23 | clase 'VentanaPrincipal' muy acoplada (CBO=12) |
+| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/autocorrecion/PantallaAutocorreccion.kt` | 23 | clase 'PantallaAutocorreccion' muy acoplada (CBO=9) |
+| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/practica/componentes/ConstructorVistaPractica.kt` | 33 | clase 'ConstructorVistaPractica' muy acoplada (CBO=12) |
+| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/simulacion/LienzoSimulacion2D.kt` | 14 | clase 'LienzoSimulacion2D' muy acoplada (CBO=8) |
+| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/simulacion/PantallaSimulacion.kt` | 19 | clase 'PantallaSimulacion' muy acoplada (CBO=11) |
+| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/simulacion/ProveedorComponentesSimulacion.kt` | 26 | clase 'ProveedorComponentesSimulacion' muy acoplada (CBO=11) |
+| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/simulacion/RenderizadorCapasLienzo2D.kt` | 16 | clase 'RenderizadorCapasLienzo2D' muy acoplada (CBO=8) |
+| Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/simulacion/graficos/PanelGraficosCinematicos.kt` | 19 | clase 'PanelGraficosCinematicos' muy acoplada (CBO=8) |
+
 ## 5. Evolución por commit
 
-Métricas calculadas sobre el estado de `main` en **cada commit** (23 commits con trabajo), del primero al último. La calidad usa el perfil `exigente`; el aporte de código lo mide RepoSense. El índice puede **bajar** al crecer el proyecto: se acumulan señales.
+Métricas calculadas sobre el estado de `main` en **cada commit** (25 commits con trabajo), del primero al último. La calidad usa el perfil `exigente`; el aporte de código lo mide RepoSense. El índice puede **bajar** al crecer el proyecto: se acumulan señales.
 
 ```mermaid
 xychart-beta
     title "Índice POO/SOLID a lo largo de los commits"
-    x-axis ["f5b4533", "0407e5e", "dd3780e", "d36b80c", "34979f5", "5b92c65", "2e89df6", "39d9b06", "0a667a3", "76a2cc8", "4b1ecf0", "27cb813", "5bef311", "e6fe907", "0c98bef", "99acd6f", "102d464", "83d8f29", "619c674", "a4c334e", "789b8bd", "69e56f5", "8377be5"]
+    x-axis ["f5b4533", "0407e5e", "dd3780e", "d36b80c", "34979f5", "5b92c65", "2e89df6", "39d9b06", "0a667a3", "76a2cc8", "4b1ecf0", "27cb813", "5bef311", "e6fe907", "0c98bef", "99acd6f", "102d464", "83d8f29", "619c674", "a4c334e", "789b8bd", "69e56f5", "8377be5", "30e9a7b", "f9983fc"]
     y-axis "Índice" 0 --> 100
-    line [0, 0, 0, 50, 60, 60, 77, 82, 68, 76, 60, 56, 56, 59, 61, 61, 61, 61, 61, 92, 92, 92, 92]
+    line [0, 0, 0, 50, 60, 60, 77, 82, 68, 76, 60, 56, 56, 59, 61, 61, 61, 61, 61, 92, 92, 92, 92, 92, 92]
 ```
 
 | # | Fecha | Commit | Autor | LOC | Índice | %POO | Duplic. | Sueltas |
@@ -217,87 +239,8 @@ xychart-beta
 | 21 | 2026-11-13 | `789b8bd` | dqmdz-etec | 6,308 | 92 | 99% | 1.8% | 0 |
 | 22 | 2026-11-14 | `69e56f5` | dqmdz-etec | 6,308 | 92 | 99% | 1.8% | 0 |
 | 23 | 2026-11-16 | `8377be5` | dqmdz-etec | 6,308 | 92 | 99% | 1.8% | 0 |
-
-<!-- actividad-clases:inicio -->
-## Actividad en días de clase
-
-> Período evaluado **2026-08-14 → 2026-11-17** · **22 clases** (lunes, viernes) · días de clase del calendario, extendidos hasta la fecha de corte.
->
-> `Commits` = commits de trabajo (no-merge); `Merges` = merges de PR (también son push). Los días sin actividad dicen **sin actividad**. El cuadro principal usa sólo las fechas de clase del calendario oficial.
->
-> **Aportes fuera del calendario:** cada alumno tiene un cuadro aparte con las fechas no lectivas con actividad, desde **2026-08-14** hasta **2026-11-17** (ventana de aportes). Esas fechas no forman parte del cuadro principal, pero se muestran para no perder trabajo hecho en fines de semana, feriados o después del período.
->
-> Se recorre `git log --all` sobre un mirror (todas las ramas y `refs/pull/*`), con deduplicación por commit. Fecha = fecha de autor en UTC-3. Los commits locales no pusheados no se ven. Si el trabajo fue en pareja y el commit es de otra persona, figura a nombre del autor del commit; para reflejarlo, usar `Co-authored-by` o una nota manual.
->
-> Sección informativa: no modifica el semáforo de aprobación.
-
-### avsalomon
-
-**12/22 clases con actividad** · 15 commits · 17 merges
-
-| Fecha | Marca | Repositorios | Commits / merges |
-|---|:--:|---|--:|
-| 2026-08-14 | No | sin actividad | 0 / 0 |
-| 2026-08-21 | No | sin actividad | 0 / 0 |
-| 2026-08-24 | No | sin actividad | 0 / 0 |
-| 2026-08-28 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-08-31 | No | sin actividad | 0 / 0 |
-| 2026-09-04 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 2 |
-| 2026-09-07 | No | sin actividad | 0 / 0 |
-| 2026-09-14 | No | sin actividad | 0 / 0 |
-| 2026-09-25 | No | sin actividad | 0 / 0 |
-| 2026-09-28 | No | sin actividad | 0 / 0 |
-| 2026-10-02 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 0 |
-| 2026-10-05 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 2 |
-| 2026-10-09 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 3 / 3 |
-| 2026-10-16 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 2 / 3 |
-| 2026-10-19 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-10-23 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 2 / 1 |
-| 2026-10-26 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 0 / 1 |
-| 2026-10-30 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-11-02 | No | sin actividad | 0 / 0 |
-| 2026-11-06 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-11-13 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-11-16 | No | sin actividad | 0 / 0 |
-
-#### Aportes fuera del calendario de clases — avsalomon
-
-_Sin aportes fuera del calendario de clases para avsalomon._
-
-### Romano-22
-
-**5/22 clases con actividad** · 12 commits · 5 merges
-
-| Fecha | Marca | Repositorios | Commits / merges |
-|---|:--:|---|--:|
-| 2026-08-14 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 4 / 1 |
-| 2026-08-21 | No | sin actividad | 0 / 0 |
-| 2026-08-24 | No | sin actividad | 0 / 0 |
-| 2026-08-28 | No | sin actividad | 0 / 0 |
-| 2026-08-31 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 2 / 0 |
-| 2026-09-04 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 4 / 2 |
-| 2026-09-07 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-09-14 | No | sin actividad | 0 / 0 |
-| 2026-09-25 | No | sin actividad | 0 / 0 |
-| 2026-09-28 | No | sin actividad | 0 / 0 |
-| 2026-10-02 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-10-05 | No | sin actividad | 0 / 0 |
-| 2026-10-09 | No | sin actividad | 0 / 0 |
-| 2026-10-16 | No | sin actividad | 0 / 0 |
-| 2026-10-19 | No | sin actividad | 0 / 0 |
-| 2026-10-23 | No | sin actividad | 0 / 0 |
-| 2026-10-26 | No | sin actividad | 0 / 0 |
-| 2026-10-30 | No | sin actividad | 0 / 0 |
-| 2026-11-02 | No | sin actividad | 0 / 0 |
-| 2026-11-06 | No | sin actividad | 0 / 0 |
-| 2026-11-13 | No | sin actividad | 0 / 0 |
-| 2026-11-16 | No | sin actividad | 0 / 0 |
-
-#### Aportes fuera del calendario de clases — Romano-22
-
-_Sin aportes fuera del calendario de clases para Romano-22._
-
-<!-- actividad-clases:fin -->
+| 24 | 2026-11-17 | `30e9a7b` | dqmdz-etec | 6,308 | 92 | 99% | 1.8% | 0 |
+| 25 | 2026-11-19 | `f9983fc` | dqmdz-etec | 6,308 | 92 | 99% | 1.8% | 0 |
 
 ---
 _Informe generado por la cátedra. Los criterios y umbrales de medición corresponden al perfil `exigente` de `calidad.py`; el semáforo de aprobación, a `CRITERIOS-CALIDAD.md` (ver `README.md`). Ante dudas, revisá el archivo señalado._
