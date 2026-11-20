@@ -16,10 +16,11 @@ class RenderizadorCinematicoTest {
 
     @Test
     fun testRenderizadorPosicionMapeaCorrectamenteXEYYConfiguraLimites() {
-        val renderizador = panel.renderizadorPosicion
+        val renderizador = panel.obtenerRenderizador(0)
         renderizador.configurarLimites(datosEjemplo, resultadoTeorico)
+        val lim = renderizador.canvas.obtenerLimites()
         assertEquals("Posición vs Tiempo", renderizador.canvas.titulo)
-        assertTrue(renderizador.canvas.xMax >= resultadoTeorico.tiempoVuelo && renderizador.canvas.yMax >= resultadoTeorico.distanciaHorizontal)
+        assertTrue(lim[1] >= resultadoTeorico.tiempoVuelo && lim[3] >= resultadoTeorico.distanciaHorizontal)
 
         val puntosEstela = listOf(calculador.calcularPosicion(datosEjemplo, 0.0), calculador.calcularPosicion(datosEjemplo, resultadoTeorico.tiempoVuelo / 2), calculador.calcularPosicion(datosEjemplo, resultadoTeorico.tiempoVuelo))
         renderizador.actualizar(resultadoTeorico.tiempoVuelo, puntosEstela, resultadoTeorico, datosEjemplo)
@@ -37,11 +38,11 @@ class RenderizadorCinematicoTest {
 
     @Test
     fun testRenderizadorVelocidadMuestraVxConstanteYVyDecreciente() {
-        val renderizador = panel.renderizadorVelocidad
+        val renderizador = panel.obtenerRenderizador(1)
         renderizador.configurarLimites(datosEjemplo, resultadoTeorico)
         assertEquals("Velocidad vs Tiempo", renderizador.canvas.titulo)
         assertEquals("Velocidad (m/s)", renderizador.canvas.etiquetaEjeY)
-        assertTrue(renderizador.canvas.yMin < 0.0)
+        assertTrue(renderizador.canvas.obtenerLimites()[2] < 0.0)
 
         val puntosEstela = calculador.calcularTrayectoria(datosEjemplo, pasos = 10)
         renderizador.actualizar(resultadoTeorico.tiempoVuelo, puntosEstela, resultadoTeorico, datosEjemplo)
@@ -58,11 +59,12 @@ class RenderizadorCinematicoTest {
 
     @Test
     fun testRenderizadorAceleracionMuestraAxEnCeroYAyEnMenosGravedad() {
-        val renderizador = panel.renderizadorAceleracion
+        val renderizador = panel.obtenerRenderizador(2)
         renderizador.configurarLimites(datosEjemplo, resultadoTeorico)
+        val lim = renderizador.canvas.obtenerLimites()
         assertEquals("Aceleración vs Tiempo", renderizador.canvas.titulo)
         assertEquals("Aceleración (m/s²)", renderizador.canvas.etiquetaEjeY)
-        assertTrue(renderizador.canvas.yMin <= -12.0 && renderizador.canvas.yMax >= 2.0)
+        assertTrue(lim[2] <= -12.0 && lim[3] >= 2.0)
 
         val puntosEstela = listOf(calculador.calcularPosicion(datosEjemplo, 0.0), calculador.calcularPosicion(datosEjemplo, 1.0))
         renderizador.actualizar(1.0, puntosEstela, resultadoTeorico, datosEjemplo)

@@ -10,9 +10,9 @@ class ThemeFactory(
     private val detector: ThemeDetector = ThemeDetector.instancia
 ) {
     companion object {
-        var instancia: ThemeFactory = ThemeFactory()
-            private set
+        val instancia: ThemeFactory = ThemeFactory()
     }
+
     private val catalogoCancha = CatalogoRenderizadoresCancha()
     private val catalogoCampo = CatalogoRenderizadoresCampo()
 

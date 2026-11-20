@@ -8,6 +8,11 @@ import org.example.model.ResultadoTiroOblicuo
  * Contrato de diseño para los renderizadores de gráficos cinemáticos cartesianos.
  */
 interface RenderizadorGraficoCinematico {
+    companion object {
+        fun posicion(): RenderizadorGraficoCinematico = RenderizadorPosicion()
+        fun velocidad(): RenderizadorGraficoCinematico = RenderizadorVelocidad()
+        fun aceleracion(): RenderizadorGraficoCinematico = RenderizadorAceleracion()
+    }
 
     val canvas: CartesianChartCanvas
 

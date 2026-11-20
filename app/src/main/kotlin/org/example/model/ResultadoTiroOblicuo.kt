@@ -1,40 +1,29 @@
 package org.example.model
 
+import java.math.BigDecimal
+import java.math.RoundingMode
+
 /**
  * Clase que almacena los resultados calculados de un tiro oblicuo.
  * Contiene todos los valores que se obtienen después de aplicar las fórmulas físicas.
  */
-class ResultadoTiroOblicuo(
-    alturaMaxima: Double,
-    distanciaHorizontal: Double,
-    tiempoVuelo: Double,
-    velocidadX: Double = 0.0,
-    velocidadY: Double = 0.0
-) {
-    var alturaMaxima: Double = alturaMaxima
-        private set
-
-    var distanciaHorizontal: Double = distanciaHorizontal
-        private set
-
-    var tiempoVuelo: Double = tiempoVuelo
-        private set
-
-    var velocidadX: Double = velocidadX
-        private set
-
-    var velocidadY: Double = velocidadY
-        private set
+class ResultadoTiroOblicuo(val alturaMaxima: Double, val distanciaHorizontal: Double, val tiempoVuelo: Double, val velocidadX: Double = 0.0, val velocidadY: Double = 0.0) {
+    private val metricas = listOf(alturaMaxima, distanciaHorizontal, tiempoVuelo, velocidadX, velocidadY)
 
     fun comoLista(): List<Double> {
-        return listOf(alturaMaxima, distanciaHorizontal, tiempoVuelo, velocidadX, velocidadY)
+        return metricas.toList()
+    }
+
+    fun redondeado(): ResultadoTiroOblicuo {
+        val r = metricas.map { BigDecimal.valueOf(it).setScale(2, RoundingMode.HALF_UP).toDouble() }
+        return ResultadoTiroOblicuo(r[0], r[1], r[2], r[3], r[4])
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is ResultadoTiroOblicuo && comoLista() == other.comoLista()
+        return other is ResultadoTiroOblicuo && metricas == other.metricas
     }
 
     override fun hashCode(): Int {
-        return comoLista().hashCode()
+        return metricas.hashCode()
     }
 }

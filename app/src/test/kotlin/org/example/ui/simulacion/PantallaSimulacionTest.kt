@@ -7,7 +7,6 @@ import org.example.model.RespuestaEstudiante
 import org.example.state.AppState
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -23,96 +22,115 @@ class PantallaSimulacionTest {
     @Test
     fun testInicializacionConValoresPorDefectoYBotonesRequeridos() {
         val (_, pantalla) = crearPantalla()
-        assertNotNull(pantalla.contenedorSimulacion)
-        assertNotNull(pantalla.lienzoSimulacion)
-        assertNotNull(pantalla.panelControl)
-        val datos = pantalla.controlador.datos
+        val escena = pantalla.obtenerEscena()
+        val botones = escena.obtenerPanelControl().leerEstadoBotones()
+        assertNotNull(pantalla.obtenerContenedorSimulacion())
+        assertNotNull(escena.obtenerLienzo())
+        assertNotNull(escena.obtenerPanelControl())
+        val datos = escena.obtenerControlador().datos
         assertEquals(PantallaSimulacion.DATOS_POR_DEFECTO.velocidadInicial, datos.velocidadInicial, delta)
         assertEquals(PantallaSimulacion.DATOS_POR_DEFECTO.angulo, datos.angulo, delta)
         assertEquals(PantallaSimulacion.DATOS_POR_DEFECTO.alturaInicial, datos.alturaInicial, delta)
-        assertTrue(pantalla.labelEjercicioCargado.text.contains("v₀ = 25.00 m/s"))
-        assertEquals("Lanzar", pantalla.botonLanzar.text)
-        assertEquals("Pausar", pantalla.botonPausar.text)
-        assertEquals("Reiniciar", pantalla.botonReiniciar.text)
-        assertTrue(pantalla.botonLanzar.isEnabled)
-        assertFalse(pantalla.botonPausar.isEnabled || pantalla.botonReiniciar.isEnabled)
+        assertTrue(pantalla.obtenerTextoEjercicioCargado().contains("v₀ = 25.00 m/s"))
+        assertEquals("Lanzar", botones["lanzarTexto"])
+        assertEquals("Pausar", botones["pausarTexto"])
+        assertEquals("Reiniciar", botones["reiniciarTexto"])
+        assertEquals("true", botones["lanzarHabilitado"])
+        assertEquals("false", botones["pausarHabilitado"])
+        assertEquals("false", botones["reiniciarHabilitado"])
     }
 
     @Test
     fun testClicEnBotonesLanzarPausarYReiniciarActualizaEstados() {
         val (_, pantalla) = crearPantalla()
+        val escena = pantalla.obtenerEscena()
+        val controlador = escena.obtenerControlador()
+        val panelControl = escena.obtenerPanelControl()
         try {
-            pantalla.botonLanzar.doClick()
-            assertEquals(EstadoSimulacion.EN_EJECUCION, pantalla.controlador.estado)
-            assertTrue(pantalla.botonPausar.isEnabled && pantalla.botonReiniciar.isEnabled && !pantalla.botonLanzar.isEnabled)
+            panelControl.presionarBoton(0)
+            assertEquals(EstadoSimulacion.EN_EJECUCION, controlador.obtenerEstado())
+            val bEjec = panelControl.leerEstadoBotones()
+            assertEquals("true", bEjec["pausarHabilitado"])
+            assertEquals("true", bEjec["reiniciarHabilitado"])
+            assertEquals("false", bEjec["lanzarHabilitado"])
 
-            pantalla.controlador.avanzarPaso(0.8)
-            pantalla.botonPausar.doClick()
-            assertEquals(EstadoSimulacion.PAUSADO, pantalla.controlador.estado)
-            assertTrue(pantalla.botonLanzar.isEnabled && !pantalla.botonPausar.isEnabled)
+            controlador.avanzarPaso(0.8)
+            panelControl.presionarBoton(1)
+            assertEquals(EstadoSimulacion.PAUSADO, controlador.obtenerEstado())
+            val bPausa = panelControl.leerEstadoBotones()
+            assertEquals("true", bPausa["lanzarHabilitado"])
+            assertEquals("false", bPausa["pausarHabilitado"])
 
-            pantalla.botonReiniciar.doClick()
-            assertEquals(EstadoSimulacion.DETENIDO, pantalla.controlador.estado)
-            assertEquals(0.0, pantalla.controlador.tiempoActual, delta)
-            assertFalse(pantalla.botonReiniciar.isEnabled)
+            panelControl.presionarBoton(2)
+            assertEquals(EstadoSimulacion.DETENIDO, controlador.obtenerEstado())
+            assertEquals(0.0, controlador.obtenerTiempoActual(), delta)
+            assertEquals("false", panelControl.leerEstadoBotones()["reiniciarHabilitado"])
         } finally {
-            pantalla.controlador.detenerTimer()
+            controlador.detenerTimer()
         }
     }
 
     @Test
     fun testActualizacionEnAppStateSincronizaAutomaticamenteElEjercicio() {
         val (appState, pantalla) = crearPantalla()
+        val escena = pantalla.obtenerEscena()
         val nuevoEjercicio = Ejercicio.crear(42, "Tiro de Mortero", "Un mortero dispara a 55 m/s con ángulo de 60 grados", Dificultad.MEDIO).copy(datos = IngresoDatos.base.copy(55.0, 60.0, 10.0))
         val respuesta = RespuestaEstudiante(260.0, 125.0, 9.9)
         val resultado = respuesta.aResultadoTiroOblicuo()
 
         appState.actualizar(nuevoEjercicio, respuesta, resultado)
-        assertEquals(55.0, pantalla.controlador.datos.velocidadInicial, delta)
-        assertEquals(60.0, pantalla.controlador.datos.angulo, delta)
-        assertEquals(10.0, pantalla.controlador.datos.alturaInicial, delta)
-        assertTrue(pantalla.labelEjercicioCargado.text.contains("Ejercicio #42: Tiro de Mortero"))
-        assertTrue(pantalla.panelGraficos.renderizadorPosicion.canvas.xMax >= 9.8)
+        val datos = escena.obtenerControlador().datos
+        assertEquals(55.0, datos.velocidadInicial, delta)
+        assertEquals(60.0, datos.angulo, delta)
+        assertEquals(10.0, datos.alturaInicial, delta)
+        assertTrue(pantalla.obtenerTextoEjercicioCargado().contains("Ejercicio #42: Tiro de Mortero"))
+        assertTrue(escena.obtenerPanelGraficos().obtenerRenderizador(0).canvas.obtenerLimites()[1] >= 9.8)
     }
 
     @Test
     fun testPanelGraficosSeSincronizaEnVivoConAvancePausaYReinicio() {
         val (_, pantalla) = crearPantalla()
+        val escena = pantalla.obtenerEscena()
+        val controlador = escena.obtenerControlador()
+        val panelControl = escena.obtenerPanelControl()
+        val canvasPos = escena.obtenerPanelGraficos().obtenerRenderizador(0).canvas
         try {
-            assertEquals(0.0, pantalla.panelGraficos.renderizadorPosicion.canvas.tiempoActual, delta)
-            pantalla.botonLanzar.doClick()
-            pantalla.controlador.avanzarPaso(0.5)
-            assertEquals(pantalla.controlador.tiempoActual, pantalla.panelGraficos.renderizadorPosicion.canvas.tiempoActual, delta)
-            val seriesPos = pantalla.panelGraficos.renderizadorPosicion.canvas.obtenerSeries()
+            assertEquals(0.0, canvasPos.obtenerTiempoActual(), delta)
+            panelControl.presionarBoton(0)
+            controlador.avanzarPaso(0.5)
+            assertEquals(controlador.obtenerTiempoActual(), canvasPos.obtenerTiempoActual(), delta)
+            val seriesPos = canvasPos.obtenerSeries()
             assertTrue(seriesPos[0].puntos.isNotEmpty() && seriesPos[1].puntos.isNotEmpty())
 
-            pantalla.botonPausar.doClick()
-            assertEquals(pantalla.controlador.tiempoActual, pantalla.panelGraficos.renderizadorPosicion.canvas.tiempoActual, delta)
+            panelControl.presionarBoton(1)
+            assertEquals(controlador.obtenerTiempoActual(), canvasPos.obtenerTiempoActual(), delta)
 
-            pantalla.botonReiniciar.doClick()
-            assertEquals(0.0, pantalla.panelGraficos.renderizadorPosicion.canvas.tiempoActual, delta)
-            assertEquals(1, pantalla.panelGraficos.renderizadorPosicion.canvas.obtenerSeries()[0].puntos.size)
+            panelControl.presionarBoton(2)
+            assertEquals(0.0, canvasPos.obtenerTiempoActual(), delta)
+            assertEquals(1, canvasPos.obtenerSeries()[0].puntos.size)
         } finally {
-            pantalla.controlador.detenerTimer()
+            controlador.detenerTimer()
         }
     }
 
     @Test
     fun testConfiguracionConV0IgualACeroMantieneProyectilEstatico() {
         val (appState, pantalla) = crearPantalla()
+        val escena = pantalla.obtenerEscena()
+        val controlador = escena.obtenerControlador()
         try {
             appState.actualizarDatos(IngresoDatos.base.copy(velocidadInicial = 0.0, angulo = 30.0, alturaInicial = 3.0))
-            assertTrue(appState.estaInicializado)
-            assertEquals(0.0, pantalla.controlador.datos.velocidadInicial, delta)
-            assertEquals(0.0, pantalla.controlador.resultadoTeorico.distanciaHorizontal, delta)
-            assertEquals(3.0, pantalla.controlador.resultadoTeorico.alturaMaxima, delta)
+            assertTrue(appState.estaInicializado())
+            assertEquals(0.0, controlador.datos.velocidadInicial, delta)
+            assertEquals(0.0, controlador.resultadoTeorico.distanciaHorizontal, delta)
+            assertEquals(3.0, controlador.resultadoTeorico.alturaMaxima, delta)
 
-            pantalla.botonLanzar.doClick()
-            assertEquals(0.0, pantalla.controlador.posicionActual.x, delta)
-            assertEquals(3.0, pantalla.controlador.posicionActual.y, delta)
-            assertEquals(1, pantalla.controlador.puntosEstela.size)
+            escena.obtenerPanelControl().presionarBoton(0)
+            assertEquals(0.0, controlador.obtenerPosicionActual().x, delta)
+            assertEquals(3.0, controlador.obtenerPosicionActual().y, delta)
+            assertEquals(1, controlador.obtenerPuntosEstela().size)
         } finally {
-            pantalla.controlador.detenerTimer()
+            controlador.detenerTimer()
         }
     }
 }

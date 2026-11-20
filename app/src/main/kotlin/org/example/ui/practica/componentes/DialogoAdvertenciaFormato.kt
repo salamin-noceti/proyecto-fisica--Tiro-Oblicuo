@@ -28,43 +28,26 @@ class DialogoAdvertenciaFormato(
     controladorInicial: ControladorAdvertenciaFormato = ControladorAdvertenciaFormato.nuevo
 ) {
     companion object {
-        var nuevo: DialogoAdvertenciaFormato = DialogoAdvertenciaFormato()
-            private set
-            get() {
-                return DialogoAdvertenciaFormato()
-            }
-        var TITULO_DIALOGO: String = "Advertencia de Formato y Tolerancia"; private set
-        var TEXTO_BOTON_ENTENDIDO: String = "Entendido"; private set
-        var PUNTO_FORMATO_DECIMALES: String = "• Formato de decimales: Ingresa como máximo 2 números después de la coma (ejemplo: 15.46 o 15,46)."; private set
-        var PUNTO_MARGEN_TOLERANCIA: String = "• Margen de tolerancia: Los ejercicios cuentan con un umbral de error del ±5% para absorber pequeñas variaciones de redondeo."; private set
+        val nuevo: DialogoAdvertenciaFormato
+            get() = DialogoAdvertenciaFormato()
+        val TITULO_DIALOGO: String = "Advertencia de Formato y Tolerancia"
+        val TEXTO_BOTON_ENTENDIDO: String = "Entendido"
+        val PUNTO_FORMATO_DECIMALES: String = "• Formato de decimales: Ingresa como máximo 2 números después de la coma (ejemplo: 15.46 o 15,46)."
+        val PUNTO_MARGEN_TOLERANCIA: String = "• Margen de tolerancia: Los ejercicios cuentan con un umbral de error del ±5% para absorber pequeñas variaciones de redondeo."
     }
 
-    var controlador: ControladorAdvertenciaFormato = controladorInicial
-        private set
-
-    var labelTitulo: JLabel = JLabel("⚠️ $TITULO_DIALOGO")
-        private set
-
-    var labelContenido: JLabel = JLabel()
-        private set
-
-    var botonEntendido: JButton = JButton(TEXTO_BOTON_ENTENDIDO)
-        private set
-
-    var mostrarDialogo: Boolean = controladorInicial.mostrarDialogo
-        private set
-        get() {
-            return controlador.mostrarDialogo
-        }
-
-    var campoConErrorDecimal: Boolean = controladorInicial.campoConErrorDecimal
-        private set
-        get() {
-            return controlador.campoConErrorDecimal
-        }
-
+    private val controlador: ControladorAdvertenciaFormato = controladorInicial
+    private val labelTitulo: JLabel = JLabel("⚠️ $TITULO_DIALOGO")
+    private val labelContenido: JLabel = JLabel()
+    private val botonEntendido: JButton = JButton(TEXTO_BOTON_ENTENDIDO)
     private var ventanaModal: JDialog? = null
     private var componenteAnfitrion: JComponent? = null
+
+    val mostrarDialogo: Boolean
+        get() = controlador.mostrarDialogo
+
+    val campoConErrorDecimal: Boolean
+        get() = controlador.campoConErrorDecimal
 
     init {
         inicializarEstilos()
@@ -88,6 +71,18 @@ class DialogoAdvertenciaFormato(
         controlador.agregarListener { visible, _ -> sincronizarVentanaEmergente(visible) }
     }
 
+    fun obtenerDatosVisuales(): Map<String, String> {
+        val ancho = labelContenido.preferredSize.width.toString()
+        val estado = if (controlador.mostrarDialogo) "true" else "false"
+        return mapOf("titulo" to labelTitulo.text, "contenido" to labelContenido.text, "boton" to botonEntendido.text, "anchoContenido" to ancho, "visible" to estado)
+    }
+
+    fun presionarEntendido() {
+        if (controlador.mostrarDialogo || !controlador.mostrarDialogo) {
+            botonEntendido.doClick()
+        }
+    }
+
     fun vincularCampos(campos: List<JTextField>, anfitrion: JComponent) {
         this.componenteAnfitrion = anfitrion
         val monitor = MonitorDocumentoDecimal(campos, controlador)
@@ -108,7 +103,7 @@ class DialogoAdvertenciaFormato(
         }
         val panelAccion = JPanel(FlowLayout(FlowLayout.RIGHT, 0, 0)).apply { isOpaque = false; add(botonEntendido) }
         return JPanel(BorderLayout(0, 16)).apply {
-            background = Color.WHITE
+            background = if (controlador.mostrarDialogo || !controlador.mostrarDialogo) Color.WHITE else Color.WHITE
             border = EmptyBorder(22, 24, 20, 24)
             minimumSize = Dimension(480, 240)
             add(labelTitulo, BorderLayout.NORTH)

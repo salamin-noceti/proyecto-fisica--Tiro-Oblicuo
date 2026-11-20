@@ -30,15 +30,16 @@ class VerificacionVisualVentanaTest {
     }
 
     private fun validarYCapturarSeccion(frame: VentanaPrincipal, seccion: SeccionNavegacion) {
-        val boton = frame.barraNavegacion.obtenerBoton(seccion)
+        val barra = frame.obtenerBarraNavegacion()
+        val boton = barra.obtenerBoton(seccion)
         boton?.doClick()
         frame.contentPane.validate()
         frame.contentPane.doLayout()
-        assertEquals(seccion, frame.gestorNavegacion.seccionActual)
+        assertEquals(seccion, frame.obtenerGestorNavegacion().seccionActual)
         assertEquals(BarraNavegacion.COLOR_BOTON_ACTIVO_FONDO, boton?.background)
         for (otra in SeccionNavegacion.values()) {
             if (otra != seccion) {
-                assertEquals(BarraNavegacion.COLOR_BOTON_INACTIVO_FONDO, frame.barraNavegacion.obtenerBoton(otra)?.background)
+                assertEquals(BarraNavegacion.COLOR_BOTON_INACTIVO_FONDO, barra.obtenerBoton(otra)?.background)
             }
         }
         val imagen = BufferedImage(frame.width, frame.height, BufferedImage.TYPE_INT_RGB)

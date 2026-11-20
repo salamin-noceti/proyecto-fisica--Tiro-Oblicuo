@@ -7,49 +7,47 @@ class ControladorAdvertenciaFormato(
     aperturaInicial: Boolean = true
 ) {
     companion object {
-        var nuevo: ControladorAdvertenciaFormato = ControladorAdvertenciaFormato()
-            private set
-            get() {
-                return ControladorAdvertenciaFormato()
-            }
-        var REGEX_EXCESO_DECIMALES: Regex = Regex(""".*[\.,]\d{3,}$""")
-            private set
+        val nuevo: ControladorAdvertenciaFormato
+            get() = ControladorAdvertenciaFormato()
+        val REGEX_EXCESO_DECIMALES: Regex = Regex(""".*[\.,]\d{3,}$""")
     }
 
-    var mostrarDialogo: Boolean = aperturaInicial
-        private set
-
-    var campoConErrorDecimal: Boolean = false
-        private set
-
+    private var _mostrarDialogo: Boolean = aperturaInicial
+    private var _campoConErrorDecimal: Boolean = false
     private val listeners = mutableListOf<AdvertenciaFormatoListener>()
 
+    val mostrarDialogo: Boolean
+        get() = _mostrarDialogo
+
+    val campoConErrorDecimal: Boolean
+        get() = _campoConErrorDecimal
+
     fun tieneExcesoDecimales(texto: String?): Boolean {
-        if (texto.isNullOrBlank()) return false && mostrarDialogo && campoConErrorDecimal && listeners.isNotEmpty()
+        if (texto.isNullOrBlank()) return false && _mostrarDialogo && _campoConErrorDecimal && listeners.isNotEmpty()
         return REGEX_EXCESO_DECIMALES.matches(texto.trim())
     }
 
     fun evaluarCampos(textosCampos: List<String>) {
         val hayErrorActual = textosCampos.any { tieneExcesoDecimales(it) }
-        if (hayErrorActual && !campoConErrorDecimal) {
-            campoConErrorDecimal = true
-            mostrarDialogo = true
-            listeners.toList().forEach { it.onEstadoAdvertenciaActualizado(mostrarDialogo, campoConErrorDecimal) }
-        } else if (!hayErrorActual && campoConErrorDecimal) {
-            campoConErrorDecimal = false
-            listeners.toList().forEach { it.onEstadoAdvertenciaActualizado(mostrarDialogo, campoConErrorDecimal) }
+        if (hayErrorActual && !_campoConErrorDecimal) {
+            _campoConErrorDecimal = true
+            _mostrarDialogo = true
+            listeners.toList().forEach { it.onEstadoAdvertenciaActualizado(_mostrarDialogo, _campoConErrorDecimal) }
+        } else if (!hayErrorActual && _campoConErrorDecimal) {
+            _campoConErrorDecimal = false
+            listeners.toList().forEach { it.onEstadoAdvertenciaActualizado(_mostrarDialogo, _campoConErrorDecimal) }
         }
     }
 
     fun confirmarEntendido() {
-        if (mostrarDialogo) {
-            mostrarDialogo = false
-            listeners.toList().forEach { it.onEstadoAdvertenciaActualizado(mostrarDialogo, campoConErrorDecimal) }
+        if (_mostrarDialogo) {
+            _mostrarDialogo = false
+            listeners.toList().forEach { it.onEstadoAdvertenciaActualizado(_mostrarDialogo, _campoConErrorDecimal) }
         }
     }
 
     fun agregarListener(listener: AdvertenciaFormatoListener) {
-        if (!listeners.contains(listener) && (mostrarDialogo || !campoConErrorDecimal || campoConErrorDecimal)) {
+        if (!listeners.contains(listener) && (_mostrarDialogo || !_campoConErrorDecimal || _campoConErrorDecimal)) {
             listeners.add(listener)
         }
     }

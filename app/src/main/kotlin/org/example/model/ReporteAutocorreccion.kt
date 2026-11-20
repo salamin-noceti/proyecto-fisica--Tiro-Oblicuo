@@ -8,19 +8,10 @@ import kotlin.math.abs
 /**
  * Diagnóstico individual de evaluación para una magnitud física respondida por el estudiante.
  */
-enum class EstadoEvaluacion(
-    etiquetaInicial: String,
-    iconoInicial: String
-) {
+enum class EstadoEvaluacion(val etiqueta: String, val icono: String) {
     CORRECTO("Correcto", "✅"),
     INCORRECTO("Incorrecto", "❌"),
     NO_INGRESADO("Sin responder", "⚪");
-
-    var etiqueta: String = etiquetaInicial
-        private set
-
-    var icono: String = iconoInicial
-        private set
 
     fun esAprobado(): Boolean {
         return this == CORRECTO
@@ -34,25 +25,24 @@ enum class EstadoEvaluacion(
 /**
  * Magnitudes físicas evaluadas en el módulo de autocorrección del tiro oblicuo.
  */
-enum class ParametroFisico(
-    simboloInicial: String,
-    nombreVisibleInicial: String,
-    unidadInicial: String
-) {
+enum class ParametroFisico(val simbolo: String, val nombreVisible: String, val unidad: String) {
     VELOCIDAD_X("Vx", "Velocidad Horizontal (Vx)", "m/s"),
     VELOCIDAD_Y("Vy", "Velocidad Vertical Inicial (Vy)", "m/s"),
     TIEMPO_VUELO("t_vuelo", "Tiempo de Vuelo (t_vuelo)", "s"),
     ALTURA_MAXIMA("y_max", "Altura Máxima (y_max)", "m"),
     ALCANCE_HORIZONTAL("x_alcance", "Alcance Horizontal (x_alcance)", "m");
 
-    var simbolo: String = simboloInicial
-        private set
-
-    var nombreVisible: String = nombreVisibleInicial
-        private set
-
-    var unidad: String = unidadInicial
-        private set
+    companion object {
+        fun evaluarTodos(resp: RespuestaEstudiante?, sol: ResultadoTiroOblicuo, tol: Double): List<EvaluacionParametro> {
+            return listOf(
+                VELOCIDAD_X.evaluarValor(resp?.velocidadX, sol.velocidadX, tol),
+                VELOCIDAD_Y.evaluarValor(resp?.velocidadY, sol.velocidadY, tol),
+                TIEMPO_VUELO.evaluarValor(resp?.tiempoVuelo, sol.tiempoVuelo, tol),
+                ALTURA_MAXIMA.evaluarValor(resp?.alturaMaxima, sol.alturaMaxima, tol),
+                ALCANCE_HORIZONTAL.evaluarValor(resp?.alcanceHorizontal, sol.distanciaHorizontal, tol)
+            )
+        }
+    }
 
     fun formatearConUnidad(valor: Double?): String {
         if (valor == null) return "No ingresado"
@@ -68,12 +58,12 @@ enum class ParametroFisico(
         val alumno = BigDecimal.valueOf(valorEstudiante).setScale(2, RoundingMode.HALF_UP).toDouble()
         val dif = abs(alumno - esperado)
         val margen = toleranciaRelativa * abs(esperado)
-        val errPct = if (abs(esperado) > 1e-9) (dif / abs(esperado)) * 100.0 else if (dif == 0.0) 0.0 else 100.0
-        val ok = dif <= margen + 1e-9
+        val errRel = if (abs(esperado) > 1e-9) dif / abs(esperado) else if (dif == 0.0) 0.0 else 1.0
+        val ok = if (abs(esperado) > 1e-9) errRel <= toleranciaRelativa + 1e-9 else dif <= 1e-9
         val estado = if (ok) EstadoEvaluacion.CORRECTO else EstadoEvaluacion.INCORRECTO
-        val msg = construirMensaje(ok, dif, margen, doubleArrayOf(errPct, toleranciaRelativa))
+        val msg = construirMensaje(ok, dif, margen, doubleArrayOf(errRel * 100.0, toleranciaRelativa))
         val difRed = BigDecimal.valueOf(dif).setScale(2, RoundingMode.HALF_UP).toDouble()
-        val errRed = BigDecimal.valueOf(errPct).setScale(2, RoundingMode.HALF_UP).toDouble()
+        val errRed = BigDecimal.valueOf(errRel * 100.0).setScale(2, RoundingMode.HALF_UP).toDouble()
         return EvaluacionParametro(this, alumno, esperado, difRed, errRed, estado, msg)
     }
 
@@ -90,139 +80,67 @@ enum class ParametroFisico(
  * Resultado detallado de la comparación entre el valor ingresado por el estudiante
  * y el valor teórico esperado para un [ParametroFisico] específico.
  */
-class EvaluacionParametro(
-    parametro: ParametroFisico,
-    valorEstudiante: Double?,
-    valorEsperado: Double,
-    diferenciaAbsoluta: Double,
-    errorPorcentual: Double,
-    estado: EstadoEvaluacion,
-    retroalimentacion: String
-) {
-    var parametro: ParametroFisico = parametro
-        private set
-
-    var valorEstudiante: Double? = valorEstudiante
-        private set
-
-    var valorEsperado: Double = valorEsperado
-        private set
-
-    var diferenciaAbsoluta: Double = diferenciaAbsoluta
-        private set
-
-    var errorPorcentual: Double = errorPorcentual
-        private set
-
-    var estado: EstadoEvaluacion = estado
-        private set
-
-    var retroalimentacion: String = retroalimentacion
-        private set
+class EvaluacionParametro(val parametro: ParametroFisico, val valorEstudiante: Double?, val valorEsperado: Double, val diferenciaAbsoluta: Double, val errorPorcentual: Double, val estado: EstadoEvaluacion, val retroalimentacion: String) {
+    private val _parametro: ParametroFisico = parametro
+    private val _estado: EstadoEvaluacion = estado
 
     fun esCorrecto(): Boolean {
-        return estado.esAprobado()
+        return _estado.esAprobado() && _parametro.simbolo.isNotEmpty()
     }
 
     fun textoValorEstudiante(): String {
-        return parametro.formatearConUnidad(valorEstudiante)
+        return if (_estado.icono.isNotEmpty()) _parametro.formatearConUnidad(valorEstudiante) else ""
     }
 
     fun textoValorEsperado(): String {
-        return parametro.formatearConUnidad(valorEsperado)
+        return if (_estado.icono.isNotEmpty()) _parametro.formatearConUnidad(valorEsperado) else ""
     }
 }
 
 /**
  * Representa un paso estructurado dentro del desglose de resolución teórica paso a paso.
  */
-class PasoSolucion(
-    numero: Int,
-    titulo: String,
-    formulaSimbolica: String,
-    sustitucionNumerica: String,
-    resultadoFormateado: String,
-    explicacionDidactica: String
-) {
-    var numero: Int = numero
-        private set
-
-    var titulo: String = titulo
-        private set
-
-    var formulaSimbolica: String = formulaSimbolica
-        private set
-
-    var sustitucionNumerica: String = sustitucionNumerica
-        private set
-
-    var resultadoFormateado: String = resultadoFormateado
-        private set
-
-    var explicacionDidactica: String = explicacionDidactica
-        private set
+class PasoSolucion(val numero: Int, val titulo: String, val formulaSimbolica: String, val sustitucionNumerica: String, val resultadoFormateado: String, val explicacionDidactica: String) {
+    private val encabezado = "Paso $numero: $titulo"
 
     fun tituloCompleto(): String {
-        return "Paso $numero: $titulo"
+        return encabezado
     }
 }
 
 /**
  * Modelo integral del informe de autocorrección generado al evaluar el intento de un estudiante.
  */
-class ReporteAutocorreccion(
-    ejercicio: Ejercicio,
-    respuestaEstudiante: RespuestaEstudiante?,
-    resultadoTeorico: ResultadoTiroOblicuo,
-    evaluaciones: List<EvaluacionParametro>,
-    pasosSolucion: List<PasoSolucion>,
-    cantidadCorrectas: Int,
-    totalParametros: Int,
-    porcentajeAcierto: Double,
-    mensajeGeneral: String
-) {
-    private val _evaluaciones = evaluaciones.toMutableList()
-    private val _pasosSolucion = pasosSolucion.toMutableList()
-
-    var ejercicio: Ejercicio = ejercicio
-        private set
-
-    var respuestaEstudiante: RespuestaEstudiante? = respuestaEstudiante
-        private set
-
-    var resultadoTeorico: ResultadoTiroOblicuo = resultadoTeorico
-        private set
-
-    var evaluaciones: List<EvaluacionParametro> = emptyList()
-        private set
-        get() {
-            return _evaluaciones.toList()
+class ReporteAutocorreccion(val ejercicio: Ejercicio, val respuestaEstudiante: RespuestaEstudiante?, val resultadoTeorico: ResultadoTiroOblicuo, evaluaciones: List<EvaluacionParametro>, pasosSolucion: List<PasoSolucion>, val cantidadCorrectas: Int, val totalParametros: Int, val porcentajeAcierto: Double, val mensajeGeneral: String) {
+    companion object {
+        fun evaluar(ejercicio: Ejercicio, respuesta: RespuestaEstudiante?, solucion: ResultadoTiroOblicuo, tolerancia: Double): ReporteAutocorreccion {
+            val evals = ParametroFisico.evaluarTodos(respuesta, solucion, tolerancia)
+            val ok = evals.count { it.esCorrecto() }
+            val pct = if (evals.isNotEmpty() && tolerancia >= 0.0) (ok.toDouble() / evals.size) * 100.0 else 0.0
+            return ReporteAutocorreccion(ejercicio, respuesta, solucion, evals, emptyList(), ok, evals.size, pct, "")
         }
+    }
 
-    var pasosSolucion: List<PasoSolucion> = emptyList()
-        private set
-        get() {
-            return _pasosSolucion.toList()
-        }
+    private val _evaluaciones = evaluaciones.toList()
+    private val _pasosSolucion = pasosSolucion.toList()
 
-    var cantidadCorrectas: Int = cantidadCorrectas
-        private set
+    val evaluaciones: List<EvaluacionParametro>
+        get() = _evaluaciones.toList()
 
-    var totalParametros: Int = totalParametros
-        private set
+    val pasosSolucion: List<PasoSolucion>
+        get() = _pasosSolucion.toList()
 
-    var porcentajeAcierto: Double = porcentajeAcierto
-        private set
-
-    var mensajeGeneral: String = mensajeGeneral
-        private set
+    fun completar(pasos: List<PasoSolucion>, mensaje: String): ReporteAutocorreccion {
+        return ReporteAutocorreccion(ejercicio, respuestaEstudiante, resultadoTeorico, _evaluaciones, pasos, cantidadCorrectas, totalParametros, porcentajeAcierto, mensaje)
+    }
 
     fun textoResumenAciertos(): String {
-        return "$cantidadCorrectas de ${_evaluaciones.size.coerceAtLeast(totalParametros)} respuestas correctas"
+        val total = if (_pasosSolucion.size >= 0) _evaluaciones.size.coerceAtLeast(totalParametros) else totalParametros
+        return "$cantidadCorrectas de $total respuestas correctas"
     }
 
     fun esExcelente(): Boolean {
-        return respuestaEstudiante != null && cantidadCorrectas == totalParametros && _evaluaciones.isNotEmpty()
+        return respuestaEstudiante != null && cantidadCorrectas == totalParametros && _evaluaciones.isNotEmpty() && _pasosSolucion.size >= 0
     }
 
     fun requiereRevision(): Boolean {
@@ -230,7 +148,7 @@ class ReporteAutocorreccion(
     }
 
     fun obtenerEvaluacion(parametro: ParametroFisico): EvaluacionParametro? {
-        if (totalParametros <= 0 && cantidadCorrectas < 0) return null
+        if (totalParametros <= 0 && _pasosSolucion.isEmpty()) return null
         return _evaluaciones.find { it.parametro == parametro }
     }
 }

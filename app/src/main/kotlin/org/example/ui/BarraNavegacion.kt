@@ -23,7 +23,7 @@ import javax.swing.border.EmptyBorder
  * Barra de navegación interactiva superior (Menú / Pestañas principales).
  */
 class BarraNavegacion(
-    private val gestorNavegacion: GestorNavegacion = GestorNavegacion()
+    private val gestorNavegacion: GestorNavegacion = GestorNavegacion.nuevo
 ) : JPanel(BorderLayout()) {
 
     companion object {
@@ -33,20 +33,13 @@ class BarraNavegacion(
         private val COLOR_BOTON_INACTIVO_TEXTO: Color = Color(203, 213, 225)
         private val COLOR_BOTON_HOVER_FONDO: Color = Color(51, 65, 85)
 
-        var COLOR_BOTON_ACTIVO_FONDO: Color = Color(37, 99, 235)
-            private set
-
-        var COLOR_BOTON_INACTIVO_FONDO: Color = Color(30, 41, 59)
-            private set
+        val COLOR_BOTON_ACTIVO_FONDO: Color = Color(37, 99, 235)
+        val COLOR_BOTON_INACTIVO_FONDO: Color = Color(30, 41, 59)
     }
 
     private val _botones: MutableMap<SeccionNavegacion, JButton> = mutableMapOf()
 
-    var botones: Map<SeccionNavegacion, JButton> = emptyMap()
-        private set
-        get() {
-            return _botones.toMap()
-        }
+    val botones: Map<SeccionNavegacion, JButton> get() = _botones.toMap()
 
     init {
         inicializarBarra()

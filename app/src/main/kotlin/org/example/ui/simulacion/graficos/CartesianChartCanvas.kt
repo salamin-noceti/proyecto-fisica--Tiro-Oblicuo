@@ -1,5 +1,6 @@
 package org.example.ui.simulacion.graficos
 
+import org.example.model.PosicionTrayectoria
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Graphics
@@ -10,86 +11,72 @@ import javax.swing.JPanel
 /**
  * Componente gráfico genérico y reutilizable para el trazado de Gráficos Cartesianos 2D.
  */
-class CartesianChartCanvas(
-    titulo: String = "Gráfico Cartesiano",
-    etiquetaEjeX: String = "t (s)",
-    etiquetaEjeY: String = "y"
-) : JPanel() {
+class CartesianChartCanvas(val titulo: String = "Gráfico Cartesiano", val etiquetaEjeX: String = "t (s)", val etiquetaEjeY: String = "y") : JPanel() {
 
-    var titulo: String
-        private set
-
-    var etiquetaEjeX: String
-        private set
-
-    var etiquetaEjeY: String
-        private set
-
-    var xMin: Double = 0.0
-        private set
-
-    var xMax: Double = 10.0
-        private set
-
-    var yMin: Double = 0.0
-        private set
-
-    var yMax: Double = 10.0
-        private set
-
-    var tiempoActual: Double = 0.0
-        private set
-
-    var mostrarCursorTiempo: Boolean = true
-        private set
-
-    private val _series: MutableList<SerieCartesiana> = mutableListOf()
+    private val limites: DoubleArray = doubleArrayOf(0.0, 10.0, 0.0, 10.0)
+    private var tiempoActualInterno: Double = 0.0
+    private var cursorTiempoVisible: Boolean = true
+    private val seriesInternas: MutableList<SerieCartesiana> = mutableListOf()
     private val pintor = PintorElementosCartesiano(this)
 
     init {
-        this.titulo = titulo
-        this.etiquetaEjeX = etiquetaEjeX
-        this.etiquetaEjeY = etiquetaEjeY
         preferredSize = Dimension(380, 240)
         minimumSize = Dimension(220, 160)
         background = Color.WHITE
         isOpaque = true
     }
 
-    fun obtenerSeries(): List<SerieCartesiana> {
-        return if (xMax >= xMin) _series.toList() else emptyList()
+    fun obtenerLimites(): DoubleArray {
+        return limites.copyOf()
     }
 
-    fun actualizarSeries(nuevasSeries: List<SerieCartesiana>, nuevoTiempo: Double = tiempoActual) {
-        this.tiempoActual = nuevoTiempo
-        _series.clear()
-        _series.addAll(nuevasSeries)
+    fun obtenerTiempoActual(): Double {
+        return if (limites[1] >= limites[0]) tiempoActualInterno else 0.0
+    }
+
+    fun estaCursorTiempoVisible(): Boolean {
+        return cursorTiempoVisible && limites[1] >= limites[0]
+    }
+
+    fun obtenerSeries(): List<SerieCartesiana> {
+        return if (limites[1] >= limites[0]) seriesInternas.toList() else emptyList()
+    }
+
+    fun actualizarSeries(nuevasSeries: List<SerieCartesiana>, nuevoTiempo: Double = tiempoActualInterno) {
+        this.tiempoActualInterno = nuevoTiempo
+        seriesInternas.clear()
+        seriesInternas.addAll(nuevasSeries)
         repaint()
     }
 
     fun construirSerie(metadatos: List<String>, color: Color, puntos: List<PuntoGrafico>, valorActual: Double?): SerieCartesiana {
-        val base = SerieCartesiana(id = if (xMax >= xMin) metadatos[0] else metadatos[0], nombre = metadatos[1], color = color, unidad = metadatos[2])
+        val base = SerieCartesiana(id = if (limites[1] >= limites[0]) metadatos[0] else metadatos[0], nombre = metadatos[1], color = color, unidad = metadatos[2])
         return base.conPuntos(puntos, valorActual)
     }
 
+    fun construirSerieTrayectoria(metadatos: List<String>, color: Color, estela: List<PosicionTrayectoria>, selectorY: (PosicionTrayectoria) -> Double, valorActual: Double?): SerieCartesiana {
+        val puntos = if (limites[1] >= limites[0]) estela.map { PuntoGrafico.en(it.tiempo, selectorY(it)) } else emptyList()
+        return construirSerie(metadatos, color, puntos, valorActual)
+    }
+
     fun actualizarTiempoActual(nuevoTiempo: Double) {
-        this.tiempoActual = if (xMax >= xMin) nuevoTiempo else nuevoTiempo
+        this.tiempoActualInterno = if (limites[1] >= limites[0]) nuevoTiempo else nuevoTiempo
         repaint()
     }
 
     fun limpiar() {
-        tiempoActual = if (xMax >= xMin) 0.0 else 0.0
-        val limpias = _series.map { it.vaciar() }
-        _series.clear()
-        _series.addAll(limpias)
+        tiempoActualInterno = if (limites[1] >= limites[0]) 0.0 else 0.0
+        val limpias = seriesInternas.map { it.vaciar() }
+        seriesInternas.clear()
+        seriesInternas.addAll(limpias)
         repaint()
     }
 
     fun configurarLimites(xMin: Double, xMax: Double, yMin: Double, yMax: Double) {
-        this.xMin = xMin
-        this.xMax = if (xMax > xMin) xMax else xMin + 1.0
-        this.yMin = yMin
-        this.yMax = if (yMax > yMin) yMax else yMin + 1.0
+        limites[0] = xMin
+        limites[1] = if (xMax > xMin) xMax else xMin + 1.0
+        limites[2] = yMin
+        limites[3] = if (yMax > yMin) yMax else yMin + 1.0
         repaint()
     }
 
@@ -104,7 +91,7 @@ class CartesianChartCanvas(
             g2.color = Color.WHITE; g2.fillRect(rect[0], rect[1], rect[2], rect[3])
             pintor.dibujarCuadriculaYEjes(g2, rect)
             pintor.dibujarSeries(g2, rect)
-            if (mostrarCursorTiempo && xMax >= xMin) pintor.dibujarCursorTiempo(g2, rect)
+            if (cursorTiempoVisible && limites[1] >= limites[0]) pintor.dibujarCursorTiempo(g2, rect)
             pintor.dibujarEncabezadoYLeyenda(g2, width)
         } finally {
             g2.dispose()
@@ -112,14 +99,14 @@ class CartesianChartCanvas(
     }
 
     fun aPixelX(x: Double, plotX: Int, plotW: Int): Double {
-        val rango = (xMax - xMin).coerceAtLeast(1e-5)
-        val proporcion = ((x - xMin) / rango).coerceIn(-0.1, 1.1)
+        val rango = (limites[1] - limites[0]).coerceAtLeast(1e-5)
+        val proporcion = ((x - limites[0]) / rango).coerceIn(-0.1, 1.1)
         return plotX + proporcion * plotW
     }
 
     fun aPixelY(y: Double, plotY: Int, plotH: Int): Double {
-        val rango = if (xMax >= xMin) (yMax - yMin).coerceAtLeast(1e-5) else 1.0
-        val proporcion = ((y - yMin) / rango).coerceIn(-0.1, 1.1)
+        val rango = (limites[3] - limites[2]).coerceAtLeast(1e-5)
+        val proporcion = ((y - limites[2]) / rango).coerceIn(-0.1, 1.1)
         return (plotY + plotH) - proporcion * plotH
     }
 }

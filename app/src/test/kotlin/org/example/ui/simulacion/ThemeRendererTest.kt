@@ -58,17 +58,17 @@ class ThemeRendererTest {
     fun testPantallaSimulacionAdaptaDinamicamenteSuTematica() {
         val appState = AppState.nuevo
         val pantalla = PantallaSimulacion(appState = appState, themeFactory = factory)
-        assertEquals(TematicaSimulacion.CANON, pantalla.temaActual.tematica)
+        assertEquals(TematicaSimulacion.CANON, pantalla.obtenerTemaActual().tematica)
 
         appState.actualizarEjercicio(crearEjercicio(1, "Futbolista", "patea un balón"))
-        assertEquals(TematicaSimulacion.FUTBOL, pantalla.temaActual.tematica)
-        assertTrue(pantalla.labelEjercicioCargado.text.contains("Fútbol"))
+        assertEquals(TematicaSimulacion.FUTBOL, pantalla.obtenerTemaActual().tematica)
+        assertTrue(pantalla.obtenerTextoEjercicioCargado().contains("Fútbol"))
 
         appState.actualizarEjercicio(crearEjercicio(2, "Básquet", "lanza hacia el aro"))
-        assertEquals(TematicaSimulacion.BASQUET, pantalla.temaActual.tematica)
-        assertTrue(pantalla.labelEjercicioCargado.text.contains("Básquet"))
+        assertEquals(TematicaSimulacion.BASQUET, pantalla.obtenerTemaActual().tematica)
+        assertTrue(pantalla.obtenerTextoEjercicioCargado().contains("Básquet"))
 
         pantalla.cambiarTematica(TematicaSimulacion.GOLF)
-        assertEquals(TematicaSimulacion.GOLF, pantalla.temaActual.tematica)
+        assertEquals(TematicaSimulacion.GOLF, pantalla.obtenerTemaActual().tematica)
     }
 }

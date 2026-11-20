@@ -16,7 +16,7 @@ class VentanaPrincipalTest {
     private fun crearBarra(inicial: SeccionNavegacion = seccionInicial): Pair<GestorNavegacion, BarraNavegacion> {
         val contenedor = ContenedorPantallasLaboratorio.nuevo
         contenedor.obtenerGestor().navegarA(inicial)
-        return contenedor.obtenerGestor() to contenedor.barraNavegacion
+        return contenedor.obtenerGestor() to contenedor.obtenerBarraNavegacion()
     }
 
     @Test
@@ -62,9 +62,9 @@ class VentanaPrincipalTest {
     fun testPantallasPlaceholdersSeInicializanConSusContenedoresListos() {
         val contenedor = ContenedorPantallasLaboratorio.nuevo
         assertEquals(SeccionNavegacion.PRACTICA, seccionInicial)
-        assertNotNull(contenedor.pantallaPractica.contenedorControles)
-        assertNotNull(contenedor.pantallaSimulacion.contenedorSimulacion)
-        assertNotNull(contenedor.pantallaAutocorrecion.contenedorCorreccion)
+        assertNotNull(contenedor.obtenerPantallaPractica().obtenerContenedorControles())
+        assertNotNull(contenedor.obtenerPantallaSimulacion().obtenerContenedorSimulacion())
+        assertNotNull(contenedor.obtenerPantallaAutocorreccion().obtenerContenedorCorreccion())
     }
 
     @Test
@@ -78,8 +78,8 @@ class VentanaPrincipalTest {
             assertEquals(720, ventana.height)
             assertTrue(ventana.isResizable)
             assertEquals(Dimension(800, 500), ventana.minimumSize)
-            ventana.barraNavegacion.obtenerBoton(SeccionNavegacion.AUTOCORRECCION)?.doClick()
-            assertEquals(SeccionNavegacion.AUTOCORRECCION, ventana.gestorNavegacion.seccionActual)
+            ventana.obtenerBarraNavegacion().obtenerBoton(SeccionNavegacion.AUTOCORRECCION)?.doClick()
+            assertEquals(SeccionNavegacion.AUTOCORRECCION, ventana.obtenerGestorNavegacion().seccionActual)
         } finally {
             ventana.dispose()
         }

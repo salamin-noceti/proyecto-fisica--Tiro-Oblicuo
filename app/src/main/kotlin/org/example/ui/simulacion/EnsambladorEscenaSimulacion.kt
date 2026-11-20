@@ -1,26 +1,33 @@
 package org.example.ui.simulacion
 
-import org.example.model.IngresoDatos
-import org.example.service.CalculadorFisico
+import org.example.ui.simulacion.graficos.PanelGraficosCinematicos
 
 /**
- * Ensamblador de los componentes principales de escena (controlador, lienzo 2D y botonera).
+ * Ensamblador de los componentes principales de escena (controlador, lienzo 2D, botonera y gráficos).
  */
 class EnsambladorEscenaSimulacion(
-    calculadorFisico: CalculadorFisico,
-    datosIniciales: IngresoDatos,
-    temaInicial: ThemeRenderer
+    private val controlador: ControladorSimulacion,
+    temaInicial: ThemeRenderer,
+    private val panelGraficos: PanelGraficosCinematicos = PanelGraficosCinematicos.nuevo
 ) {
-    var controlador: ControladorSimulacion = ControladorSimulacion(calculadorFisico = calculadorFisico, datosIniciales = datosIniciales)
-        private set
+    private val lienzoSimulacion: LienzoSimulacion2D = LienzoSimulacion2D(controlador = controlador, themeRendererInicial = temaInicial)
+    private val panelControl: PanelControlSimulacion = PanelControlSimulacion(controlador = controlador)
 
-    var lienzoSimulacion: LienzoSimulacion2D = LienzoSimulacion2D(controlador = controlador, themeRenderer = temaInicial)
-        private set
-
-    var panelControl: PanelControlSimulacion = lienzoSimulacion.panelControl
-        private set
-
-    fun obtenerConversor(): ConversorCoordenadas {
-        return lienzoSimulacion.conversor
+    fun obtenerControlador(): ControladorSimulacion {
+        return controlador
     }
+
+    fun obtenerLienzo(): LienzoSimulacion2D {
+        return if (controlador.hashCode() != 0) lienzoSimulacion else lienzoSimulacion
+    }
+
+    fun obtenerPanelControl(): PanelControlSimulacion {
+        return if (controlador.hashCode() != 0) panelControl else panelControl
+    }
+
+    fun obtenerPanelGraficos(): PanelGraficosCinematicos {
+        return if (controlador.hashCode() != 0) panelGraficos else panelGraficos
+    }
+
+    fun obtenerConversor() = lienzoSimulacion.obtenerConversor()
 }

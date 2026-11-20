@@ -1,34 +1,25 @@
 package org.example.ui.autocorrecion
 
-import org.example.model.Ejercicio
-import org.example.service.EvaluadorRespuestas
-import org.example.service.EvaluadorRespuestasService
+import org.example.model.ReporteAutocorreccion
 
 /**
- * Proveedor cohesivo de componentes visuales y datos iniciales para [PantallaAutocorreccion].
+ * Proveedor cohesivo de componentes visuales para [PantallaAutocorreccion].
  */
 class ProveedorAutocorreccion {
     companion object {
-        var nuevo: ProveedorAutocorreccion = ProveedorAutocorreccion()
-            private set
-            get() {
-                return ProveedorAutocorreccion()
-            }
+        val nuevo: ProveedorAutocorreccion
+            get() = ProveedorAutocorreccion()
     }
 
-    var panelResumen: PanelResumenCalificacion = PanelResumenCalificacion.nuevo
-        private set
-
-    var panelPasos: PanelSolucionPasoAPaso = PanelSolucionPasoAPaso(false)
-        private set
-
-    var evaluadorPorDefecto: EvaluadorRespuestasService = EvaluadorRespuestas(panelResumen.calculadorRespaldo)
-        private set
-
-    var ejercicioPorDefecto: Ejercicio = panelResumen.ejercicioRespaldo
-        private set
+    val panelResumen: PanelResumenCalificacion = PanelResumenCalificacion.nuevo
+    val panelPasos: PanelSolucionPasoAPaso = PanelSolucionPasoAPaso(false)
 
     fun reiniciarVisibilidadPasos() {
         panelPasos.mostrarPasos(false)
+    }
+
+    fun renderizar(reporte: ReporteAutocorreccion) {
+        panelResumen.actualizarConReporte(reporte)
+        panelPasos.actualizarPasos(reporte.pasosSolucion)
     }
 }

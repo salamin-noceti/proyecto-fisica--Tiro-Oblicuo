@@ -11,7 +11,7 @@ import kotlin.math.abs
  * el destino del flujo al presionar "Enviar a Simulación".
  */
 class SimulacionConsoleRunner(
-    private val calculador: CalculadorFisico = CalculadorTiroOblicuo(),
+    private val calculador: CalculadorFisico = CalculadorFisico.porDefecto,
     private val margenComparacion: Double = 0.1
 ) : NavegadorSimulacionService {
 

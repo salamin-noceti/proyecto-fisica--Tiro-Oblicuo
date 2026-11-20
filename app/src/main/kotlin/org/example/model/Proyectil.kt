@@ -7,11 +7,8 @@ class Proyectil(
     nombreInicial: String,
     masaInicial: Double = 1.0
 ) {
-    var nombre: String = nombreInicial
-        private set
-
-    var masa: Double = masaInicial
-        private set
+    val nombre: String = nombreInicial
+    val masa: Double = masaInicial
 
     override fun toString(): String {
         return "$nombre (${masa} kg)"

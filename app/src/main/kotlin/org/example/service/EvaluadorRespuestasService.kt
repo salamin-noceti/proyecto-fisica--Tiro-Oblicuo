@@ -13,6 +13,11 @@ import org.example.model.ResultadoTiroOblicuo
  * Abstracción del servicio de evaluación y diagnóstico pedagógico de respuestas (DIP).
  */
 interface EvaluadorRespuestasService {
+    companion object {
+        val porDefecto: EvaluadorRespuestasService
+            get() = EvaluadorRespuestas.instancia
+    }
+
     val toleranciaRelativa: Double
         get() = 0.055
 
@@ -23,6 +28,6 @@ interface EvaluadorRespuestasService {
     fun evaluar(ejercicio: Ejercicio, respuesta: RespuestaEstudiante?, resultadoTeorico: ResultadoTiroOblicuo? = null): ReporteAutocorreccion
 
     fun generarPasosSolucion(datos: IngresoDatos, resultadoTeorico: ResultadoTiroOblicuo): List<PasoSolucion> {
-        return GeneradorPasosSolucion().generar(datos, resultadoTeorico)
+        return GeneradorPasosSolucion.instancia.generar(datos, resultadoTeorico)
     }
 }

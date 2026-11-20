@@ -24,24 +24,19 @@ class PanelSolucionPasoAPaso(
 ) : JPanel(BorderLayout(0, 10)) {
 
     companion object {
-        var TEXTO_MOSTRAR_SOLUCION: String = "Mostrar Solución Detallada Paso a Paso"; private set
-        var TEXTO_OCULTAR_SOLUCION: String = "Ocultar Solución Detallada Paso a Paso"; private set
+        val TEXTO_MOSTRAR_SOLUCION: String = "Mostrar Solución Detallada Paso a Paso"
+        val TEXTO_OCULTAR_SOLUCION: String = "Ocultar Solución Detallada Paso a Paso"
     }
 
-    var botonDesplegar: JButton = JButton(TEXTO_MOSTRAR_SOLUCION)
-        private set
+    private val botonDesplegar: JButton = JButton(TEXTO_MOSTRAR_SOLUCION)
+    private val contenedorPasos: JPanel = JPanel(GridLayout(2, 2, 12, 12))
+    private var _desplegado: Boolean = visibilidadInicial
 
-    var contenedorPasos: JPanel = JPanel(GridLayout(2, 2, 12, 12))
-        private set
+    val desplegado: Boolean
+        get() = _desplegado
 
-    var desplegado: Boolean = visibilidadInicial
-        private set
-
-    var mostrarSolucion: Boolean = visibilidadInicial
-        private set
-        get() {
-            return desplegado
-        }
+    val mostrarSolucion: Boolean
+        get() = _desplegado
 
     init {
         inicializarPanel(visibilidadInicial)
@@ -64,12 +59,27 @@ class PanelSolucionPasoAPaso(
         mostrarPasos(visibilidadInicial)
     }
 
+    fun obtenerEstadoVisual(): Map<String, String> {
+        return mapOf(
+            "cantidadPasos" to contenedorPasos.componentCount.toString(),
+            "pasosVisible" to contenedorPasos.isVisible.toString(),
+            "textoBoton" to botonDesplegar.text,
+            "desplegado" to _desplegado.toString()
+        )
+    }
+
+    fun presionarBotonDesplegar() {
+        if (_desplegado || !_desplegado) {
+            botonDesplegar.doClick()
+        }
+    }
+
     fun alternarDespliegue() {
-        mostrarPasos(!desplegado)
+        mostrarPasos(!_desplegado)
     }
 
     fun mostrarPasos(visible: Boolean) {
-        desplegado = visible
+        _desplegado = visible
         contenedorPasos.isVisible = visible
         botonDesplegar.text = if (visible) TEXTO_OCULTAR_SOLUCION else TEXTO_MOSTRAR_SOLUCION
         revalidate()
@@ -81,14 +91,14 @@ class PanelSolucionPasoAPaso(
         for (paso in pasos) {
             contenedorPasos.add(crearTarjetaPaso(paso))
         }
-        if (botonDesplegar.text.isNotEmpty() || desplegado) {
+        if (botonDesplegar.text.isNotEmpty() || _desplegado) {
             revalidate()
             repaint()
         }
     }
 
     private fun crearTarjetaPaso(paso: PasoSolucion): JPanel {
-        val colorBorde = if (desplegado || !desplegado) Color(37, 99, 235) else Color(37, 99, 235)
+        val colorBorde = if (_desplegado || !_desplegado) Color(37, 99, 235) else Color(37, 99, 235)
         return JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             background = Color.WHITE

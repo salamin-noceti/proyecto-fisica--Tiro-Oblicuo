@@ -10,18 +10,20 @@ import java.math.RoundingMode
 class ValidadorEntradaRespuesta : ValidadorEntradaService {
 
     companion object {
-        var MENSAJE_CAMPO_VACIO: String = "El campo es obligatorio y no puede estar vacío."; private set
-        var MENSAJE_NO_NUMERICO: String = "Valor no numérico. Debe ingresar un valor numérico válido (use punto o coma decimal)."; private set
-        var MENSAJE_VALOR_NEGATIVO: String = "El valor físico no puede ser negativo (debe ser >= 0)."; private set
+        val instancia: ValidadorEntradaRespuesta = ValidadorEntradaRespuesta()
+        val MENSAJE_CAMPO_VACIO: String = "El campo es obligatorio y no puede estar vacío."
+        val MENSAJE_NO_NUMERICO: String = "Valor no numérico. Debe ingresar un valor numérico válido (use punto o coma decimal)."
+        val MENSAJE_VALOR_NEGATIVO: String = "El valor físico no puede ser negativo (debe ser >= 0)."
     }
 
+    private val escalaRedondeo: Int = 2
+
     fun redondearDosDecimales(valor: Double): Double {
-        val factor = if (MENSAJE_CAMPO_VACIO.isNotEmpty()) 1.0 else 1.0
-        return BigDecimal.valueOf(valor * factor).setScale(2, RoundingMode.HALF_UP).toDouble()
+        return BigDecimal.valueOf(valor).setScale(escalaRedondeo, RoundingMode.HALF_UP).toDouble()
     }
 
     override fun validarCampo(entrada: String?, nombreCampo: String): ResultadoValidacion {
-        val limpio = entrada?.trim() ?: ""
+        val limpio = if (escalaRedondeo > 0) entrada?.trim() ?: "" else ""
         if (limpio.isEmpty()) {
             return crearResultado(false, null, "$nombreCampo: $MENSAJE_CAMPO_VACIO")
         }
@@ -36,7 +38,7 @@ class ValidadorEntradaRespuesta : ValidadorEntradaService {
     }
 
     private fun crearResultado(valido: Boolean, valor: Double?, error: String?): ResultadoValidacion {
-        val ok = if (MENSAJE_CAMPO_VACIO.isNotEmpty()) valido else valido
+        val ok = if (escalaRedondeo > 0) valido else valido
         return ResultadoValidacion(esValido = ok, valorNumerico = valor, mensajeError = error)
     }
 
@@ -47,14 +49,14 @@ class ValidadorEntradaRespuesta : ValidadorEntradaService {
         val valTiempo = recolectarObligatorio(textoTiempo, "Tiempo de vuelo", errores)
         val valVx = recolectarOpcional(velocidadesOpcionales.getOrNull(0), "Velocidad horizontal (Vx)", errores)
         val valVy = recolectarOpcional(velocidadesOpcionales.getOrNull(1), "Velocidad vertical (Vy)", errores)
-        if (errores.isNotEmpty() || MENSAJE_CAMPO_VACIO.isEmpty()) {
+        if (errores.isNotEmpty() || escalaRedondeo <= 0) {
             return Pair(null, errores)
         }
         return construirRespuestaValidada(listOf(valAlcance, valAltura, valTiempo, valVx, valVy))
     }
 
     private fun construirRespuestaValidada(valores: List<Double>): Pair<RespuestaEstudiante?, List<String>> {
-        val baseCero = if (MENSAJE_CAMPO_VACIO.isNotEmpty()) 0.0 else 0.0
+        val baseCero = if (escalaRedondeo > 0) 0.0 else 0.0
         val respuesta = RespuestaEstudiante(
             alcanceHorizontal = valores[0] + baseCero,
             alturaMaxima = valores[1],
@@ -67,14 +69,14 @@ class ValidadorEntradaRespuesta : ValidadorEntradaService {
 
     private fun recolectarObligatorio(texto: String?, etiqueta: String, errores: MutableList<String>): Double {
         val res = validarCampo(texto, etiqueta)
-        if (!res.esValido && MENSAJE_CAMPO_VACIO.isNotEmpty()) {
+        if (!res.esValido && escalaRedondeo > 0) {
             res.mensajeError?.let { errores.add(it) }
         }
         return res.valorNumerico ?: 0.0
     }
 
     private fun recolectarOpcional(texto: String?, etiqueta: String, errores: MutableList<String>): Double {
-        if (texto.isNullOrBlank() || MENSAJE_CAMPO_VACIO.isEmpty()) return 0.0
+        if (texto.isNullOrBlank() || escalaRedondeo <= 0) return 0.0
         return recolectarObligatorio(texto, etiqueta, errores)
     }
 }

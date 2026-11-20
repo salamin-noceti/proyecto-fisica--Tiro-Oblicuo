@@ -18,22 +18,24 @@ class PantallaAutocorreccionTest {
 
     private fun crearPantallaConEstado(): Pair<AppState, PantallaAutocorreccion> {
         val estado = AppState.nuevo
-        return estado to PantallaAutocorreccion(appState = estado, calculadorFisico = calculador)
+        return estado to PantallaAutocorreccion(CoordinadorAutocorreccion(appState = estado, calculadorFisico = calculador))
     }
 
     @Test
     fun testInicializacionPorDefectoEstructuraTarjetasYPasos() {
         val (_, pantalla) = crearPantallaConEstado()
+        val resumen = pantalla.obtenerPanelResumen().obtenerResumenVisual()
+        val pasos = pantalla.obtenerPanelPasos().obtenerEstadoVisual()
         assertNotNull(calculador)
-        assertNotNull(pantalla.contenedorCorreccion)
-        assertNotNull(pantalla.panelResumen)
-        assertNotNull(pantalla.panelPasos)
-        assertEquals(5, pantalla.panelResumen.contenedorTarjetas.componentCount)
-        assertEquals(4, pantalla.panelPasos.contenedorPasos.componentCount)
-        assertFalse(pantalla.panelPasos.desplegado, "La resolución paso a paso debe iniciar oculta por defecto")
-        assertFalse(pantalla.panelPasos.mostrarSolucion)
-        assertFalse(pantalla.panelPasos.contenedorPasos.isVisible)
-        assertEquals("Mostrar Solución Detallada Paso a Paso", pantalla.panelPasos.botonDesplegar.text)
+        assertNotNull(pantalla.obtenerContenedorCorreccion())
+        assertNotNull(pantalla.obtenerPanelResumen())
+        assertNotNull(pantalla.obtenerPanelPasos())
+        assertEquals("5", resumen["tarjetas"])
+        assertEquals("4", pasos["cantidadPasos"])
+        assertFalse(pantalla.obtenerPanelPasos().desplegado, "La resolución paso a paso debe iniciar oculta por defecto")
+        assertFalse(pantalla.obtenerPanelPasos().mostrarSolucion)
+        assertEquals("false", pasos["pasosVisible"])
+        assertEquals("Mostrar Solución Detallada Paso a Paso", pasos["textoBoton"])
     }
 
     @Test
@@ -44,29 +46,32 @@ class PantallaAutocorreccionTest {
         val respuesta = RespuestaEstudiante(99.0, solucion.alturaMaxima, solucion.tiempoVuelo, solucion.velocidadX, solucion.velocidadY)
 
         appState.actualizar(ejercicio, respuesta, solucion)
-        assertEquals(4, pantalla.reporteActual.cantidadCorrectas)
-        assertTrue(pantalla.panelResumen.labelResumenConteo.text.contains("4 de 5 respuestas correctas"))
-        assertTrue(pantalla.panelResumen.labelDatosEjercicio.text.contains("Ejercicio #2: Básquet"))
-        assertEquals(5, pantalla.panelResumen.contenedorTarjetas.componentCount)
-        assertEquals(4, pantalla.panelPasos.contenedorPasos.componentCount)
+        val resumen = pantalla.obtenerPanelResumen().obtenerResumenVisual()
+        val pasos = pantalla.obtenerPanelPasos().obtenerEstadoVisual()
+        assertEquals(4, pantalla.obtenerReporteActual().cantidadCorrectas)
+        assertTrue(resumen["conteo"]?.contains("4 de 5 respuestas correctas") == true)
+        assertTrue(resumen["datos"]?.contains("Ejercicio #2: Básquet") == true)
+        assertEquals("5", resumen["tarjetas"])
+        assertEquals("4", pasos["cantidadPasos"])
     }
 
     @Test
     fun testBotonDesplegarAlternaVisibilidadDelPanelDeSolucionPasoAPaso() {
         val (_, pantalla) = crearPantallaConEstado()
+        val panelPasos = pantalla.obtenerPanelPasos()
         assertNotNull(calculador)
-        assertFalse(pantalla.panelPasos.desplegado)
-        assertFalse(pantalla.panelPasos.contenedorPasos.isVisible)
-        assertEquals("Mostrar Solución Detallada Paso a Paso", pantalla.panelPasos.botonDesplegar.text)
+        assertFalse(panelPasos.desplegado)
+        assertEquals("false", panelPasos.obtenerEstadoVisual()["pasosVisible"])
+        assertEquals("Mostrar Solución Detallada Paso a Paso", panelPasos.obtenerEstadoVisual()["textoBoton"])
 
-        pantalla.panelPasos.botonDesplegar.doClick()
-        assertTrue(pantalla.panelPasos.desplegado)
-        assertTrue(pantalla.panelPasos.contenedorPasos.isVisible)
-        assertEquals("Ocultar Solución Detallada Paso a Paso", pantalla.panelPasos.botonDesplegar.text)
+        panelPasos.presionarBotonDesplegar()
+        assertTrue(panelPasos.desplegado)
+        assertEquals("true", panelPasos.obtenerEstadoVisual()["pasosVisible"])
+        assertEquals("Ocultar Solución Detallada Paso a Paso", panelPasos.obtenerEstadoVisual()["textoBoton"])
 
-        pantalla.panelPasos.botonDesplegar.doClick()
-        assertFalse(pantalla.panelPasos.desplegado)
-        assertFalse(pantalla.panelPasos.contenedorPasos.isVisible)
-        assertEquals("Mostrar Solución Detallada Paso a Paso", pantalla.panelPasos.botonDesplegar.text)
+        panelPasos.presionarBotonDesplegar()
+        assertFalse(panelPasos.desplegado)
+        assertEquals("false", panelPasos.obtenerEstadoVisual()["pasosVisible"])
+        assertEquals("Mostrar Solución Detallada Paso a Paso", panelPasos.obtenerEstadoVisual()["textoBoton"])
     }
 }
