@@ -3,13 +3,14 @@
 
 > Documento **generado automáticamente** por la cátedra de Programación II (RepoSense + análisis de calidad POO/SOLID). **No editar a mano**: se regenera en cada evaluación.
 > Rama evaluada: `main`. Análisis **heurístico** (regex + métricas): es una criba para orientar la revisión, **no una nota**.
-> Generado: 2026-11-20.
+> Generado: 2026-11-25.
 
 ## 1. Veredicto
 
 | Aspecto | Resultado |
 |---|---|
 | Índice de calidad POO/SOLID | **93/100** |
+| Commit evaluado | `3a44171029ef` (2026-11-20) |
 | Código (LOC) | 6,302 |
 | Archivos de código | 118 |
 | Clases (bien usadas) | 116 (99 OK) |
@@ -184,6 +185,30 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 - **Por qué importa:** Es comportamiento procedural disfrazado de clase: no se instancia ni participa del modelo de objetos.
 - **Tu resultado:** **0** clase(s) solo con métodos estáticos
 
+### Resumen de señales por tipo
+
+| Señal | Cantidad | Principio | Archivos |
+|---|---:|---|---:|
+| bloque duplicado | 5 | DRY | 2 |
+| acoplamiento alto | 5 | D | 5 |
+| duplicación | 1 | DRY | 0 |
+| baja cohesión | 1 | S | 1 |
+
+### Resumen por archivo
+
+> Archivos ordenados por cantidad de señales. Se excluyen **1** señal(es) de nivel repositorio sin archivo propio.
+
+| Archivo | Señales | Aspectos | Líneas |
+|---|---:|---|---|
+| `app/src/main/kotlin/org/example/ui/simulacion/EdificioThemeRenderer.kt` | 3 | DRY | 118, 121, 128 |
+| `app/src/main/kotlin/org/example/service/ImpresoraMenuConsola.kt` | 2 | DRY | 19, 21 |
+| `app/src/main/kotlin/org/example/state/AppState.kt` | 1 | cohesión | 12 |
+| `app/src/main/kotlin/org/example/ui/practica/componentes/ConstructorVistaPractica.kt` | 1 | acoplamiento | 29 |
+| `app/src/main/kotlin/org/example/ui/simulacion/ControladorSimulacion.kt` | 1 | acoplamiento | 12 |
+| `app/src/main/kotlin/org/example/ui/simulacion/LienzoSimulacion2D.kt` | 1 | acoplamiento | 12 |
+| `app/src/main/kotlin/org/example/ui/simulacion/RenderizadorCapasLienzo2D.kt` | 1 | acoplamiento | 16 |
+| `app/src/main/kotlin/org/example/ui/simulacion/graficos/CartesianChartCanvas.kt` | 1 | acoplamiento | 14 |
+
 ### Archivos donde se originan las señales
 
 > Se listan **12** hallazgo(s) localizados en **8** archivo(s). La columna `Línea` es la línea del archivo donde el análisis detectó la señal; `—` indica una señal de nivel repositorio (sin archivo propio).
@@ -203,6 +228,38 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 | Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/simulacion/RenderizadorCapasLienzo2D.kt` | 16 | clase 'RenderizadorCapasLienzo2D' muy acoplada (CBO=8) |
 | Acoplamiento alto (CBO) | `app/src/main/kotlin/org/example/ui/simulacion/graficos/CartesianChartCanvas.kt` | 14 | clase 'CartesianChartCanvas' muy acoplada (CBO=8) |
 
+### Clases señaladas — métricas
+
+> Solo clases con al menos una señal. `LOC lóg.` y `Mét. lóg.` descuentan getters/setters; `LCOM` es la cantidad de pares de métodos sin campos en común.
+
+| Clase | Archivo | Línea | LOC lóg. | Mét. lóg. | Campos | CBO | LCOM | Cohesión | WMC | RFC | Señales |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| `RenderizadorCapasLienzo2D` | `app/src/main/kotlin/org/example/ui/simulacion/RenderizadorCapasLienzo2D.kt` | 16 | 122 | 10 | 1 | 8 | 0 | 100% | 30 | 50 | acoplamiento alto×1 |
+| `ControladorSimulacion` | `app/src/main/kotlin/org/example/ui/simulacion/ControladorSimulacion.kt` | 12 | 91 | 17 | 13 | 8 | 61 | 55% | 28 | 52 | acoplamiento alto×1 |
+| `ConstructorVistaPractica` | `app/src/main/kotlin/org/example/ui/practica/componentes/ConstructorVistaPractica.kt` | 29 | 84 | 12 | 15 | 8 | 0 | 100% | 25 | 62 | acoplamiento alto×1 |
+| `CartesianChartCanvas` | `app/src/main/kotlin/org/example/ui/simulacion/graficos/CartesianChartCanvas.kt` | 14 | 71 | 13 | 5 | 8 | 8 | 90% | 24 | 54 | acoplamiento alto×1 |
+| `AppState` | `app/src/main/kotlin/org/example/state/AppState.kt` | 12 | 64 | 14 | 7 | 6 | 52 | 43% | 24 | 38 | baja cohesión×1 |
+| `LienzoSimulacion2D` | `app/src/main/kotlin/org/example/ui/simulacion/LienzoSimulacion2D.kt` | 12 | 48 | 6 | 4 | 9 | 2 | 87% | 9 | 37 | acoplamiento alto×1 |
+
+### Umbrales aplicados (perfil exigente)
+
+| Señal | Regla |
+|---|---|
+| Clase grande (SRP) | ≥ 200 LOC lógico, o ≥ 15 métodos con lógica y ≥ 100 LOC lógico; no cuentan getters/setters. |
+| Baja cohesión (LCOM) | < 50 % de pares de métodos comparten algún campo, con ≥ 4 métodos con lógica y ≥ 3 campos. |
+| Complejidad alta | algún método con complejidad ciclomática ≥ 10. |
+| Método largo | ≥ 30 líneas. |
+| Muchos parámetros | > 4 parámetros (5 o más). |
+| Acoplamiento alto (CBO) | CBO ≥ 8. |
+| Herencia profunda | DIT ≥ 3. |
+| Type-check / switch de tipos | ≥ 1 cadena de type-check. |
+| Interfaz demasiado grande (ISP) | > 6 métodos (7 o más). |
+| Override vacío (LSP) | método vacío o marcado como 'no implementado'. |
+| Clase solo de datos | 0 métodos y ≥ 3 campos. |
+| Campos mutables públicos | ≥ 4 campos mutables públicos y ≥ 4 campos. |
+| Clase estática | ≥ 2 métodos y todos estáticos. |
+| Duplicación lógica | ventana de 8 líneas; solo lógica; se informa desde 1 %. |
+
 ### Desglose de la columna S (SRP)
 
 > La columna **S** no es un puntaje: cuenta **señales** de SRP. Aquí suma **1** entrada(s) sobre **1** clase(s) distinta(s).
@@ -219,14 +276,14 @@ Cada aspecto indica **qué mide**, **por qué importa** y **tu resultado**. Cuan
 
 ## 5. Evolución por commit
 
-Métricas calculadas sobre el estado de `main` en **cada commit** (30 commits con trabajo), del primero al último. La calidad usa el perfil `exigente`; el aporte de código lo mide RepoSense. El índice puede **bajar** al crecer el proyecto: se acumulan señales.
+Métricas calculadas sobre el estado de `main` en **cada commit** (31 commits con trabajo), del primero al último. La calidad usa el perfil `exigente`; el aporte de código lo mide RepoSense. El índice puede **bajar** al crecer el proyecto: se acumulan señales.
 
 ```mermaid
 xychart-beta
     title "Índice POO/SOLID a lo largo de los commits"
-    x-axis ["f5b4533", "0407e5e", "dd3780e", "d36b80c", "34979f5", "5b92c65", "2e89df6", "39d9b06", "0a667a3", "76a2cc8", "4b1ecf0", "27cb813", "5bef311", "e6fe907", "0c98bef", "99acd6f", "102d464", "83d8f29", "619c674", "a4c334e", "789b8bd", "69e56f5", "8377be5", "30e9a7b", "f9983fc", "1c98343", "eb1ae87", "1722af0", "e75f4c0", "a6bb9a4"]
+    x-axis ["f5b4533", "0407e5e", "dd3780e", "d36b80c", "34979f5", "5b92c65", "2e89df6", "39d9b06", "0a667a3", "76a2cc8", "4b1ecf0", "27cb813", "5bef311", "e6fe907", "0c98bef", "99acd6f", "102d464", "83d8f29", "619c674", "a4c334e", "789b8bd", "69e56f5", "8377be5", "30e9a7b", "f9983fc", "1c98343", "eb1ae87", "1722af0", "e75f4c0", "a6bb9a4", "3a44171"]
     y-axis "Índice" 0 --> 100
-    line [0, 0, 0, 50, 60, 60, 77, 82, 68, 76, 60, 56, 56, 59, 61, 61, 61, 61, 61, 92, 92, 92, 92, 92, 92, 92, 93, 93, 93, 93]
+    line [0, 0, 0, 50, 60, 60, 77, 82, 68, 76, 60, 56, 56, 59, 61, 61, 61, 61, 61, 92, 92, 92, 92, 92, 92, 92, 93, 93, 93, 93, 93]
 ```
 
 | # | Fecha | Commit | Autor | LOC | Índice | %POO | Duplic. | Sueltas |
@@ -261,89 +318,7 @@ xychart-beta
 | 28 | 2026-11-20 | `1722af0` | dqmdz-etec | 6,302 | 93 | 99% | 1.8% | 0 |
 | 29 | 2026-11-20 | `e75f4c0` | dqmdz-etec | 6,302 | 93 | 99% | 1.8% | 0 |
 | 30 | 2026-11-20 | `a6bb9a4` | dqmdz-etec | 6,302 | 93 | 99% | 1.8% | 0 |
-
-<!-- actividad-clases:inicio -->
-## Actividad en días de clase
-
-> Período evaluado **2026-08-14 → 2026-11-20** · **23 clases** (lunes, viernes) · días de clase del calendario, extendidos hasta la fecha de corte.
->
-> `Commits` = commits de trabajo (no-merge); `Merges` = merges de PR (también son push). Los días sin actividad dicen **sin actividad**. El cuadro principal usa sólo las fechas de clase del calendario oficial.
->
-> **Aportes fuera del calendario:** cada alumno tiene un cuadro aparte con las fechas no lectivas con actividad, desde **2026-08-14** hasta **2026-11-20** (ventana de aportes). Esas fechas no forman parte del cuadro principal, pero se muestran para no perder trabajo hecho en fines de semana, feriados o después del período.
->
-> Se recorre `git log --all` sobre un mirror (todas las ramas y `refs/pull/*`), con deduplicación por commit. Fecha = fecha de autor en UTC-3. Los commits locales no pusheados no se ven. Si el trabajo fue en pareja y el commit es de otra persona, figura a nombre del autor del commit; para reflejarlo, usar `Co-authored-by` o una nota manual.
->
-> Sección informativa: no modifica el semáforo de aprobación.
-
-### avsalomon
-
-**13/23 clases con actividad** · 17 commits · 17 merges
-
-| Fecha | Marca | Repositorios | Commits / merges |
-|---|:--:|---|--:|
-| 2026-08-14 | No | sin actividad | 0 / 0 |
-| 2026-08-21 | No | sin actividad | 0 / 0 |
-| 2026-08-24 | No | sin actividad | 0 / 0 |
-| 2026-08-28 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-08-31 | No | sin actividad | 0 / 0 |
-| 2026-09-04 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 2 |
-| 2026-09-07 | No | sin actividad | 0 / 0 |
-| 2026-09-14 | No | sin actividad | 0 / 0 |
-| 2026-09-25 | No | sin actividad | 0 / 0 |
-| 2026-09-28 | No | sin actividad | 0 / 0 |
-| 2026-10-02 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 0 |
-| 2026-10-05 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 2 |
-| 2026-10-09 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 3 / 3 |
-| 2026-10-16 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 2 / 3 |
-| 2026-10-19 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-10-23 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 2 / 1 |
-| 2026-10-26 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 0 / 1 |
-| 2026-10-30 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-11-02 | No | sin actividad | 0 / 0 |
-| 2026-11-06 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-11-13 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-11-16 | No | sin actividad | 0 / 0 |
-| 2026-11-20 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 2 / 0 |
-
-#### Aportes fuera del calendario de clases — avsalomon
-
-_Sin aportes fuera del calendario de clases para avsalomon._
-
-### Romano-22
-
-**5/23 clases con actividad** · 12 commits · 5 merges
-
-| Fecha | Marca | Repositorios | Commits / merges |
-|---|:--:|---|--:|
-| 2026-08-14 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 4 / 1 |
-| 2026-08-21 | No | sin actividad | 0 / 0 |
-| 2026-08-24 | No | sin actividad | 0 / 0 |
-| 2026-08-28 | No | sin actividad | 0 / 0 |
-| 2026-08-31 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 2 / 0 |
-| 2026-09-04 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 4 / 2 |
-| 2026-09-07 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-09-14 | No | sin actividad | 0 / 0 |
-| 2026-09-25 | No | sin actividad | 0 / 0 |
-| 2026-09-28 | No | sin actividad | 0 / 0 |
-| 2026-10-02 | **Sí** | proyecto-fisica--Tiro-Oblicuo | 1 / 1 |
-| 2026-10-05 | No | sin actividad | 0 / 0 |
-| 2026-10-09 | No | sin actividad | 0 / 0 |
-| 2026-10-16 | No | sin actividad | 0 / 0 |
-| 2026-10-19 | No | sin actividad | 0 / 0 |
-| 2026-10-23 | No | sin actividad | 0 / 0 |
-| 2026-10-26 | No | sin actividad | 0 / 0 |
-| 2026-10-30 | No | sin actividad | 0 / 0 |
-| 2026-11-02 | No | sin actividad | 0 / 0 |
-| 2026-11-06 | No | sin actividad | 0 / 0 |
-| 2026-11-13 | No | sin actividad | 0 / 0 |
-| 2026-11-16 | No | sin actividad | 0 / 0 |
-| 2026-11-20 | No | sin actividad | 0 / 0 |
-
-#### Aportes fuera del calendario de clases — Romano-22
-
-_Sin aportes fuera del calendario de clases para Romano-22._
-
-<!-- actividad-clases:fin -->
+| 31 | 2026-11-20 | `3a44171` | dqmdz-etec | 6,302 | 93 | 99% | 1.8% | 0 |
 
 ---
 _Informe generado por la cátedra. Los criterios y umbrales de medición corresponden al perfil `exigente` de `calidad.py`; el semáforo de aprobación, a `CRITERIOS-CALIDAD.md` (ver `README.md`). Ante dudas, revisá el archivo señalado._
